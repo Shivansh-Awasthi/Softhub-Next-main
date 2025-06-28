@@ -36,6 +36,8 @@ const CreateApps = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [userData, setUserData] = useState(null);
     const [showTagSelector, setShowTagSelector] = useState(false);
+    const [gameMode, setGameMode] = useState("");
+    const [releaseYear, setReleaseYear] = useState("");
     const fileInputRef = useRef(null);
     const thumbnailInputRef = useRef(null);
 
@@ -154,6 +156,8 @@ const CreateApps = () => {
         formData.append('price', price);
         formData.append('size', `${size} ${unit}`);
         formData.append('category', category);
+        formData.append('gameMode', gameMode);
+        formData.append('releaseYear', releaseYear);
 
         // Format system requirements as backend expects
         formData.append('systemRequirements', JSON.stringify({
@@ -371,6 +375,46 @@ const CreateApps = () => {
                                                 <option key={cat.value} value={cat.value}>{cat.label}</option>
                                             ))}
                                         </select>
+                                    </div>
+
+                                    {/* Game Mode */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2a4 4 0 014-4h3a4 4 0 014 4v2" />
+                                            </svg>
+                                            Game Mode
+                                        </label>
+                                        <select
+                                            value={gameMode}
+                                            onChange={e => setGameMode(e.target.value)}
+                                            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-300"
+                                            required
+                                        >
+                                            <option value="">Select Game Mode</option>
+                                            <option value="Single Player">Single Player</option>
+                                            <option value="Multiplayer">Multiplayer</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Release Year */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
+                                            </svg>
+                                            Release Year
+                                        </label>
+                                        <input
+                                            type="number"
+                                            placeholder="e.g. 2025"
+                                            value={releaseYear}
+                                            onChange={e => setReleaseYear(e.target.value)}
+                                            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-300"
+                                            min="1970"
+                                            max="2100"
+                                            required
+                                        />
                                     </div>
 
                                     {/* Pricing Section */}
