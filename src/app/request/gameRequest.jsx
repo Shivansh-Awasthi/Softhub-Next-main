@@ -345,31 +345,72 @@ export default function GameRequestForm() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {stages.map((stage, index) => (
-                            <div
-                                key={index}
-                                className={`bg-[#1A2739] rounded-2xl shadow-lg p-8 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl ${stage.hoverColor}`}
-                            >
-                                <div className="flex flex-col items-center">
-                                    {/* Icon with colored background */}
-                                    <div className={`${stage.color} p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6 text-white`}>
-                                        {stage.icon}
+                    <div className="relative flex flex-col lg:flex-row items-stretch justify-between gap-6  mt-12">
+                        {/* Timeline line */}
+                        <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-[#232b39] z-0" style={{ transform: 'translateY(-50%)' }} />
+                        {/* Pending */}
+                        <div className="relative z-10 w-full lg:w-1/4">
+                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-blue-500/40 hover:ring-2 hover:ring-blue-500/40">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-[#22335a] rounded-xl p-3 flex items-center justify-center">
+                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-blue-400">
+                                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" />
+                                        </svg>
                                     </div>
-
-                                    <h3 className="text-2xl font-bold text-white mb-4">{stage.title}</h3>
-
-                                    <ul className="space-y-3 text-gray-400 w-full">
-                                        {stage.points.map((point, idx) => (
-                                            <li key={idx} className="flex items-start">
-                                                <span className="inline-block h-2 w-2 rounded-full bg-gray-400 mt-2 mr-3"></span>
-                                                <span>{point}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
                                 </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Pending</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-center gap-2 text-blue-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>Need 20 votes</li>
+                                    <li className="flex items-center gap-2 text-blue-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" /></svg>Within 5 days</li>
+                                </ul>
                             </div>
-                        ))}
+                        </div>
+                        {/* Processing */}
+                        <div className="relative z-10 w-full lg:w-1/4">
+                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-yellow-500/40 hover:ring-2 hover:ring-yellow-500/40">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-[#4b3a1a] rounded-xl p-3 flex items-center justify-center">
+                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-yellow-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><circle cx="12" cy="12" r="5" fill="#facc15" /></svg>
+                                    </div>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Processing</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-center gap-2 text-yellow-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Quality check</li>
+                                    <li className="flex items-center gap-2 text-yellow-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" /></svg>~24h processing time</li>
+                                </ul>
+                            </div>
+                        </div>
+                        {/* Approved (with glow) */}
+                        <div className="relative z-10 w-full lg:w-1/4">
+                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-green-500/40 hover:ring-2 hover:ring-green-500/40">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-[#1a3a2a] rounded-xl p-3 flex items-center justify-center">
+                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-green-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>
+                                    </div>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Approved</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-center gap-2 text-green-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /><polyline points="7 11 12 16 17 11" /></svg>Ready for download</li>
+                                    <li className="flex items-center gap-2 text-green-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>Files verified</li>
+                                </ul>
+                            </div>
+                        </div>
+                        {/* Rejected */}
+                        <div className="relative z-10 w-full lg:w-1/4">
+                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-red-500/40 hover:ring-2 hover:ring-red-500/40">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-[#3a1a2a] rounded-xl p-3 flex items-center justify-center">
+                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-pink-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9l-6 6m0-6l6 6" /></svg>
+                                    </div>
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-2">Rejected</h3>
+                                <ul className="space-y-2">
+                                    <li className="flex items-center gap-2 text-pink-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16h.01" /></svg>Less than 20 votes</li>
+                                    <li className="flex items-center gap-2 text-pink-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 9l6 6m0-6l-6 6" /></svg>Removed in 3 days</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
