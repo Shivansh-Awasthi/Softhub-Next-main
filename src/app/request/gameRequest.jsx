@@ -131,43 +131,50 @@ export default function GameRequestForm() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Submit Game Card */}
-                        <div className="bg-[#1A2739] rounded-xl shadow-2xl p-8 transform transition-all hover:scale-105">
-                            <div className="flex justify-center mb-6">
-                                <div className="bg-blue-100 p-4 rounded-full">
-                                    <FaGamepad className="text-blue-600 text-4xl" />
+                        {/* Step 1: Submit Game */}
+                        <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-3 flex items-center justify-center">
+                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.862 3.487a2.25 2.25 0 113.182 3.182l-9.193 9.193a2.25 2.25 0 01-.797.53l-3.25 1.25a.5.5 0 01-.65-.65l1.25-3.25a2.25 2.25 0 01.53-.797l9.193-9.193z" />
+                                    </svg>
                                 </div>
+                                <span className="text-blue-400 font-medium text-base">Step 1</span>
                             </div>
-                            <h2 className="text-2xl font-bold text-center text-white mb-4">Submit Game</h2>
-                            <p className="text-gray-500 text-center">
-                                Share the Steam link and details for the game you want added to our library.
-                            </p>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-1">Submit Game</h2>
+                                <p className="text-[#b2b9c9] text-base font-normal">Share the Steam link and details for the game you want added to our library.</p>
+                            </div>
                         </div>
-
-                        {/* Get Votes Card */}
-                        <div className="bg-[#1A2739] rounded-xl shadow-2xl p-8 transform transition-all hover:scale-105">
-                            <div className="flex justify-center mb-6">
-                                <div className="bg-blue-100 p-4 rounded-full">
-                                    <FaVoteYea className="text-blue-600 text-4xl" />
+                        {/* Step 2: Get Votes */}
+                        <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-3 flex items-center justify-center">
+                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4a4 4 0 10-8 0 4 4 0 008 0zm6 4a4 4 0 00-3-3.87M6 10a4 4 0 00-3 3.87" />
+                                    </svg>
                                 </div>
+                                <span className="text-blue-400 font-medium text-base">Step 2</span>
                             </div>
-                            <h2 className="text-2xl font-bold text-center text-white mb-4">Get Votes</h2>
-                            <p className="text-gray-500 text-center">
-                                Gather community support. Your request needs 20 votes for priority processing.
-                            </p>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-1">Get Votes</h2>
+                                <p className="text-[#b2b9c9] text-base font-normal">Gather community support. Your request needs 20 votes for priority processing.</p>
+                            </div>
                         </div>
-
-                        {/* Fast Processing Card */}
-                        <div className="bg-[#1A2739] rounded-xl shadow-2xl p-8 transform transition-all hover:scale-105">
-                            <div className="flex justify-center mb-6">
-                                <div className="bg-blue-100 p-4 rounded-full">
-                                    <FaBolt className="text-blue-600 text-4xl" />
+                        {/* Step 3: Fast Processing */}
+                        <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-3 flex items-center justify-center">
+                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-white">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
                                 </div>
+                                <span className="text-blue-400 font-medium text-base">Step 3</span>
                             </div>
-                            <h2 className="text-2xl font-bold text-center text-white mb-4">Fast Processing</h2>
-                            <p className="text-gray-500 text-center">
-                                Once approved, your request is processed within 24 hours.
-                            </p>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-1">Fast Processing</h2>
+                                <p className="text-[#b2b9c9] text-base font-normal">Once approved, your request is processed within 24 hours.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
