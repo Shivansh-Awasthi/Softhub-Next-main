@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { jwtDecode } from 'jwt-decode';
 
 const CreateApps = () => {
     const router = useRouter();
@@ -33,26 +34,35 @@ const CreateApps = () => {
     });
     const [loading, setLoading] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [userData, setUserData] = useState(null);
     const [showTagSelector, setShowTagSelector] = useState(false);
     const fileInputRef = useRef(null);
     const thumbnailInputRef = useRef(null);
 
     useEffect(() => {
-        const checkAdminStatus = () => {
-            try {
-                const role = localStorage.getItem('role');
-                if (!role || role !== 'ADMIN') {
-                    toast.error('Unauthorized access. Redirecting to home page...');
-                    setTimeout(() => router.push('/'), 2000);
-                } else {
-                    setIsAdmin(true);
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const decoded = jwtDecode(token);
+                    setUserData(decoded);
+                    if (decoded.role === 'ADMIN') {
+                        setIsAdmin(true);
+                    } else {
+                        toast.error('Unauthorized access. Redirecting to home page...');
+                        setTimeout(() => router.push('/'), 2000);
+                    }
+                } catch (err) {
+                    console.error('Failed to decode JWT token:', err);
+                    setUserData(null);
+                    router.push('/');
                 }
-            } catch (error) {
-                console.error('Error checking admin status:', error);
-                router.push('/');
+            } else {
+                setUserData(null);
+                toast.error('Unauthorized access. Redirecting to home page...');
+                setTimeout(() => router.push('/'), 2000);
             }
-        };
-        checkAdminStatus();
+        }
     }, [router]);
 
     const handleThumbnail = (e) => {
@@ -101,8 +111,19 @@ const CreateApps = () => {
         e.preventDefault();
         setLoading(true);
 
-        const role = localStorage.getItem('role');
-        if (!role || role !== 'ADMIN') {
+        const token = localStorage.getItem('token');
+        let decoded = null;
+        if (token) {
+            try {
+                decoded = jwtDecode(token);
+            } catch (err) {
+                toast.error('Invalid token. Please login again.');
+                setLoading(false);
+                router.push('/');
+                return;
+            }
+        }
+        if (!decoded || decoded.role !== 'ADMIN') {
             toast.error('Unauthorized access. Only admins can create apps.');
             setTimeout(() => router.push('/'), 2000);
             setLoading(false);
