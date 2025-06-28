@@ -10,7 +10,7 @@ export default function AdminDashboard() {
     // You can add admin authentication/role check here (fetch user, check role)
     // For now, assume admin is authenticated and authorized
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 py-12 px-2 md:px-8">
+        <div className="min-h-screen py-12 px-2 md:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col items-center mb-12">
                     <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full p-4 shadow-lg mb-4 animate-fadeIn">

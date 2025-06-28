@@ -34,9 +34,9 @@ export default function AdminBulkActions() {
     }
 
     return (
-        <div className="bg-blue-50 rounded-xl shadow p-4 mb-6 flex items-center space-x-4">
-            <span className="font-semibold">Bulk Status Update:</span>
-            <select value={status} onChange={e => setStatus(e.target.value)} className="border rounded px-2 py-1">
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 border border-blue-800">
+            <span className="font-semibold text-blue-200 text-lg">Bulk Status Update:</span>
+            <select value={status} onChange={e => setStatus(e.target.value)} className="border-2 border-blue-700 rounded-lg px-3 py-2 bg-[#1A2739] text-blue-100 font-semibold focus:ring-2 focus:ring-blue-400">
                 <option value="">Select status</option>
                 {['pending', 'processing', 'approved', 'rejected', 'deleted'].map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -45,11 +45,11 @@ export default function AdminBulkActions() {
             <button
                 onClick={handleBulkUpdate}
                 disabled={loading || !status || selected.length === 0}
-                className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 disabled:opacity-50"
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-2 rounded-lg font-bold shadow hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all disabled:opacity-50"
             >
                 Update Selected
             </button>
-            {message && <span className="ml-4 text-blue-700">{message}</span>}
+            {message && <span className="ml-4 text-blue-400 font-semibold">{message}</span>}
         </div>
     );
 }
