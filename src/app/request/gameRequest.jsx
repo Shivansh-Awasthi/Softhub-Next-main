@@ -202,13 +202,6 @@ export default function GameRequestForm() {
                                             />
                                         </div>
                                     </div>
-                                    <textarea
-                                        placeholder="Description"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        className="w-full border p-2 rounded"
-                                        rows={3}
-                                    />
                                     <select
                                         value={platform}
                                         onChange={(e) => setPlatform(e.target.value)}
@@ -219,10 +212,7 @@ export default function GameRequestForm() {
                                         <option value="PC">PC</option>
                                         <option value="Mac">Mac</option>
                                         <option value="Android">Android</option>
-                                        <option value="iOS">iOS</option>
                                         <option value="Playstation">Playstation</option>
-                                        <option value="Xbox">Xbox</option>
-                                        <option value="Switch">Switch</option>
                                     </select>
 
                                     <div>

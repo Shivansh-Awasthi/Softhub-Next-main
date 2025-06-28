@@ -13,6 +13,7 @@ const STATUS_META = {
         glow: "shadow-[0_0_24px_0_rgba(59,130,246,0.4)]",
         border: "border-blue-600",
         textColor: "text-blue-400",
+        tagColor: "bg-blue-900/30 text-blue-200",
         desc: "Support your favorite games and help them reach our library. Games with 20 or more community votes get priority processing.",
         success: { label: "Success Rate", value: "85%", color: "text-blue-400" },
     },
@@ -24,6 +25,7 @@ const STATUS_META = {
         glow: "shadow-[0_0_24px_0_rgba(234,179,8,0.4)]",
         border: "border-yellow-500",
         textColor: "text-yellow-400",
+        tagColor: "bg-yellow-900/30 text-yellow-200",
         desc: "Games that have reached the vote threshold and are being processed by our team.",
         success: { label: "Est. Time", value: "24h", color: "text-yellow-400" },
     },
@@ -35,6 +37,7 @@ const STATUS_META = {
         glow: "shadow-[0_0_24px_0_rgba(34,197,94,0.4)]",
         border: "border-green-600",
         textColor: "text-green-400",
+        tagColor: "bg-green-900/30 text-green-200",
         desc: "Successfully processed games ready for download. Get them while they are fresh!",
         success: { label: "Success Rate", value: "97%", color: "text-green-400" },
     },
@@ -46,6 +49,7 @@ const STATUS_META = {
         glow: "shadow-[0_0_24px_0_rgba(239,68,68,0.4)]",
         border: "border-red-600",
         textColor: "text-red-400",
+        tagColor: "bg-red-900/30 text-red-200",
         desc: "These requests did not meet our requirements or lacked sufficient community support. They will be automatically removed after 3 days.",
         success: { label: "Auto Removal", value: "3 Days", color: "text-red-400" },
     },
@@ -89,11 +93,20 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
     const meta = STATUS_META[status];
     const votesNeeded = Math.max(0, 20 - req.votes);
     const percent = Math.round((req.votes / 20) * 100);
-    const timeAgo = req.timeAgo || "3 days ago"; // Replace with real time logic
+    const timeAgo = req.timeAgo || "3 days ago";
+    const platform = req.platform || "PC";
+
     return (
         <div
-            className={`relative bg-[#181e29] rounded-2xl border ${meta.border} p-6 flex flex-col min-h-[320px] transition-all duration-200 ${glow ? meta.glow : "hover:shadow-xl hover:scale-[1.03]"}`}
+            className={`relative bg-[#181e29] rounded-2xl border ${meta.border} pt-5 pb-5 px-5 p flex flex-col min-h-[320px] transition-all duration-200 ${glow ? meta.glow : "hover:shadow-xl hover:scale-[1.03]"}`}
         >
+            {/* Centered Platform Tag */}
+            <div className="flex justify-center -mt-3 mb-2">
+                <div className={`px-3 py-1 rounded-full text-xs font-bold ${meta.tagColor} shadow-lg`}>
+                    {platform}
+                </div>
+            </div>
+
             {/* Top bar */}
             <div className="flex items-center justify-between mb-4">
                 <span className="text-white font-bold text-lg truncate max-w-[70%]">{req.title}</span>
@@ -107,6 +120,7 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
                     <span className="bg-[#232b3a] text-red-200 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><FaTimes className="inline" /> Rejected</span>
                 )}
             </div>
+
             {/* Progress/Status */}
             <div className="flex flex-col items-center mb-4">
                 {status === "pending" && (
@@ -153,6 +167,7 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
                     </div>
                 )}
             </div>
+
             {/* View on Steam */}
             {req.steamLink && (
                 <a
@@ -164,6 +179,7 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
                     <FaExternalLinkAlt className="text-base" /> View on Steam
                 </a>
             )}
+
             {/* Vote/Share Button */}
             {status === "pending" && (
                 <button
@@ -180,16 +196,29 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
                     )}
                 </button>
             )}
+
             {/* Footer */}
             <div className="flex items-center justify-between mt-4 text-xs text-gray-400">
                 <span>
                     {status === "pending" && `Requested ${timeAgo}`}
-                    {status === "processing" && `Started processing `}
+                    {status === "processing" && (
+                        <div>
+                            Started processing<br />
+                            {timeAgo}
+                        </div>
+                    )}
                     {status === "approved" && `Approved ${timeAgo}`}
-                    {status === "rejected" && `Rejected ${timeAgo}. Auto removal in 3 days`}
+                    {status === "rejected" && (
+                        <>
+                            Rejected {timeAgo}
+                            <br />
+                            Auto deleted in 7 days
+                        </>
+                    )}
+
                 </span>
                 <span className="flex items-center gap-1">
-                    <FaUsers className={`${meta.textColor}`} />
+                    <FaUsers className={meta.textColor} />
                     <span className={`font-bold ${meta.textColor}`}>{req.votes} requests</span>
                 </span>
             </div>
@@ -243,7 +272,12 @@ export default function GameRequestList() {
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    setRequests(data.filter((r) => STATUS_ORDER.includes(r.status)));
+                    // Add platforms to the requests (in real app, this would come from backend)
+                    const requestsWithPlatforms = data.map(req => ({
+                        ...req,
+                        platform: req.platform || ["PC", "Mac", "Android", "iOS"][Math.floor(Math.random() * 4)]
+                    }));
+                    setRequests(requestsWithPlatforms.filter((r) => STATUS_ORDER.includes(r.status)));
                 } else {
                     setError(data.error || data.message || "Failed to load requests.");
                 }
@@ -323,7 +357,7 @@ export default function GameRequestList() {
                             </div>
                         </div>
                         {/* Cards Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {cards.slice(0, cardsToShow).map((req, idx) => (
                                 <RequestCard
                                     key={req._id}
