@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { FaHeart, FaCheck, FaClock, FaCog, FaTimesCircle, FaSteam, FaInfoCircle, FaExclamationTriangle, FaCheckCircle, FaGamepad, FaVoteYea, FaBolt } from 'react-icons/fa';
+import { FaHeart, FaPlus, FaClock, FaCog, FaTimesCircle, FaSteam, FaInfoCircle, FaExclamationTriangle, FaCheckCircle, FaGamepad, FaVoteYea, FaBolt } from 'react-icons/fa';
 
 
 // PopupModal: Modern, reusable modal for error/info messages
@@ -185,10 +185,11 @@ export default function GameRequestForm() {
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Left Column - Form */}
-                            <div className="lg:col-span-2 bg-[#1A2739] rounded-2xl shadow-xl p-8">
-                                <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="lg:col-span-2 bg-[#101928]/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-[#232c3a]">
+                                <form onSubmit={handleSubmit} className="space-y-7">
+                                    {/* Game Title */}
                                     <div>
-                                        <label htmlFor="gameTitle" className="block text-lg font-medium text-white mb-2">
+                                        <label htmlFor="gameTitle" className="block text-base font-semibold text-white mb-2 tracking-wide">
                                             Game Title
                                         </label>
                                         <div className="relative">
@@ -198,102 +199,85 @@ export default function GameRequestForm() {
                                                 value={title}
                                                 onChange={(e) => setTitle(e.target.value)}
                                                 required
-                                                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                                maxLength={191}
+                                                className="w-full px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
                                             />
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#7b8597]">{title.length}/191</span>
                                         </div>
+                                        {/* Example error message (replace with your error state if needed) */}
+                                        {/* <p className="mt-1 text-sm text-red-400">The title field is required.</p> */}
                                     </div>
-                                    <select
-                                        value={platform}
-                                        onChange={(e) => setPlatform(e.target.value)}
-                                        required
-                                        className="w-full border p-2 rounded"
-                                    >
-                                        <option value="">Select Platform</option>
-                                        <option value="PC">PC</option>
-                                        <option value="Mac">Mac</option>
-                                        <option value="Android">Android</option>
-                                        <option value="Playstation">Playstation</option>
-                                    </select>
 
+                                    {/* Steam Store URL */}
                                     <div>
-                                        <label htmlFor="steamUrl" className="block text-lg font-medium text-white mb-2">
+                                        <label htmlFor="steamUrl" className="block text-base font-semibold text-white mb-2 tracking-wide">
                                             Steam Store URL
                                         </label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
-                                                <FaSteam className="text-xl text-[#fff]" />
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <FaSteam className="text-xl text-[#7b8597]" />
                                             </div>
                                             <input
                                                 type="url"
-                                                placeholder="Steam Link (optional)"
+                                                placeholder="https://store.steampowered.com/app/..."
                                                 value={steamLink}
                                                 onChange={(e) => setSteamLink(e.target.value)}
-                                                className="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                                className="w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
                                             />
+                                            {/* Example valid/invalid state (replace with your validation logic) */}
+                                            {/* <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-green-400">✓ Valid URL</span> */}
+                                            {/* <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-red-400">The steam link field is required.</span> */}
                                         </div>
                                     </div>
-                                    <div className="space-y-4">
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5 mt-1">
-                                                <input
-                                                    id="verification"
-                                                    type="checkbox"
-                                                    className="w-5 h-5 text-blue-600 rounded focus:ring-cyan-500"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="ml-3">
-                                                <label htmlFor="verification" className="text-gray-400">
-                                                    I verify that this game has been officially released and is patched by Steam groups at P2P community.
-                                                    <a href="#" className="text-blue-600 hover:text-blue-800 ml-1 inline-flex items-center">
-                                                        What is Denover? <FaInfoCircle className="ml-1" />
-                                                    </a>
-                                                </label>
-                                            </div>
-                                        </div>
 
-                                        {/* Notice Box */}
-                                        <div className="p-4 rounded-xl bg-yellow-50 border-l-4 border-yellow-400">
-                                            <div className="flex">
-                                                <div className="flex-shrink-0">
-                                                    <FaExclamationTriangle className="h-5 w-5 text-yellow-500" />
-                                                </div>
-                                                <div className="ml-3">
-                                                    <h3 className="text-sm font-medium text-yellow-800">Imperient Notice</h3>
-                                                    <div className="mt-2 text-sm text-yellow-700">
-                                                        <p>
-                                                            Camus protruded by Denovo DSM cannot be published on our platform. Please verify the game's DSM status before submitting your request to avoid rejection.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    {/* Release Verification Checkbox */}
+                                    <div className="flex items-start bg-transparent rounded-lg py-2">
+                                        <input
+                                            id="verification"
+                                            type="checkbox"
+                                            className="w-5 h-5 accent-blue-600 rounded border border-[#232c3a] mt-1 focus:ring-blue-500"
+                                            required
+                                        />
+                                        <label htmlFor="verification" className="ml-3 text-[#b2b9c9] text-sm select-none">
+                                            I verify that this game has been officially released and is patched by Scene groups or P2P community.
+                                            <a href="#" className="text-blue-400 hover:underline ml-1 inline-flex items-center">
+                                                What is Denuvo? <FaInfoCircle className="ml-1" />
+                                            </a>
+                                        </label>
+                                    </div>
 
-                                        {/* Info Box */}
-                                        <div className="p-4 rounded-xl bg-blue-50 border-l-4 border-blue-400">
-                                            <div className="flex">
-                                                <div className="flex-shrink-0">
-                                                    <FaInfoCircle className="h-5 w-5 text-blue-500" />
-                                                </div>
-                                                <div className="ml-3">
-                                                    <h3 className="text-sm font-medium text-blue-800">Request Processing Information</h3>
-                                                    <div className="mt-2 text-sm text-blue-700">
-                                                        <p>
-                                                            Requests require 20+ community votes for priority processing. Average processing time is 24 hours after reaching the threshold.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    {/* Important Notice */}
+                                    <div className="p-4 rounded-xl bg-[#2a1a13]/80 border border-[#ffb86b] flex items-start gap-3">
+                                        <FaExclamationTriangle className="h-5 w-5 text-yellow-400 mt-1" />
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-yellow-200 mb-1">Important Notice</h3>
+                                            <p className="text-sm text-yellow-100">
+                                                Games protected by Denuvo DRM cannot be published on our platform. Please verify the game's DRM status before submitting your request to avoid rejection.
+                                            </p>
                                         </div>
                                     </div>
+
+                                    {/* Request Processing Info */}
+                                    <div className="p-4 rounded-xl bg-[#1a2233]/80 border border-[#3b4a6b] flex items-start gap-3">
+                                        <FaInfoCircle className="h-5 w-5 text-blue-400 mt-1" />
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-blue-200 mb-1">Request Processing Information</h3>
+                                            <p className="text-sm text-blue-100">
+                                                Requests require 20+ community votes for priority processing. Average processing time is 24 hours after reaching the threshold.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Submit Button */}
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-medium rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-800 transform transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                                        className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 text-lg mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
+                                        <FaPlus className="text-xl" />
                                         {loading ? "Submitting..." : "Submit Request"}
                                     </button>
-                                    {message && <div className="text-center text-sm mt-2">{message}</div>}
+                                    {message && <div className="text-center text-sm mt-2 text-green-400">{message}</div>}
                                 </form>
                             </div>
                             {/* right card */}
