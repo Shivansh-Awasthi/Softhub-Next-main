@@ -229,21 +229,34 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
 function PopupModal({ open, message, onClose }) {
     if (!open) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center relative animate-fadeIn">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
+            <div className="bg-[#232b39] border border-[#2e3748] rounded-2xl shadow-2xl max-w-md w-full p-8 pt-7 relative animate-fadeIn">
+                {/* Top blue border */}
+                <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-indigo-500" />
+                {/* Close button */}
+                <button onClick={onClose} className="absolute top-4 right-4 text-[#7b8597] hover:text-blue-400 text-xl focus:outline-none">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
                 <div className="flex flex-col items-center">
-                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full p-4 mb-4">
-                        <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                    <div className="bg-[#22335a] rounded-full p-4 mb-4">
+                        <svg className="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
                         </svg>
                     </div>
-                    <div className="text-xl font-semibold text-gray-800 mb-2">Notice</div>
-                    <div className="text-gray-600 mb-6">{message}</div>
+                    <div className="text-2xl font-bold text-white mb-2">Daily Vote Used</div>
+                    <div className="text-base text-[#b2b9c9] mb-6 text-center">{message}</div>
+                    <div className="w-full mb-6">
+                        <div className="flex items-center gap-2 bg-[#22335a]/60 border border-blue-700 rounded-xl px-4 py-3">
+                            <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" /></svg>
+                            <span className="text-blue-200 text-sm">Your vote helps determine which games get priority processing!</span>
+                        </div>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg font-bold shadow hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all"
+                        className="w-full py-3 bg-[#313a4d] text-white rounded-xl font-semibold shadow hover:bg-[#3a4560] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all text-lg"
                     >
-                        OK
+                        Close
                     </button>
                 </div>
             </div>
