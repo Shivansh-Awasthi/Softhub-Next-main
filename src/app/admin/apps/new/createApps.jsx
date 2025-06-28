@@ -546,10 +546,10 @@ const CreateApps = () => {
                                                                 type="button"
                                                                 onClick={() => toggleTag(tag)}
                                                                 className={`px-3 py-1 rounded-full text-xs font-medium ${tags.includes(tag)
-                                                                        ? 'bg-purple-600 text-white'
-                                                                        : tags.length >= 15
-                                                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                                                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                                                    ? 'bg-purple-600 text-white'
+                                                                    : tags.length >= 15
+                                                                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                                                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                                                     }`}
                                                             >
                                                                 {tag}
