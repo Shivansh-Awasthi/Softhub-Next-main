@@ -73,16 +73,11 @@ export default function AndroidSoftwares({ serverData }) {
     };
 
     // Function to check if a software is new (within 2 days)
-    const isGameNew = (createdAt, updatedAt) => {
+    const isGameNew = (createdAt) => {
         const now = new Date();
-        const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days ago
-
-        // Check both createdAt and updatedAt
+        const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000));
         const gameCreatedAt = new Date(createdAt);
-        const gameUpdatedAt = new Date(updatedAt);
-
-        // Software is new if either created or updated within 2 days
-        return gameCreatedAt >= twoDaysAgo || gameUpdatedAt >= twoDaysAgo;
+        return gameCreatedAt >= twoDaysAgo;
     };
 
     const createSlug = (title) => {
@@ -155,7 +150,7 @@ export default function AndroidSoftwares({ serverData }) {
                                 </div>
 
                                 {/* NEW badge for software within 2 days */}
-                                {isGameNew(ele.createdAt, ele.updatedAt) && (
+                                {isGameNew(ele.createdAt) && (
                                     <div className="absolute top-2 right-2 z-20">
                                         <div className="relative">
                                             {/* Glowing background */}

@@ -12,16 +12,11 @@ export default function PpssppIso({ serverData }) {
     const initialPage = parseInt(searchParams.get('page') || '1', 10);
 
     // Function to check if a game is new (within 2 days)
-    const isGameNew = (createdAt, updatedAt) => {
+    const isGameNew = (createdAt) => {
         const now = new Date();
         const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days ago
-
-        // Check both createdAt and updatedAt
         const gameCreatedAt = new Date(createdAt);
-        const gameUpdatedAt = new Date(updatedAt);
-
-        // Game is new if either created or updated within 2 days
-        return gameCreatedAt >= twoDaysAgo || gameUpdatedAt >= twoDaysAgo;
+        return gameCreatedAt >= twoDaysAgo;
     };
 
     // Initialize with server data or handle error from server
@@ -156,7 +151,7 @@ export default function PpssppIso({ serverData }) {
                                 </div>
 
                                 {/* NEW badge for games within 2 days */}
-                                {isGameNew(ele.createdAt, ele.updatedAt) && (
+                                {isGameNew(ele.createdAt) && (
                                     <div className="absolute top-2 right-2 z-20">
                                         <div className="relative">
                                             {/* Glowing background */}
