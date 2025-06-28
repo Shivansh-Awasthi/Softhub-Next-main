@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { FaHeart, FaCheck, FaClock, FaCog, FaTimesCircle, FaSteam, FaInfoCircle, FaExclamationTriangle, FaCheckCircle, FaGamepad, FaVoteYea, FaBolt } from 'react-icons/fa';
 
+
+// PopupModal: Modern, reusable modal for error/info messages
 function PopupModal({ open, message, onClose }) {
     if (!open) return null;
     return (
@@ -91,25 +93,19 @@ export default function GameRequestForm() {
                 },
                 body: JSON.stringify({ title, description, platform, steamLink }),
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
             if (res.ok) {
                 setMessage("Request submitted successfully!");
                 setTitle("");
                 setDescription("");
                 setPlatform("");
                 setSteamLink("");
+            } else if (res.status === 429) {
+                setModalMessage("Your request limit exceeded. You can request only a single game in a week.");
+                setModalOpen(true);
             } else {
-                // Custom error handling for request limit and vote limit
-                if (data.error && data.error.toLowerCase().includes("limit")) {
-                    setModalMessage("Your request limit exceeded. You can request only a single game in a week.");
-                    setModalOpen(true);
-                } else if (data.error && data.error.toLowerCase().includes("vote")) {
-                    setModalMessage("Your daily vote is used. Try again tomorrow.");
-                    setModalOpen(true);
-                } else {
-                    setModalMessage(data.error || data.message || "Failed to submit request.");
-                    setModalOpen(true);
-                }
+                setModalMessage(data.error || data.message || "Failed to submit request.");
+                setModalOpen(true);
             }
         } catch (err) {
             setModalMessage("An error occurred. Please try again.");

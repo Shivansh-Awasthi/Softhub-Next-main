@@ -150,12 +150,40 @@ function RequestCard({ req, onVote, voting, isVoted }) {
     );
 }
 
+// PopupModal: Modern, reusable modal for error/info messages
+function PopupModal({ open, message, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center relative animate-fadeIn">
+                <div className="flex flex-col items-center">
+                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full p-4 mb-4">
+                        <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                        </svg>
+                    </div>
+                    <div className="text-xl font-semibold text-gray-800 mb-2">Notice</div>
+                    <div className="text-gray-600 mb-6">{message}</div>
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg font-bold shadow hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all"
+                    >
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function GameRequestList() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [votingId, setVotingId] = useState(null);
     const [voted, setVoted] = useState({});
     const [error, setError] = useState("");
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -193,17 +221,22 @@ export default function GameRequestList() {
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
             });
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
             if (res.ok) {
                 setRequests((prev) =>
                     prev.map((r) => (r._id === id ? { ...r, votes: r.votes + 1 } : r))
                 );
                 setVoted((prev) => ({ ...prev, [id]: true }));
+            } else if (res.status === 429) {
+                setModalMessage("Your daily vote is used. Try again tomorrow.");
+                setModalOpen(true);
             } else {
-                setError(data.error || data.message || "Failed to vote.");
+                setModalMessage(data.error || data.message || "Failed to vote.");
+                setModalOpen(true);
             }
         } catch (err) {
-            setError("An error occurred. Please try again.");
+            setModalMessage("An error occurred. Please try again.");
+            setModalOpen(true);
         } finally {
             setVotingId(null);
         }
@@ -216,6 +249,7 @@ export default function GameRequestList() {
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
+            <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
             <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Game Requests</h1>
 
             {loading && (
@@ -223,8 +257,6 @@ export default function GameRequestList() {
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                 </div>
             )}
-
-            {error && <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 text-center">{error}</div>}
 
             {!loading && (
                 <div className="space-y-10">
