@@ -23,8 +23,21 @@ export const metadata = {
     description: 'Download free PSP ISO games for PPSSPP emulator',
 };
 
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    return params.toString();
+}
+
 // This component fetches data with a timeout to prevent long waits
-async function PpssppIsoLoader({ currentPage, itemsPerPage }) {
+async function PpssppIsoLoader({ currentPage, itemsPerPage, searchParams }) {
     try {
         // Check if we're in a build environment (no actual API call needed)
         if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
@@ -47,8 +60,9 @@ async function PpssppIsoLoader({ currentPage, itemsPerPage }) {
         });
 
         // Create the fetch promise
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
         const fetchPromise = fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ppsspp?page=${currentPage}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ppsspp?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -98,7 +112,7 @@ export default async function PpssppIsoPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="PPSSPP" />}>
-            <PpssppIsoLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <PpssppIsoLoader currentPage={currentPage} itemsPerPage={itemsPerPage} searchParams={searchParams} />
         </Suspense>
     );
 }

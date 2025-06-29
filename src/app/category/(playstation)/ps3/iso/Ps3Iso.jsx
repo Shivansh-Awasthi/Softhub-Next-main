@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import { FaPlaystation } from "react-icons/fa";
+import FilterBar from '@/app/components/Filtres/FilterBar';
+import FilterModal from '@/app/components/Filtres/FilterModal';
 
 export default function Ps3Iso({ serverData }) {
     const searchParams = useSearchParams();
@@ -17,6 +19,7 @@ export default function Ps3Iso({ serverData }) {
     const [error, setError] = useState(serverData.error || null);
     const [currentPage, setCurrentPage] = useState(initialPage);
     const [totalItems, setTotalItems] = useState(serverData.total || 0);
+    const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     const itemsPerPage = 48;
     const totalPages = Math.max(Math.ceil(totalItems / itemsPerPage), 1); // Ensure at least 1 page
@@ -67,8 +70,82 @@ export default function Ps3Iso({ serverData }) {
         fetchData();
     }, [currentPage]);
 
+    // Helper: Map filter modal values to backend query params
+    const mapFiltersToQuery = (filters) => {
+        const params = new URLSearchParams(searchParams.toString());
+        const GENRES = [
+            { id: 1, name: "Action" }, { id: 2, name: "Adventure" }, { id: 3, name: "RPG" }, { id: 4, name: "Racing" },
+            // ...add more as needed or use the full list from PC/Mac if available...
+        ];
+        const genreNames = filters.genres?.map(id => {
+            const found = GENRES.find(g => g.id === id);
+            return found ? found.name : null;
+        }).filter(Boolean);
+        if (genreNames && genreNames.length > 0) {
+            params.set('tags', genreNames.join(','));
+        } else {
+            params.delete('tags');
+        }
+        if (filters.gameMode && filters.gameMode !== 'any') {
+            params.set('gameMode', filters.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer');
+        } else {
+            params.delete('gameMode');
+        }
+        if (filters.size) {
+            params.set('sizeLimit', filters.size);
+        } else {
+            params.delete('sizeLimit');
+        }
+        if (filters.year) {
+            params.set('releaseYear', filters.year);
+        } else {
+            params.delete('releaseYear');
+        }
+        if (filters.popularity && filters.popularity !== 'all') {
+            let sortBy = 'newest';
+            switch (filters.popularity) {
+                case 'popular': sortBy = 'popular'; break;
+                case 'relevance': sortBy = 'relevance'; break;
+                case 'sizeAsc': sortBy = 'sizeAsc'; break;
+                case 'sizeDesc': sortBy = 'sizeDesc'; break;
+                case 'oldest': sortBy = 'oldest'; break;
+                case 'newest': sortBy = 'newest'; break;
+                default: sortBy = 'newest';
+            }
+            params.set('sortBy', sortBy);
+        } else {
+            params.delete('sortBy');
+        }
+        params.set('page', '1');
+        return params;
+    };
+
+    // Handle filter apply
+    const handleApplyFilters = (filters) => {
+        const params = mapFiltersToQuery(filters);
+        router.push(`/category/ps3/iso?${params.toString()}`);
+    };
+
+    // Check if any filter is active
+    const isFilterActive = () => {
+        const keys = ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'];
+        return keys.some(key => searchParams.get(key));
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'].forEach(key => params.delete(key));
+        params.set('page', '1');
+        router.push(`/category/ps3/iso?${params.toString()}`);
+    };
+
+    // Update handlePageChange to preserve filters
     const handlePageChange = (newPage) => {
-        router.push(`/category/ps3/iso?page=${newPage}`);
+        const validPage = Math.max(1, Math.min(newPage, totalPages));
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', validPage);
+        router.push(`/category/ps3/iso?${params.toString()}`);
     };
 
     const slugify = (text = '') => {
@@ -91,6 +168,23 @@ export default function Ps3Iso({ serverData }) {
 
     return (
         <div className="container mx-auto p-2 relative">
+            {/* Filter Bar at the top */}
+            <div className="mb-6 flex justify-end items-center gap-3">
+                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                {isFilterActive() && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
+                    >
+                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span className="relative flex items-center gap-2 font-medium">
+                            Clear Filters
+                        </span>
+                    </button>
+                )}
+            </div>
+            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
+
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 opacity-5 rounded-full blur-3xl -z-10"></div>
@@ -114,7 +208,37 @@ export default function Ps3Iso({ serverData }) {
             {loading ? (
                 <p className="text-center">Loading...</p>
             ) : error ? (
-                <p className="text-red-500 text-center">{error}</p>
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">{error}</p>
+                    {isFilterActive() && (
+                        <button
+                            onClick={handleClearFilters}
+                            className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 mt-2"
+                        >
+                            <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <span className="relative flex items-center gap-2 font-medium">
+                                Clear Filters
+                            </span>
+                        </button>
+                    )}
+                </div>
+            ) : data.length === 0 ? (
+                <div className="text-center py-10 text-gray-400">
+                    No PS3 ISO games found.
+                    {isFilterActive() && (
+                        <div className="mt-4">
+                            <button
+                                onClick={handleClearFilters}
+                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
+                            >
+                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <span className="relative flex items-center gap-2 font-medium">
+                                    Clear Filters
+                                </span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 relative">
                     {/* Grid accent elements */}

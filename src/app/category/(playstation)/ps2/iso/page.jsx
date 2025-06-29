@@ -23,12 +23,25 @@ export const metadata = {
     description: 'Download free PlayStation 2 ISO games',
 };
 
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    return params.toString();
+}
+
 // This component fetches data and renders the Ps2Iso component
-async function Ps2IsoLoader({ currentPage, itemsPerPage }) {
+async function Ps2IsoLoader({ currentPage, itemsPerPage, searchParams }) {
     try {
-        // This fetch happens at build time and during revalidation
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ps2?page=${currentPage}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ps2?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -58,7 +71,7 @@ export default async function Ps2IsoPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="PS2" />}>
-            <Ps2IsoLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <Ps2IsoLoader currentPage={currentPage} itemsPerPage={itemsPerPage} searchParams={searchParams} />
         </Suspense>
     );
 }
