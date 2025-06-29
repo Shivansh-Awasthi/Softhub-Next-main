@@ -65,7 +65,7 @@ const ProfileIcon = () => {
   return (
     <div className="relative flex items-center ml-4">
       <button
-        className="focus:outline-none"
+        className="focus:outline-none mr-2made the caed design like "
         onClick={() => setShowDropdown((v) => !v)}
       >
         <img
@@ -76,18 +76,33 @@ const ProfileIcon = () => {
         />
       </button>
       {showDropdown && (
-        <div className="profile-dropdown absolute right-0 mt-2 w-48 bg-[#181818] rounded-lg shadow-lg py-2 z-50 border border-[#232323]">
+        <div className="profile-dropdown absolute right-0 mt-122 w-64 bg-[#181C23] rounded-2xl shadow-2xl py-4 z-50 border border-[#232323] flex flex-col gap-1" style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}>
           <Link href="/profile" onClick={() => setShowDropdown(false)}>
-            <span className="block px-4 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer">My profile</span>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">My profile</span>
           </Link>
-          {!user && (
-            <Link href="/user/login" onClick={() => setShowDropdown(false)}>
-              <span className="block px-4 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer">Login</span>
-            </Link>
-          )}
+          <Link href="/watch-history" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Watch history</span>
+          </Link>
+          <Link href="/liked" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Liked</span>
+          </Link>
+          <Link href="/watchlist" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Watchlist</span>
+          </Link>
+          <div className="border-t border-[#232323] my-2"></div>
+          <Link href="/billing" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Billing</span>
+          </Link>
+          <Link href="/membership" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Subscription</span>
+          </Link>
+          <div className="border-t border-[#232323] my-2"></div>
+          <Link href="/settings" onClick={() => setShowDropdown(false)}>
+            <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">Settings</span>
+          </Link>
           {user && (
             <button
-              className="block w-full text-left px-4 py-2 text-red-400 hover:bg-[#232323] cursor-pointer"
+              className="block w-full text-left px-6 py-2 text-red-400 hover:bg-[#232323] cursor-pointer text-base"
               onClick={() => setShowLogoutWarning(true)}
             >
               Logout
