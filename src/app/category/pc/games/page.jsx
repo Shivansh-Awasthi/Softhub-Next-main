@@ -44,7 +44,11 @@ async function PcGamesLoader({ currentPage, itemsPerPage }) {
         }
 
         const data = await res.json();
-        return <PcGames serverData={data} initialPage={currentPage} />;
+        return (
+            <>
+                <PcGames serverData={data} initialPage={currentPage} />
+            </>
+        );
     } catch (error) {
         console.error("Error fetching data:", error);
         // Return component with error state

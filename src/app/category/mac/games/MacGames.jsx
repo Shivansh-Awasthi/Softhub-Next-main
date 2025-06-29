@@ -7,6 +7,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useLoading } from '@/app/context/LoadingContext';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import { LuAppWindowMac } from "react-icons/lu";
+import RandomGameButton from '@/app/components/RandomGameButton';
 
 // Slugify function (simplified version)
 const slugify = (text = '') => {
@@ -422,6 +423,11 @@ export default function MacGames({ serverData, initialPage = 1 }) {
                     No games available at the moment
                 </div>
             )}
+
+            {/* Random game button - always visible at the bottom right */}
+            <div className="fixed bottom-4 right-4 z-20">
+                <RandomGameButton />
+            </div>
         </div>
     );
 }

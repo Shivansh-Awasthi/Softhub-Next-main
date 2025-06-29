@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
+import RandomGameButton from '@/app/components/RandomGameButton';
 
 export default function PcGames({ serverData, initialPage = 1 }) {
     const searchParams = useSearchParams();
@@ -181,6 +182,10 @@ export default function PcGames({ serverData, initialPage = 1 }) {
                     <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/20 to-transparent -z-10"></div>
                 </div>
             )}
+            {/* Random game button - always visible at the bottom right */}
+            <div className="fixed bottom-4 right-4 z-20">
+                <RandomGameButton />
+            </div>
         </div>
     );
 }
