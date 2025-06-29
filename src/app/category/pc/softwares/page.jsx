@@ -23,8 +23,21 @@ export const metadata = {
     description: 'Download free PC software and applications',
 };
 
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    return params.toString();
+}
+
 // This component fetches data with a timeout to prevent long waits
-async function PcSoftwaresLoader({ currentPage, itemsPerPage }) {
+async function PcSoftwaresLoader({ searchParams, currentPage, itemsPerPage }) {
     try {
         // Check if we're in a build environment (no actual API call needed)
         if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
@@ -46,9 +59,10 @@ async function PcSoftwaresLoader({ currentPage, itemsPerPage }) {
             setTimeout(() => reject(new Error('Request timed out')), 5000);
         });
 
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
         // Create the fetch promise
         const fetchPromise = fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/spc?page=${currentPage}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/spc?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -98,7 +112,7 @@ export default async function PcSoftwaresPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="PC" />}>
-            <PcSoftwaresLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <PcSoftwaresLoader searchParams={searchParams} currentPage={currentPage} itemsPerPage={itemsPerPage} />
         </Suspense>
     );
 }
