@@ -19,15 +19,26 @@ export const metadata = {
     description: 'Download free Mac games and apps',
 };
 
-// This component fetches data and renders the MacGames component
-async function MacGamesLoader({ currentPage, itemsPerPage }) {
-    try {
-        // Ensure currentPage is a valid number
-        const page = isNaN(currentPage) ? 1 : currentPage;
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    return params.toString();
+}
 
+// This component fetches data and renders the MacGames component
+async function MacGamesLoader({ currentPage, itemsPerPage, searchParams }) {
+    try {
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
         // This fetch happens at build time and during revalidation
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?page=${page}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -43,11 +54,11 @@ async function MacGamesLoader({ currentPage, itemsPerPage }) {
         }
 
         const data = await res.json();
-        return <MacGames serverData={data} initialPage={page} />;
+        return <MacGames serverData={data} initialPage={currentPage} />;
     } catch (error) {
         console.error("Error fetching data:", error);
         // Return component with error state
-        return <MacGames serverData={{ apps: [], total: 0, error: error.message }} initialPage={1} />;
+        return <MacGames serverData={{ apps: [], total: 0, error: error.message }} initialPage={currentPage} />;
     }
 }
 
@@ -57,7 +68,7 @@ export default async function MacGamesPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="Mac" />}>
-            <MacGamesLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <MacGamesLoader currentPage={currentPage} itemsPerPage={itemsPerPage} searchParams={searchParams} />
         </Suspense>
     );
 }
