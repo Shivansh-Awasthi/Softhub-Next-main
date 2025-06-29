@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { CiLock } from 'react-icons/ci'; // Lock Icon
 import SearchSkeleton from './SearchSkeleton';
 import { jwtDecode } from 'jwt-decode';
+import { createSlug } from '@/app/utils/formatUtils';
 
 // Function to format dates consistently between server and client
 const formatDate = (dateString) => {
@@ -157,14 +158,6 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    };
-
-    const createSlug = (title) => {
-        return title
-            .toLowerCase() // Convert to lowercase
-            .replace(/[^\w\s-]/g, '') // Remove non-alphanumeric characters
-            .replace(/\s+/g, '-') // Replace spaces with hyphens
-            .trim(); // Remove trailing spaces
     };
 
     return (
