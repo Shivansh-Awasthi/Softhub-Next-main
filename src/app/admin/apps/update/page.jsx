@@ -254,7 +254,7 @@ const UpdateApps = () => {
         { value: "ps4", label: "Mac Exclusive Games" },
     ];
     const architectures = ["Native", "ARM", "Wineskin", "Port"];
-    const gameModes = ["Single Player", "Multiplayer"];
+    const gameModes = ["Singleplayer", "Multiplayer"];
     const platforms = ["PC", "Mac", "Android", "Playstation"];
     const downloadLinkLabelsAndPlaceholders = [
         { label: "Viking File (Mac) // VikingFile (PC)", placeholder: "Enter the VikingFile link" },

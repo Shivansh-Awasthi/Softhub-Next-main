@@ -392,7 +392,7 @@ const CreateApps = () => {
                                             required
                                         >
                                             <option value="">Select Game Mode</option>
-                                            <option value="Single Player">Single Player</option>
+                                            <option value="Singleplayer">Single Player</option>
                                             <option value="Multiplayer">Multiplayer</option>
                                         </select>
                                     </div>
