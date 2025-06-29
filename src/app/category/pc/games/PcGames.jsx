@@ -174,11 +174,36 @@ export default function PcGames({ serverData, initialPage = 1 }) {
         router.push(`/category/pc/games?${params.toString()}`);
     };
 
+    // Check if any filter is active
+    const isFilterActive = () => {
+        const keys = ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'];
+        return keys.some(key => searchParams.get(key));
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'].forEach(key => params.delete(key));
+        params.set('page', '1');
+        router.push(`/category/pc/games?${params.toString()}`);
+    };
+
     return (
         <div className="container mx-auto p-2 relative">
             {/* Filter Bar at the top */}
-            <div className="mb-6 flex justify-end">
+            <div className="mb-6 flex justify-end items-center gap-3">
                 <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                {isFilterActive() && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
+                    >
+                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span className="relative flex items-center gap-2 font-medium">
+                            Clear Filters
+                        </span>
+                    </button>
+                )}
             </div>
             {/* Filter Modal */}
             <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
