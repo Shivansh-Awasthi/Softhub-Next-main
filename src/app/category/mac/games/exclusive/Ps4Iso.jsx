@@ -9,6 +9,8 @@ import { FaCrown } from "react-icons/fa";
 import { FaRupeeSign } from "react-icons/fa";
 import { useLoading } from '@/app/context/LoadingContext';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
+import FilterBar from '@/app/components/Filtres/FilterBar';
+import FilterModal from '@/app/components/Filtres/FilterModal';
 
 // Utility function to create URL-friendly slugs
 function createSlug(text) {
@@ -64,9 +66,183 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
     const [purchasedGames, setPurchasedGames] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [userData, setUserData] = useState(null);
+    const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     // Calculate total pages
     const totalPages = Math.max(1, Math.ceil(totalApps / ITEMS_PER_PAGE));
+
+    // Update state when props or URL changes
+    useEffect(() => {
+        // Update data and total from server data
+        const { games, total } = extractData(serverData);
+        setData(games);
+        setTotalApps(total);
+
+        // Update current page from URL
+        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+        if (pageFromUrl !== currentPage) {
+            setCurrentPage(pageFromUrl);
+        }
+
+        // Reset page transition state
+        const timer = setTimeout(() => {
+            setIsPageTransitioning(false);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [serverData, searchParams]);
+
+    // Load user data from localStorage on client side
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            // Read JWT token from localStorage (or cookie if you have that setup)
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const decoded = jwtDecode(token);
+                    setUserData(decoded);
+                } catch (err) {
+                    console.error('Failed to decode JWT token:', err);
+                    setUserData(null);
+                }
+            } else {
+                setUserData(null);
+            }
+        }
+    }, []);
+
+    // Fetch data when page changes (client-side)
+    useEffect(() => {
+        if (currentPage === 1) return; // already have page 1 data from server
+
+        const fetchData = async () => {
+            setIsPageTransitioning(true);
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ps4?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
+                    {
+                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
+                    }
+                );
+
+                if (!res.ok) {
+                    throw new Error(`API error: ${res.status}`);
+                }
+
+                const json = await res.json();
+
+                // Handle API response structure
+                const { games, total } = extractData(json);
+                setData(games);
+                setTotalApps(total);
+                setError(null);
+            } catch (err) {
+                setError('Failed to load data: ' + err.message);
+                console.error("Client fetch failed:", err.message);
+            } finally {
+                setIsPageTransitioning(false);
+            }
+        };
+
+        fetchData();
+    }, [currentPage, ITEMS_PER_PAGE]);
+
+    // Helper: Map filter modal values to backend query params (same as Mac)
+    const mapFiltersToQuery = (filters) => {
+        const params = new URLSearchParams(searchParams.toString());
+        const GENRES = [
+            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
+            { id: 83, name: "Agriculture" }, { id: 33, name: "Anime" }, { id: 40, name: "Apps" }, { id: 71, name: "Arcade" },
+            { id: 115, name: "Artificial Intelligence" }, { id: 129, name: "Assassin" }, { id: 60, name: "Atmospheric" },
+            { id: 109, name: "Automation" }, { id: 133, name: "Blood" }, { id: 24, name: "Building" }, { id: 95, name: "Cartoon" },
+            { id: 22, name: "Casual" }, { id: 107, name: "Character Customization" }, { id: 68, name: "Cinematic*" },
+            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 108, name: "Colony Sim" }, { id: 70, name: "Colorful" },
+            { id: 86, name: "Combat" }, { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" },
+            { id: 105, name: "Controller" }, { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" },
+            { id: 67, name: "Cyberpunk" }, { id: 91, name: "Dark Humor" }, { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" },
+            { id: 126, name: "Driving" }, { id: 118, name: "Early Access" }, { id: 46, name: "eSport" }, { id: 125, name: "Exploration" },
+            { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" }, { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" },
+            { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" }, { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" },
+            { id: 88, name: "Flight" }, { id: 43, name: "FPS" }, { id: 64, name: "Funny" }, { id: 76, name: "Gore" },
+            { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" }, { id: 10, name: "History" }, { id: 11, name: "Horror" },
+            { id: 57, name: "Hunting" }, { id: 69, name: "Idler" }, { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" },
+            { id: 25, name: "Indie" }, { id: 101, name: "LEGO" }, { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" },
+            { id: 113, name: "Management" }, { id: 61, name: "Mature" }, { id: 96, name: "Memes" }, { id: 50, name: "Military" },
+            { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" }, { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" },
+            { id: 26, name: "Open World" }, { id: 74, name: "Parkour" }, { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" },
+            { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" }, { id: 48, name: "PvP" }, { id: 28, name: "Racing" },
+            { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" }, { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" },
+            { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" }, { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" },
+            { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" }, { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" },
+            { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" }, { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" },
+            { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" }, { id: 37, name: "Survival" }, { id: 47, name: "Tactical" },
+            { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" }, { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" },
+            { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" }, { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" },
+            { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
+            { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
+        ];
+        const genreNames = filters.genres?.map(id => {
+            const found = GENRES.find(g => g.id === id);
+            return found ? found.name : null;
+        }).filter(Boolean);
+        if (genreNames && genreNames.length > 0) {
+            params.set('tags', genreNames.join(','));
+        } else {
+            params.delete('tags');
+        }
+        if (filters.gameMode && filters.gameMode !== 'any') {
+            params.set('gameMode', filters.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer');
+        } else {
+            params.delete('gameMode');
+        }
+        if (filters.size) {
+            params.set('sizeLimit', filters.size);
+        } else {
+            params.delete('sizeLimit');
+        }
+        if (filters.year) {
+            params.set('releaseYear', filters.year);
+        } else {
+            params.delete('releaseYear');
+        }
+        if (filters.popularity && filters.popularity !== 'all') {
+            let sortBy = 'newest';
+            switch (filters.popularity) {
+                case 'popular': sortBy = 'popular'; break;
+                case 'relevance': sortBy = 'relevance'; break;
+                case 'sizeAsc': sortBy = 'sizeAsc'; break;
+                case 'sizeDesc': sortBy = 'sizeDesc'; break;
+                case 'oldest': sortBy = 'oldest'; break;
+                case 'newest': sortBy = 'newest'; break;
+                default: sortBy = 'newest';
+            }
+            params.set('sortBy', sortBy);
+        } else {
+            params.delete('sortBy');
+        }
+        params.set('page', '1');
+        return params;
+    };
+
+    // Handle filter apply
+    const handleApplyFilters = (filters) => {
+        const params = mapFiltersToQuery(filters);
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    // Check if any filter is active
+    const isFilterActive = () => {
+        const keys = ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'];
+        return keys.some(key => searchParams.get(key));
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'].forEach(key => params.delete(key));
+        params.set('page', '1');
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     // Update state when props or URL changes
     useEffect(() => {
@@ -149,17 +325,12 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         if (newPage === currentPage || newPage < 1 || newPage > totalPages || isPageTransitioning) {
             return; // Don't do anything if invalid page or already transitioning
         }
-
-        // Set transition state
         setIsPageTransitioning(true);
-
-        // Show skeleton while loading
-        showSkeleton('PS4');
-
-        // Update URL - this will trigger a new server-side render
-        router.push(`${pathname}?page=${newPage}`);
-
-        // Scroll to top
+        showSkeleton && showSkeleton('PS4');
+        // Preserve all filters
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', newPage);
+        router.push(`${pathname}?${params.toString()}`);
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -354,6 +525,23 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
     if ((error && !data.length) || (!data.length && !isPageTransitioning)) {
         return (
             <div className="container mx-auto p-2 pb-24 relative">
+                {/* Filter Bar at the top for error/empty state */}
+                <div className="mb-6 flex justify-end items-center gap-3">
+                    <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                    {isFilterActive() && (
+                        <button
+                            onClick={handleClearFilters}
+                            className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
+                        >
+                            <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <span className="relative flex items-center gap-2 font-medium">
+                                Clear Filters
+                            </span>
+                        </button>
+                    )}
+                </div>
+                <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
+
                 {/* Add all the decorative elements from the main render */}
                 <style jsx global>{`
                     @keyframes gradient-x {
@@ -523,258 +711,68 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
 
     // Main render
     return (
-        <div className="container mx-auto p-2 pb-24 relative">
-            {/* Add CSS for animations */}
-            <style jsx global>{`
-                @keyframes gradient-x {
-                    0% {
-                        background-position: 0% 50%;
-                    }
-                    50% {
-                        background-position: 100% 50%;
-                    }
-                    100% {
-                        background-position: 0% 50%;
-                    }
-                }
+        <div className="container mx-auto p-2 pb-24">
+            {/* Filter Bar - always visible at the top */}
+            <div className="mb-6 flex justify-end items-center gap-3">
+                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                {isFilterActive() && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
+                    >
+                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span className="relative flex items-center gap-2 font-medium">
+                            Clear Filters
+                        </span>
+                    </button>
+                )}
+            </div>
+            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
 
-                @keyframes float {
-                    0% {
-                        transform: translateY(0px);
-                    }
-                    50% {
-                        transform: translateY(-10px);
-                    }
-                    100% {
-                        transform: translateY(0px);
-                    }
-                }
+            {/* Page header - enhanced with glassmorphism and gradient */}
+            <div className="mb-8 text-center relative">
+                {/* Glassmorphism effect */}
+                <div className="absolute inset-0 rounded-lg bg-black/30 blur-md"></div>
 
-                @keyframes pulse-glow {
-                    0% {
-                        box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4);
-                    }
-                    70% {
-                        box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
-                    }
-                    100% {
-                        box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
-                    }
-                }
+                {/* Main title with gradient and glass effect */}
+                <h1 className="relative text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-4">
+                    Exclusive PS4 Games
+                </h1>
 
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                .animate-gradient-x {
-                    background-size: 200% 200%;
-                    animation: gradient-x 3s ease infinite;
-                }
-
-                .animate-float {
-                    animation: float 6s ease-in-out infinite;
-                }
-
-                .animate-pulse-glow {
-                    animation: pulse-glow 2s infinite;
-                }
-
-                .animate-fadeInUp {
-                    animation: fadeInUp 0.5s ease-out forwards;
-                }
-            `}</style>
-
-            {/* Premium background decorative elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 opacity-5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-blue-600 opacity-5 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '3s' }}></div>
-
-            {/* Decorative particles */}
-            <div className="absolute top-20 left-20 w-2 h-2 bg-purple-400 opacity-30 rounded-full -z-10 animate-ping" style={{ animationDuration: '3s' }}></div>
-            <div className="absolute top-40 right-40 w-2 h-2 bg-blue-400 opacity-30 rounded-full -z-10 animate-ping" style={{ animationDuration: '4s' }}></div>
-            <div className="absolute bottom-60 left-60 w-2 h-2 bg-purple-400 opacity-30 rounded-full -z-10 animate-ping" style={{ animationDuration: '5s' }}></div>
-            <div className="absolute bottom-20 right-20 w-2 h-2 bg-blue-400 opacity-30 rounded-full -z-10 animate-ping" style={{ animationDuration: '6s' }}></div>
-
-            {/* Enhanced decorative grid lines */}
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-30 -z-10"></div>
-
-            {/* Premium border frame */}
-            <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-purple-500/20 rounded-tl-lg -z-10"></div>
-            <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-blue-500/20 rounded-tr-lg -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-blue-500/20 rounded-bl-lg -z-10"></div>
-            <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-purple-500/20 rounded-br-lg -z-10"></div>
-
-            {/* Premium Header with enhanced styling */}
-            <div className="cover mb-16 text-center relative">
-                {/* Background glow effects */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
-                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-purple-600/20 rounded-full blur-xl -z-10"></div>
-                <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-blue-600/20 rounded-full blur-xl -z-10"></div>
-
-                {/* Premium badge - responsive for small screens */}
-                <div className="inline-block mb-4 sm:mb-6">
-                    <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full shadow-lg flex items-center">
-                        <FaStar className="mr-1" size={10} />
-                        PREMIUM COLLECTION
-                    </div>
-                </div>
-                <br />
-                {/* Main heading with glass effect - responsive for small screens */}
-                <div className="inline-block relative mb-6 max-w-full">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25 animate-gradient-x"></div>
-                    <div className="relative px-4 sm:px-7 py-4 bg-black/50 rounded-lg leading-none flex flex-col sm:flex-row items-center">
-                        <FaCrown className="text-amber-500 mb-2 sm:mb-0 sm:mr-3" size={24} />
-                        <div className="text-center sm:text-left">
-                            <div className="font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                                    Mac Exclusive Games{' '}
-                                    <span className="font-medium text-blue-400">{totalApps}</span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Description text - responsive for small screens */}
-                <p className="text-gray-400 max-w-2xl mx-auto mb-6 text-sm sm:text-base md:text-lg px-4 sm:px-0">
-                    Exclusive premium Mac games available only to our members. Experience the best gaming titles with enhanced graphics and performance.
+                {/* Subtitle with glass effect */}
+                <p className="relative text-lg sm:text-xl text-white/90 mb-6">
+                    Handpicked selection of the best PS4 games, available only on our platform.
                 </p>
 
-                {/* Contact buttons container */}
-                <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                    {/* Telegram button */}
-                    <a
-                        href="https://t.me/n0t_ur_type"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-pulse-glow"
-                    >
-                        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2c5.514 0 10 4.486 10 10s-4.486 10-10 10S2 17.514 2 12 6.486 2 12 2zm2.8 14.4c.12 0 .234-.05.318-.134.084-.084.134-.198.134-.318 0-.12-.05-.234-.134-.318-.084-.084-.198-.134-.318-.134H9.2c-.12 0-.234.05-.318.134-.084.084-.134.198-.134.318 0 .12.05.234.134.318.084.084.198.134.318.134h5.6zm-2.8-8.4c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 4.8c-.993 0-1.8-.807-1.8-1.8s.807-1.8 1.8-1.8 1.8.807 1.8 1.8-.807 1.8-1.8 1.8z" />
-                        </svg>
-                        Buy via Telegram
-                    </a>
-
-                    {/* Become a Member button */}
-                    <Link
-                        href="/membership"
-                        className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-full shadow-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
-                    >
-                        <FaCoffee className="mr-2" />
-                        Become a Member
-                    </Link>
-                </div>
-
-                {/* Feature badges - responsive for small screens */}
-                <div className="flex flex-wrap justify-center gap-3">
-                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
-                        <FaStar className="text-amber-500 mr-1 sm:mr-2" size={14} />
-                        Premium Quality
-                    </div>
-                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
-                        <FaApple className="text-blue-400 mr-1 sm:mr-2" size={14} />
-                        Mac Exclusive
-                    </div>
-                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
-                        <FaDownload className="text-green-400 mr-1 sm:mr-2" size={14} />
-                        Easy Download
-                    </div>
-                </div>
-
-                {/* Decorative line */}
-                <div className="absolute -bottom-6 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+                {/* Decorative elements - subtle and elegant */}
+                <div className="absolute top-0 left-0 w-32 h-32 bg-purple-600 opacity-10 rounded-full blur-3xl -z-10"></div>
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full blur-3xl -z-10"></div>
             </div>
 
-            {data.length > 0 ? (
-                <>
-                    <div className="relative">
-                        {/* Premium loading overlay during page transitions */}
-                        {isPageTransitioning && (
-                            <div className="absolute inset-0 bg-[#1a1a1a] bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
-                                <div className="flex flex-col items-center bg-black/50 p-8 rounded-xl border border-purple-500/30">
-                                    <div className="relative mb-6">
-                                        {/* Pulsing glow effect */}
-                                        <div className="absolute inset-0 rounded-full bg-purple-600/20 blur-xl animate-pulse"></div>
-
-                                        {/* Spinner */}
-                                        <div className="relative animate-spin rounded-full h-16 w-16 border-4 border-t-purple-500 border-r-blue-500 border-b-purple-500 border-l-blue-500 border-t-transparent"></div>
-                                    </div>
-                                    <p className="text-white text-lg font-medium">Loading Premium Content</p>
-                                    <p className="text-gray-400 text-sm mt-2">Page {currentPage} of {totalPages}</p>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 transition-opacity duration-300 ease-in-out relative">
-                            {/* Grid accent elements */}
-                            <div className="absolute -top-6 -left-6 w-12 h-12 border-t-2 border-l-2 border-purple-500/30 rounded-tl-lg"></div>
-                            <div className="absolute -bottom-6 -right-6 w-12 h-12 border-b-2 border-r-2 border-blue-500/30 rounded-br-lg"></div>
-
-                            {data.map((game) => (
-                                <GameCard
-                                    key={game?._id || `game-${Math.random().toString(36).substring(2, 9)}`}
-                                    game={game}
-                                />
-                            ))}
-                        </div>
+            {/* Game grid - responsive and adaptive */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {data.length > 0 ? (
+                    data.map(game => (
+                        <GameCard key={game._id} game={game} />
+                    ))
+                ) : (
+                    <div className="col-span-full text-center py-16">
+                        <p className="text-gray-400">
+                            No games found. Try adjusting your filters or check back later.
+                        </p>
                     </div>
-                </>
-            ) : (
-                <div className="text-center py-16 bg-gradient-to-r from-purple-900/10 to-blue-900/10 rounded-xl border border-purple-500/20 animate-fadeInUp">
-                    <div className="inline-block p-6 rounded-full bg-gradient-to-r from-purple-900/20 to-blue-900/20 mb-6 animate-float">
-                        <FaApple className="text-purple-400" size={40} />
-                    </div>
-                    <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-3">Premium Collection Coming Soon</h3>
-                    <p className="text-gray-400 text-lg max-w-lg mx-auto mb-4">Our exclusive Mac games collection is being prepared for you.</p>
-                    <p className="text-gray-500 mt-2">Check back soon for premium exclusive content</p>
+                )}
+            </div>
 
-                    <div className="mt-8 flex justify-center space-x-4">
-                        <div className="px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-sm text-gray-300 flex items-center animate-pulse-glow">
-                            <FaStar className="text-amber-500 mr-2" size={14} />
-                            Coming Soon
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Premium Pagination Controls */}
+            {/* Pagination - enhanced with smooth scrolling and improved UX */}
             {totalPages > 1 && (
-                <div className="mt-16 mb-16 relative animate-fadeInUp">
-                    {/* Premium pagination decorative elements */}
-                    <div className="absolute left-1/4 -top-8 w-32 h-32 bg-purple-600 opacity-5 rounded-full blur-2xl -z-10 animate-pulse"></div>
-                    <div className="absolute right-1/4 -top-8 w-32 h-32 bg-blue-600 opacity-5 rounded-full blur-2xl -z-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-                    {/* Premium pagination frame */}
-                    <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-xl -z-10"></div>
-                    <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-purple-600/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 animate-gradient-x"></div>
-
-                    {/* Premium pagination header */}
-                    <div className="text-center mb-6">
-                        <h3 className="text-lg font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                            Browse Premium Collection
-                        </h3>
-                        <p className="text-gray-400 text-sm">Page {currentPage} of {totalPages}</p>
-                    </div>
-
-                    <div className="relative z-10 bg-black/30 p-4 rounded-xl border border-purple-500/20">
-                        <EnhancedPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            isLoading={isPageTransitioning}
-                        />
-                    </div>
-
-                    {/* Decorative line */}
-                    <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent -z-10"></div>
+                <div className="mt-8">
+                    <EnhancedPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isLoading={isPageTransitioning}
+                    />
                 </div>
             )}
         </div>
