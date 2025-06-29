@@ -5,71 +5,159 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import { FaAndroid } from "react-icons/fa6";
+import FilterBar from '@/app/components/Filtres/FilterBar';
+import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function AndroidSoftwares({ serverData }) {
+export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const initialPage = parseInt(searchParams.get('page') || '1', 10);
+    const pathname = '/category/android/softwares'; // FIX: use correct route for filters and pagination
+    const ITEMS_PER_PAGE = 48;
 
-    // Initialize with server data or handle error from server
-    const [data, setData] = useState(serverData.apps || []);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(serverData.error || null);
-    const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalItems, setTotalItems] = useState(serverData.total || 0);
-
-    const itemsPerPage = 48;
-    const totalPages = Math.max(Math.ceil(totalItems / itemsPerPage), 1); // Ensure at least 1 page
-
-    // Debug log to see what data we're receiving
-    useEffect(() => {
-    }, [serverData]);
-
-    useEffect(() => {
-        // Update current page when URL changes
-        const page = parseInt(searchParams.get('page') || '1', 10);
-        if (page !== currentPage) {
-            setCurrentPage(page);
+    // Extract data from server response
+    const extractData = (data) => {
+        if (data?.apps && Array.isArray(data.apps)) {
+            return {
+                apps: data.apps,
+                total: data.total || 0
+            };
         }
-    }, [searchParams, currentPage]);
+        if (data?.data && Array.isArray(data.data)) {
+            return {
+                apps: data.data,
+                total: data.total || 0
+            };
+        }
+        return {
+            apps: [],
+            total: 0
+        };
+    };
+    const { apps, total } = extractData(serverData);
+
+    const [data, setData] = useState(apps);
+    const [totalItems, setTotalItems] = useState(total);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(serverData?.error || null);
+    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [filterModalOpen, setFilterModalOpen] = useState(false);
+    const totalPages = Math.max(Math.ceil(totalItems / ITEMS_PER_PAGE), 1);
 
     useEffect(() => {
-        if (currentPage === 1) return; // already have page 1 data from server
+        const { apps, total } = extractData(serverData);
+        setData(apps);
+        setTotalItems(total);
+        setError(serverData?.error || null);
+        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+        if (pageFromUrl !== currentPage) {
+            setCurrentPage(pageFromUrl);
+        }
+    }, [serverData, searchParams]);
 
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/sandroid?page=${currentPage}&limit=${itemsPerPage}`,
-                    {
-                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
-                    }
-                );
-
-                if (!res.ok) {
-                    throw new Error(`API error: ${res.status}`);
-                }
-
-                const json = await res.json();
-
-
-                // Handle API response structure
-                setData(json.apps || []);
-                setTotalItems(json.total || 0);
-                setError(null);
-            } catch (err) {
-                setError('Failed to load data: ');
-
-            } finally {
-                setLoading(false);
+    // Helper: Map filter modal values to backend query params
+    const mapFiltersToQuery = (filters) => {
+        const params = new URLSearchParams(searchParams.toString());
+        // Genres (tags)
+        const GENRES = [
+            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
+            { id: 40, name: "Apps" }, { id: 71, name: "Arcade" }, { id: 115, name: "Artificial Intelligence" },
+            { id: 60, name: "Atmospheric" }, { id: 24, name: "Building" }, { id: 22, name: "Casual" }, { id: 68, name: "Cinematic*" },
+            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 70, name: "Colorful" }, { id: 86, name: "Combat" },
+            { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" }, { id: 105, name: "Controller" },
+            { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" }, { id: 67, name: "Cyberpunk" },
+            { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" }, { id: 126, name: "Driving" }, { id: 118, name: "Early Access" },
+            { id: 46, name: "eSport" }, { id: 125, name: "Exploration" }, { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" },
+            { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" }, { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" },
+            { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" }, { id: 88, name: "Flight" }, { id: 43, name: "FPS" },
+            { id: 64, name: "Funny" }, { id: 76, name: "Gore" }, { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" },
+            { id: 10, name: "History" }, { id: 11, name: "Horror" }, { id: 57, name: "Hunting" }, { id: 69, name: "Idler" },
+            { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" }, { id: 25, name: "Indie" }, { id: 101, name: "LEGO" },
+            { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" }, { id: 113, name: "Management" }, { id: 61, name: "Mature" },
+            { id: 96, name: "Memes" }, { id: 50, name: "Military" }, { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" },
+            { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" }, { id: 26, name: "Open World" }, { id: 74, name: "Parkour" },
+            { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" }, { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" },
+            { id: 48, name: "PvP" }, { id: 28, name: "Racing" }, { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" },
+            { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" }, { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" },
+            { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" }, { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" },
+            { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" }, { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" },
+            { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" }, { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" },
+            { id: 37, name: "Survival" }, { id: 47, name: "Tactical" }, { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" },
+            { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" }, { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" },
+            { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" }, { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" },
+            { id: 75, name: "Violent" }, { id: 20, name: "VR" }, { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
+        ];
+        const genreNames = filters.genres?.map(id => {
+            const found = GENRES.find(g => g.id === id);
+            return found ? found.name : null;
+        }).filter(Boolean);
+        if (genreNames && genreNames.length > 0) {
+            params.set('tags', genreNames.join(','));
+        } else {
+            params.delete('tags');
+        }
+        if (filters.gameMode && filters.gameMode !== 'any') {
+            params.set('gameMode', filters.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer');
+        } else {
+            params.delete('gameMode');
+        }
+        if (filters.size) {
+            params.set('sizeLimit', filters.size);
+        } else {
+            params.delete('sizeLimit');
+        }
+        if (filters.year) {
+            params.set('releaseYear', filters.year);
+        } else {
+            params.delete('releaseYear');
+        }
+        if (filters.popularity && filters.popularity !== 'all') {
+            let sortBy = 'newest';
+            switch (filters.popularity) {
+                case 'popular': sortBy = 'popular'; break;
+                case 'relevance': sortBy = 'relevance'; break;
+                case 'sizeAsc': sortBy = 'sizeAsc'; break;
+                case 'sizeDesc': sortBy = 'sizeDesc'; break;
+                case 'oldest': sortBy = 'oldest'; break;
+                case 'newest': sortBy = 'newest'; break;
+                default: sortBy = 'newest';
             }
-        };
+            params.set('sortBy', sortBy);
+        } else {
+            params.delete('sortBy');
+        }
+        params.set('page', '1');
+        return params;
+    };
 
-        fetchData();
-    }, [currentPage]);
+    // Handle filter apply
+    const handleApplyFilters = (filters) => {
+        const params = mapFiltersToQuery(filters);
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
+    // Check if any filter is active
+    const isFilterActive = () => {
+        const keys = ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'];
+        return keys.some(key => searchParams.get(key));
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'].forEach(key => params.delete(key));
+        params.set('page', '1');
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
+    // Handle page change
     const handlePageChange = (newPage) => {
-        router.push(`/android/software?page=${newPage}`);
+        const validPage = Math.max(1, Math.min(newPage, totalPages));
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', validPage);
+        router.push(`${pathname}?${params.toString()}`);
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     // Function to check if a software is new (within 2 days)
@@ -90,6 +178,23 @@ export default function AndroidSoftwares({ serverData }) {
 
     return (
         <div className="container mx-auto p-2 relative">
+            {/* Filter Bar at the top */}
+            <div className="mb-6 flex justify-end items-center gap-3">
+                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                {isFilterActive() && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
+                    >
+                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span className="relative flex items-center gap-2 font-medium">
+                            Clear Filters
+                        </span>
+                    </button>
+                )}
+            </div>
+            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
+
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 opacity-5 rounded-full blur-3xl -z-10"></div>
