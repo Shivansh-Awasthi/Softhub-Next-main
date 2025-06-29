@@ -14,6 +14,21 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     const [game, setGame] = useState(null);
     const [error, setError] = useState("");
     const [isExploding, setIsExploding] = useState(false);
+    const [blessing, setBlessing] = useState("");
+    const [showBlessing, setShowBlessing] = useState(false);
+
+    const blessingMessages = [
+        "The gods have chosen this game for you!",
+        "The fairies have blessed you with this pick!",
+        "Destiny rolled the dice for you!",
+        "A wizard conjured this game just for you!",
+        "The stars aligned for this choice!",
+        "A secret council picked this adventure!",
+        "The universe wants you to play this!",
+        "Fate placed this at your feet. Step lightly.",
+        "The last warrior who ignored this… vanished.",
+        "You can play this only, when you earned it!!"
+    ];
 
     const fetchRandomGame = async (preserveCard = false) => {
         setLoading(true);
@@ -37,16 +52,25 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
         }
     };
 
+    const showRandomBlessing = () => {
+        const msg = blessingMessages[Math.floor(Math.random() * blessingMessages.length)];
+        setBlessing(msg);
+        setShowBlessing(true);
+        setTimeout(() => setShowBlessing(false), 1200);
+    };
+
     const handleDiceClick = async () => {
         setIsExploding(true);
         setTimeout(() => setIsExploding(false), 700);
         await fetchRandomGame(false); // clear card on first roll
+        showRandomBlessing();
     };
 
     const handleShuffleClick = async () => {
         setIsExploding(true);
         setTimeout(() => setIsExploding(false), 700);
         await fetchRandomGame(true); // preserve card on shuffle
+        showRandomBlessing();
     };
 
     return (
@@ -58,12 +82,18 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
             {/* If a game is fetched, show the card instead of the button */}
             {game ? (
                 <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#121212] border border-purple-600/20 shadow-lg overflow-hidden min-h-[180px]">
+                    {/* Blessing message overlay */}
+                    {showBlessing && (
+                        <div className="absolute left-1/2 top-8 z-40 px-4 py-1.5 rounded-lg bg-black/20 backdrop-blur-sm text-white text-sm font-medium shadow-lg shadow-black/70 animate-fadeInOut" style={{ transform: 'translateX(-50%)' }}>
+                            {blessing}
+                        </div>
+                    )}
                     {/* Background image */}
                     {game.thumbnail?.[2] && (
                         <img src={game.thumbnail[2]} alt="background" className="absolute inset-0 w-full h-full object-cover object-center opacity-70" style={{ zIndex: 1 }} />
                     )}
                     {/* Overlay for darkening */}
-                    <div className="absolute inset-0 bg-black/60 z-10"></div>
+                    <div className="absolute inset-0 bg-black/40 z-10"></div>
                     {/* Back button */}
                     <button onClick={() => setGame(null)} className="absolute top-4 left-4 z-20 flex items-center justify-center w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white shadow-lg focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
