@@ -34,12 +34,14 @@ export default function Android({ initialData = { apps: [], total: 0 }, initialP
         }
     }, [initialData, searchParams, currentPage]);
 
-    // Handle page change
+    // Update handlePageChange to preserve filters
     const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
-
-        // Navigate to the new page
-        router.push(`/category/android/games?page=${newPage}`);
+        // Validate page range
+        const validPage = Math.max(1, Math.min(newPage, totalPages));
+        // Preserve all current filters and sortBy
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', validPage);
+        router.push(`/category/android/games?${params.toString()}`);
     };
 
     // Function to check if a game is new (within 2 days)
@@ -198,9 +200,37 @@ export default function Android({ initialData = { apps: [], total: 0 }, initialP
             {loading ? (
                 <p className="text-center">Loading...</p>
             ) : error ? (
-                <p className="text-red-500 text-center">{error}</p>
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">{error}</p>
+                    {isFilterActive() && (
+                        <button
+                            onClick={handleClearFilters}
+                            className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 mt-2"
+                        >
+                            <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <span className="relative flex items-center gap-2 font-medium">
+                                Clear Filters
+                            </span>
+                        </button>
+                    )}
+                </div>
             ) : data.length === 0 ? (
-                <p className="text-center">No Android games found.</p>
+                <div className="text-center py-10 text-gray-400">
+                    No Android games found.
+                    {isFilterActive() && (
+                        <div className="mt-4">
+                            <button
+                                onClick={handleClearFilters}
+                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
+                            >
+                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <span className="relative flex items-center gap-2 font-medium">
+                                    Clear Filters
+                                </span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 relative">
                     {/* Grid accent elements */}
