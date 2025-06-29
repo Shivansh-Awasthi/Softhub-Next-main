@@ -39,74 +39,72 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
         <div className="w-full max-w-xl mx-auto flex flex-col items-center gap-4">
             {/* If a game is fetched, show the card instead of the button */}
             {game ? (
-                <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#121212] border border-purple-600/20 shadow-lg overflow-hidden">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 pb-2">
-                        <img src={game.thumbnail?.[0] || game.coverImg} alt={game.title} className="w-24 h-24 rounded-lg object-cover border border-purple-500/20" />
-                        <div className="flex-1 flex flex-col justify-end">
-                            {/* Game Title */}
-                            <h3 className="mb-1 line-clamp-1 pr-2 text-xl leading-tight font-bold text-white sm:mb-2 sm:line-clamp-none sm:pr-4 sm:text-2xl">{game.title}</h3>
-                            {/* Info Row */}
-                            <div className="flex items-center justify-between">
-                                {/* Left Side - Info Badges */}
-                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
-                                    {/* Rating Badge (show _id as fallback) */}
-                                    <div className="flex items-center">
-                                        <span className="rounded border border-white/5 bg-white/10 px-2 py-0.5 text-xs font-medium text-white sm:py-1">{game.rating || game.gameMode}</span>
-                                    </div>
-                                    {/* Year */}
-                                    <div className="flex items-center text-white/80">
-                                        <svg className="mr-1 h-3.5 w-3.5 text-white/60 sm:mr-1.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                        <span className="text-xs sm:text-sm">{game.year || game.releaseYear || '2025'}</span>
-                                    </div>
-                                    {/* Developer (hidden on mobile) */}
-                                    {game.developer && (
-                                        <div className="hidden items-center text-white/80 sm:flex">
-                                            <svg className="mr-1.5 h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                                            <span className="max-w-[150px] truncate text-sm">{game.developer}</span>
-                                        </div>
-                                    )}
-                                    {/* Size (hidden on mobile) */}
-                                    {game.size && (
-                                        <div className="hidden items-center text-white/80 sm:flex">
-                                            <svg className="mr-1.5 h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
-                                            <span className="text-sm">{game.size}</span>
-                                        </div>
-                                    )}
-                                    {/* Genres */}
-                                    <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                                        {Array.isArray(game.genres) && game.genres.length > 0 && (
-                                            <span className="rounded border border-white/5 bg-white/10 px-1.5 py-0.5 text-xs font-medium text-white sm:px-2">{game.genres[0]}</span>
-                                        )}
-                                        {Array.isArray(game.genres) && game.genres.length > 1 && (
-                                            <span className="hidden rounded border border-white/5 bg-white/10 px-2 py-0.5 text-xs font-medium text-white sm:inline-block">{game.genres[1]}</span>
-                                        )}
-                                        {Array.isArray(game.genres) && game.genres.length > 2 && (
-                                            <span className="inline-block rounded border border-white/5 bg-white/10 px-1.5 py-0.5 text-xs font-medium text-white sm:hidden">+{game.genres.length - 1}</span>
-                                        )}
-                                    </div>
+                <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#121212] border border-purple-600/20 shadow-lg overflow-hidden min-h-[220px]">
+                    {/* Background image */}
+                    {game.thumbnail?.[2] && (
+                        <img src={game.thumbnail[2]} alt="background" className="absolute inset-0 w-full h-full object-cover object-center opacity-60" style={{zIndex:1}} />
+                    )}
+                    {/* Overlay for darkening */}
+                    <div className="absolute inset-0 bg-black/60 z-10"></div>
+                    {/* Back button */}
+                    <button onClick={()=>setGame(null)} className="absolute top-4 left-4 z-20 flex items-center justify-center w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white shadow-lg focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <div className="relative flex flex-col justify-end h-full z-20 px-4 py-4 sm:px-6 sm:py-5">
+                        {/* Game Title */}
+                        <h3 className="mb-1 line-clamp-1 pr-2 text-xl leading-tight font-bold text-white sm:mb-2 sm:line-clamp-none sm:pr-4 sm:text-2xl">{game.title}</h3>
+                        {/* Info Row */}
+                        <div className="flex items-center justify-between">
+                            {/* Left Side - Info Badges */}
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+                                {/* Rating Badge (show _id as fallback) */}
+                                <div className="flex items-center">
+                                    <span className="rounded border border-white/5 bg-white/10 px-2 py-0.5 text-xs font-medium text-white sm:py-1">{game.rating || game.gameMode}</span>
                                 </div>
-                                {/* Right Side - Action Buttons */}
-                                <div className="ml-2 flex flex-shrink-0 items-center gap-2 sm:ml-3 sm:gap-3">
-                                    {/* Shuffle Button */}
-                                    <button onClick={fetchRandomGame} disabled={loading} className="group flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/15 focus:outline-none sm:h-9 sm:w-9">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 transform text-white transition-transform duration-500 group-hover:rotate-180 sm:h-4.5 sm:w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                                    </button>
-                                    {/* View Details Button */}
-                                    <a href={`/download/${createSlug(game.platform)}/${createSlug(game.title)}/${game._id}`} className="group flex h-7 items-center gap-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-2.5 text-white shadow-lg shadow-black/30 transition-all duration-300 hover:from-blue-500 hover:to-purple-500 hover:shadow-black/50 focus:outline-none sm:h-9 sm:gap-2 sm:px-4">
-                                        <span className="text-xs font-medium sm:text-sm">
-                                            <span className="inline sm:hidden">View</span>
-                                            <span className="hidden sm:inline">View Details</span>
-                                        </span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 transform transition-transform duration-300 group-hover:translate-x-0.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                    </a>
+                                {/* Year */}
+                                <div className="flex items-center text-white/80">
+                                    <svg className="mr-1 h-3.5 w-3.5 text-white/60 sm:mr-1.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span className="text-xs sm:text-sm">{game.year || game.releaseYear || '2025'}</span>
                                 </div>
+                                {/* Developer (hidden on mobile) */}
+                                {game.developer && (
+                                    <div className="hidden items-center text-white/80 sm:flex">
+                                        <svg className="mr-1.5 h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                        <span className="max-w-[150px] truncate text-sm">{game.developer}</span>
+                                    </div>
+                                )}
+                                {/* Size (hidden on mobile) */}
+                                {game.size && (
+                                    <div className="hidden items-center text-white/80 sm:flex">
+                                        <svg className="mr-1.5 h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                                        <span className="text-sm">{game.size}</span>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Right Side - Action Buttons */}
+                            <div className="ml-2 flex flex-shrink-0 items-center gap-2 sm:ml-3 sm:gap-3">
+                                {/* Shuffle Button */}
+                                <button onClick={fetchRandomGame} disabled={loading} className="group flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/15 focus:outline-none sm:h-9 sm:w-9">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 transform text-white transition-transform duration-500 group-hover:rotate-180 sm:h-4.5 sm:w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                </button>
+                                {/* View Details Button */}
+                                <a href={`/download/${createSlug(game.platform)}/${createSlug(game.title)}/${game._id}`} className="group flex h-7 items-center gap-1 rounded-lg bg-blue-500 px-4 text-white shadow-lg shadow-black/30 transition-all duration-300 hover:bg-blue-600 hover:shadow-black/50 focus:outline-none sm:h-9 sm:gap-2 sm:px-6">
+                                    <span className="text-xs font-medium sm:text-base flex items-center gap-1">View Details <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg></span>
+                                </a>
                             </div>
                         </div>
+                        {/* Genres */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                            {Array.isArray(game.genres) && game.genres.slice(0,2).map((genre, idx) => (
+                                <span key={genre+idx} className="rounded border border-white/5 bg-white/10 px-2 py-0.5 text-xs font-medium text-white">{genre}</span>
+                            ))}
+                            {Array.isArray(game.genres) && game.genres.length > 2 && (
+                                <span className="rounded border border-white/5 bg-white/10 px-2 py-0.5 text-xs font-medium text-white">+{game.genres.length-2}</span>
+                            )}
+                        </div>
                     </div>
-                    {/* Description */}
-                    <div className="px-4 pb-4 text-xs text-gray-400 line-clamp-2">{game.description || "No description available."}</div>
                     {loading && (
-                        <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-black/30">Loading...</span>
+                        <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-black/30 z-30">Loading...</span>
                     )}
                 </div>
             ) : (
