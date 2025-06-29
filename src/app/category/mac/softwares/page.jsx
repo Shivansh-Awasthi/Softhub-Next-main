@@ -23,17 +23,32 @@ export const metadata = {
     description: 'Download free Mac software and applications',
 };
 
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    return params.toString();
+}
+
 // This component fetches data with a timeout to prevent long waits
-async function MacSoftwaresLoader({ currentPage, itemsPerPage }) {
+async function MacSoftwaresLoader({ searchParams, currentPage, itemsPerPage }) {
     try {
         // Create a promise that rejects after 5 seconds
         const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Request timed out')), 5000);
         });
 
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
+
         // Create the fetch promise
         const fetchPromise = fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/smac?page=${currentPage}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/smac?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -66,7 +81,7 @@ export default async function MacSoftwaresPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="Mac" />}>
-            <MacSoftwaresLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <MacSoftwaresLoader searchParams={searchParams} currentPage={currentPage} itemsPerPage={itemsPerPage} />
         </Suspense>
     );
 }
