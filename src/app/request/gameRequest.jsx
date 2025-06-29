@@ -130,8 +130,19 @@ export default function GameRequestForm() {
 
     return (
         <div>
+            <div className="flex justify-center items-center">
+                <div className="inline-flex items-center rounded-full px-5 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-blue-100/50 dark:border-gray-700/50 mb-8">
+                    <div className="flex items-center">
+                        <span className="relative flex h-2 w-2 mr-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                        </span>
+                        <span className="text-sm font-medium text-green-400 dark:text-green-400">Request System Live</span>
+                    </div>
+                </div>
+            </div>
             <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
-            <section className="bg-[#030712] py-16 px-4">
+            <section className="bg-[#030712] pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
                         <h1 className="text-5xl md:text-7xl font-bold text-blue-500 mb-4">
@@ -347,86 +358,166 @@ export default function GameRequestForm() {
                     </div>
                 </div>
             </section>
-            <section className="py-16 px-4 bg-[#030712]">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-cyan-500 mb-4">
-                            Request Lifecycle
-                        </h2>
-                        <p className="text-lg text-gray-500 max-w-3xl mx-auto">
-                            Understanding how your game request progresses through our system
-                        </p>
+            <div className="relative mb-15">
+                {/* <!-- Section Header --> */}
+                <div className="relative mb-12 text-center">
+                    <h2 className="text-3xl font-bold bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                        Request Lifecycle
+                    </h2>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                        Understanding how your game request progresses through our system
+                    </p>
+                </div>
+
+                {/* <!-- State Flow Timeline --> */}
+                <div className="relative max-w-5xl mx-auto">
+                    {/* <!-- Connection Line --> */}
+                    <div className="absolute top-1/2 left-0 right-0 h-1 bg-linear-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20">
                     </div>
 
-                    <div className="relative flex flex-col lg:flex-row items-stretch justify-between gap-6  mt-12">
-                        {/* Timeline line */}
-                        <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-[#232b39] z-0" style={{ transform: 'translateY(-50%)' }} />
-                        {/* Pending */}
-                        <div className="relative z-10 w-full lg:w-1/4">
-                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-blue-500/40 hover:ring-2 hover:ring-blue-500/40">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-[#22335a] rounded-xl p-3 flex items-center justify-center">
-                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-blue-400">
-                                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" />
+                    {/* <!-- States Grid --> */}
+                    <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
+                        {/* <!-- PENDING State --> */}
+                        <div className="relative group">
+                            <div className="absolute -inset-1 bg-linear-to-r from-blue-500/50 to-purple-500/50 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500">
+                            </div>
+                            <div className="relative backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-700/30">
+                                {/* <!-- State Icon --> */}
+                                <div className="mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Pending</h3>
-                                <ul className="space-y-2">
-                                    <li className="flex items-center gap-2 text-blue-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>Need 20 votes</li>
-                                    <li className="flex items-center gap-2 text-blue-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" /></svg>Within 5 days</li>
-                                </ul>
-                            </div>
-                        </div>
-                        {/* Processing */}
-                        <div className="relative z-10 w-full lg:w-1/4">
-                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-yellow-500/40 hover:ring-2 hover:ring-yellow-500/40">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-[#4b3a1a] rounded-xl p-3 flex items-center justify-center">
-                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-yellow-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><circle cx="12" cy="12" r="5" fill="#facc15" /></svg>
+
+                                {/* <!-- State Title --> */}
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Pending
+                                </h3>
+
+                                {/* <!-- Requirements --> */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>Need 20 votes</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>Within 5 days</span>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Processing</h3>
-                                <ul className="space-y-2">
-                                    <li className="flex items-center gap-2 text-yellow-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Quality check</li>
-                                    <li className="flex items-center gap-2 text-yellow-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" /></svg>~24h processing time</li>
-                                </ul>
                             </div>
                         </div>
-                        {/* Approved (with glow) */}
-                        <div className="relative z-10 w-full lg:w-1/4">
-                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-green-500/40 hover:ring-2 hover:ring-green-500/40">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-[#1a3a2a] rounded-xl p-3 flex items-center justify-center">
-                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-green-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>
+
+                        {/* <!-- PROCESSING State --> */}
+                        <div className="relative group">
+                            <div className="absolute -inset-1 bg-linear-to-r from-amber-500/50 to-orange-500/50 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500">
+                            </div>
+                            <div className="relative backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-700/30">
+                                {/* <!-- State Icon with Animation --> */}
+                                <div className="mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                                        <div className="relative">
+                                            <div className="w-3 h-3 bg-amber-500 rounded-full animate-ping absolute"></div>
+                                            <div className="w-3 h-3 bg-amber-500 rounded-full relative"></div>
+                                        </div>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Approved</h3>
-                                <ul className="space-y-2">
-                                    <li className="flex items-center gap-2 text-green-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /><polyline points="7 11 12 16 17 11" /></svg>Ready for download</li>
-                                    <li className="flex items-center gap-2 text-green-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>Files verified</li>
-                                </ul>
+
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                    Processing</h3>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                        <span>Quality check</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>~24h processing time</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        {/* Rejected */}
-                        <div className="relative z-10 w-full lg:w-1/4">
-                            <div className="bg-[#232b39]/80 border border-[#2e3748] rounded-2xl shadow-lg p-8 flex flex-col gap-4 group transition-all duration-300 hover:shadow-red-500/40 hover:ring-2 hover:ring-red-500/40">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-[#3a1a2a] rounded-xl p-3 flex items-center justify-center">
-                                        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-pink-400"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 9l-6 6m0-6l6 6" /></svg>
+
+                        {/* <!-- Success Path --> */}
+                        <div className="relative group">
+                            <div className="absolute -inset-1 bg-linear-to-r from-emerald-500/50 to-green-500/50 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500">
+                            </div>
+                            <div className="relative backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-700/30">
+                                {/* <!-- Success Icon --> */}
+                                <div className="mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
                                     </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">Rejected</h3>
-                                <ul className="space-y-2">
-                                    <li className="flex items-center gap-2 text-pink-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16h.01" /></svg>Less than 20 votes</li>
-                                    <li className="flex items-center gap-2 text-pink-300 text-base"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 9l6 6m0-6l-6 6" /></svg>Removed in 3 days</li>
-                                </ul>
+
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Approved
+                                </h3>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        <span>Ready for download</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>Files verified</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* <!-- Rejected State --> */}
+                        <div className="relative group">
+                            <div className="absolute -inset-1 bg-linear-to-r from-rose-500/50 to-red-500/50 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-500">
+                            </div>
+                            <div className="relative backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 rounded-xl p-6 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-700/30">
+                                {/* <!-- Rejected Icon --> */}
+                                <div className="mb-4">
+                                    <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Rejected
+                                </h3>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>Less than 20 votes</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        <span>Removed in 3 days</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
