@@ -53,7 +53,10 @@ export default function PcGames({ serverData, initialPage = 1 }) {
     const handlePageChange = (newPage) => {
         // Validate page range
         const validPage = Math.max(1, Math.min(newPage, totalPages));
-        router.push(`/category/pc/games?page=${validPage}`);
+        // Preserve all current filters and sortBy
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', validPage);
+        router.push(`/category/pc/games?${params.toString()}`);
     };
 
     const createSlug = (title) => {
@@ -129,19 +132,41 @@ export default function PcGames({ serverData, initialPage = 1 }) {
         }
         // Popularity/sort
         if (filters.popularity && filters.popularity !== 'all') {
-            // Map to backend sortBy
-            let sortBy = 'popular';
-            if (filters.popularity === 'popular_weekly') sortBy = 'popular';
-            else if (filters.popularity === 'popular_monthly') sortBy = 'popular';
-            else if (filters.popularity === 'popular_all_time') sortBy = 'popular';
+            let sortBy = 'newest'; // default fallback
+
+            switch (filters.popularity) {
+                case 'popular':
+                    sortBy = 'popular';
+                    break;
+                case 'relevance':
+                    sortBy = 'relevance';
+                    break;
+                case 'sizeAsc':
+                    sortBy = 'sizeAsc';
+                    break;
+                case 'sizeDesc':
+                    sortBy = 'sizeDesc';
+                    break;
+                case 'oldest':
+                    sortBy = 'oldest';
+                    break;
+                case 'newest':
+                    sortBy = 'newest';
+                    break;
+                default:
+                    sortBy = 'newest'; // fallback safety
+            }
+
             params.set('sortBy', sortBy);
         } else {
             params.delete('sortBy');
         }
+
         // Always reset to page 1 on filter
         params.set('page', '1');
+
         return params;
-    };
+    }
 
     // Handle filter apply
     const handleApplyFilters = (filters) => {

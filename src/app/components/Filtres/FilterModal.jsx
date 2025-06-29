@@ -174,9 +174,12 @@ const YEARS = [
 
 const POPULARITY = [
   { id: "all", label: "All Games" },
-  { id: "popular_all_time", label: "Most Downloaded (All Time)" },
-  { id: "popular_monthly", label: "Most Downloaded (Last 30 Days)" },
-  { id: "popular_weekly", label: "Most Downloaded (Last 7 Days)" },
+  { id: "popular", label: "Popularity" },
+  { id: "relevance", label: "Relevance" },
+  { id: "sizeAsc", label: "Size: Smallest First" },
+  { id: "sizeDesc", label: "Size: Largest First" },
+  { id: "oldest", label: "Oldest" },
+  { id: "newest", label: "Newest" },
 ];
 
 const FilterModal = ({ open, onClose, onApply }) => {
@@ -339,7 +342,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           <label
                             htmlFor={`genre${g.id}`}
                             className={`flex w-full px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedGenres.includes(g.id)
-                              ? "bg-primary text-white border-primary"
+                              ? "bg-[#28A9E0] text-white border-[#28A9E0]"
                               : ""
                               }`}
                           >
@@ -372,50 +375,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
                     </button>
                   </div>
                 </div>
-                {/* Game Mode Filter */}
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-5 shadow-sm">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2 text-primary"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
-                      />
-                    </svg>
-                    Game Mode
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {GAME_MODES.map((m) => (
-                      <div key={m.id}>
-                        <input
-                          type="radio"
-                          id={`mode${m.id}`}
-                          name="mode"
-                          value={m.id}
-                          className="hidden peer"
-                          checked={selectedGameMode === m.id}
-                          onChange={() => setSelectedGameMode(m.id)}
-                        />
-                        <label
-                          htmlFor={`mode${m.id}`}
-                          className={`inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 rounded-lg text-sm cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedGameMode === m.id
-                            ? "bg-primary text-white border-primary"
-                            : ""
-                            }`}
-                        >
-                          <span>{m.label}</span>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
                 {/* Size Filter */}
                 <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
@@ -452,7 +412,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         <label
                           htmlFor={`size${s.id}`}
                           className={`flex items-center justify-center px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedSizeRange === s.id
-                            ? "bg-primary text-white border-primary"
+                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
                             : ""
                             }`}
                         >
@@ -525,7 +485,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           <label
                             htmlFor={`year${y || "All"}`}
                             className={`flex items-center justify-center px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedReleaseYear === y
-                              ? "bg-primary text-white border-primary"
+                              ? "bg-[#28A9E0] text-white border-[#28A9E0]"
                               : ""
                               }`}
                           >
@@ -553,7 +513,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
                       />
                     </svg>
-                    Sort by Popularity
+                    Sort by
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {POPULARITY.map((p) => (
@@ -570,11 +530,55 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         <label
                           htmlFor={`download${p.id}`}
                           className={`inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 rounded-lg text-sm cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedPopularity === p.id
-                            ? "bg-primary text-white border-primary"
+                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
                             : ""
                             }`}
                         >
                           <span>{p.label}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Game Mode Filter */}
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-5 shadow-sm">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2 text-primary"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                      />
+                    </svg>
+                    Game Mode
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {GAME_MODES.map((m) => (
+                      <div key={m.id}>
+                        <input
+                          type="radio"
+                          id={`mode${m.id}`}
+                          name="mode"
+                          value={m.id}
+                          className="hidden peer"
+                          checked={selectedGameMode === m.id}
+                          onChange={() => setSelectedGameMode(m.id)}
+                        />
+                        <label
+                          htmlFor={`mode${m.id}`}
+                          className={`inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 rounded-lg text-sm cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedGameMode === m.id
+                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
+                            : ""
+                            }`}
+                        >
+                          <span>{m.label}</span>
                         </label>
                       </div>
                     ))}
