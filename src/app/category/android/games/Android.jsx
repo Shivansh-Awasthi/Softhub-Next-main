@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import { FaAndroid } from "react-icons/fa6";
+import FilterBar from '@/app/components/Filtres/FilterBar';
+import FilterModal from '@/app/components/Filtres/FilterModal';
 
 export default function Android({ initialData = { apps: [], total: 0 }, initialPage = 1 }) {
     const router = useRouter();
@@ -15,6 +17,7 @@ export default function Android({ initialData = { apps: [], total: 0 }, initialP
     const itemsPerPage = 48;
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     // Calculate total pages
     const totalPages = totalItems > 0 ? Math.ceil(totalItems / itemsPerPage) : 1;
@@ -55,8 +58,122 @@ export default function Android({ initialData = { apps: [], total: 0 }, initialP
             .trim(); // Remove trailing spaces
     };
 
+    // Helper: Map filter modal values to backend query params (same as PC)
+    const mapFiltersToQuery = (filters) => {
+        const params = new URLSearchParams(searchParams.toString());
+        const GENRES = [
+            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
+            { id: 83, name: "Agriculture" }, { id: 33, name: "Anime" }, { id: 40, name: "Apps" }, { id: 71, name: "Arcade" },
+            { id: 115, name: "Artificial Intelligence" }, { id: 129, name: "Assassin" }, { id: 60, name: "Atmospheric" },
+            { id: 109, name: "Automation" }, { id: 133, name: "Blood" }, { id: 24, name: "Building" }, { id: 95, name: "Cartoon" },
+            { id: 22, name: "Casual" }, { id: 107, name: "Character Customization" }, { id: 68, name: "Cinematic*" },
+            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 108, name: "Colony Sim" }, { id: 70, name: "Colorful" },
+            { id: 86, name: "Combat" }, { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" },
+            { id: 105, name: "Controller" }, { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" },
+            { id: 67, name: "Cyberpunk" }, { id: 91, name: "Dark Humor" }, { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" },
+            { id: 126, name: "Driving" }, { id: 118, name: "Early Access" }, { id: 46, name: "eSport" }, { id: 125, name: "Exploration" },
+            { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" }, { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" },
+            { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" }, { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" },
+            { id: 88, name: "Flight" }, { id: 43, name: "FPS" }, { id: 64, name: "Funny" }, { id: 76, name: "Gore" },
+            { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" }, { id: 10, name: "History" }, { id: 11, name: "Horror" },
+            { id: 57, name: "Hunting" }, { id: 69, name: "Idler" }, { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" },
+            { id: 25, name: "Indie" }, { id: 101, name: "LEGO" }, { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" },
+            { id: 113, name: "Management" }, { id: 61, name: "Mature" }, { id: 96, name: "Memes" }, { id: 50, name: "Military" },
+            { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" }, { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" },
+            { id: 26, name: "Open World" }, { id: 74, name: "Parkour" }, { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" },
+            { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" }, { id: 48, name: "PvP" }, { id: 28, name: "Racing" },
+            { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" }, { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" },
+            { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" }, { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" },
+            { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" }, { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" },
+            { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" }, { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" },
+            { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" }, { id: 37, name: "Survival" }, { id: 47, name: "Tactical" },
+            { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" }, { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" },
+            { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" }, { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" },
+            { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
+            { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
+        ];
+        const genreNames = filters.genres?.map(id => {
+            const found = GENRES.find(g => g.id === id);
+            return found ? found.name : null;
+        }).filter(Boolean);
+        if (genreNames && genreNames.length > 0) {
+            params.set('tags', genreNames.join(','));
+        } else {
+            params.delete('tags');
+        }
+        if (filters.gameMode && filters.gameMode !== 'any') {
+            params.set('gameMode', filters.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer');
+        } else {
+            params.delete('gameMode');
+        }
+        if (filters.size) {
+            params.set('sizeLimit', filters.size);
+        } else {
+            params.delete('sizeLimit');
+        }
+        if (filters.year) {
+            params.set('releaseYear', filters.year);
+        } else {
+            params.delete('releaseYear');
+        }
+        if (filters.popularity && filters.popularity !== 'all') {
+            let sortBy = 'newest';
+            switch (filters.popularity) {
+                case 'popular': sortBy = 'popular'; break;
+                case 'relevance': sortBy = 'relevance'; break;
+                case 'sizeAsc': sortBy = 'sizeAsc'; break;
+                case 'sizeDesc': sortBy = 'sizeDesc'; break;
+                case 'oldest': sortBy = 'oldest'; break;
+                case 'newest': sortBy = 'newest'; break;
+                default: sortBy = 'newest';
+            }
+            params.set('sortBy', sortBy);
+        } else {
+            params.delete('sortBy');
+        }
+        params.set('page', '1');
+        return params;
+    };
+
+    // Handle filter apply
+    const handleApplyFilters = (filters) => {
+        const params = mapFiltersToQuery(filters);
+        router.push(`/category/android/games?${params.toString()}`);
+    };
+
+    // Check if any filter is active
+    const isFilterActive = () => {
+        const keys = ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'];
+        return keys.some(key => searchParams.get(key));
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        ['tags', 'gameMode', 'sizeLimit', 'releaseYear', 'sortBy'].forEach(key => params.delete(key));
+        params.set('page', '1');
+        router.push(`/category/android/games?${params.toString()}`);
+    };
+
     return (
         <div className="container mx-auto p-2 relative">
+            {/* Filter Bar at the top */}
+            <div className="mb-6 flex justify-end items-center gap-3">
+                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                {isFilterActive() && (
+                    <button
+                        onClick={handleClearFilters}
+                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
+                    >
+                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span className="relative flex items-center gap-2 font-medium">
+                            Clear Filters
+                        </span>
+                    </button>
+                )}
+            </div>
+            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
+
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600 opacity-5 rounded-full blur-3xl -z-10"></div>
