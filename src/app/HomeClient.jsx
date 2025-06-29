@@ -219,9 +219,9 @@ const HomeClient = ({
                 <div className="cover mb-8 flex justify-between items-center relative">
                     <div className="absolute top-1/2 left-0 w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10 -translate-y-1/2"></div>
                     <h2 className="text-2xl font-bold relative">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                        <span className="text-white">
                             Mac Games{' '}
-                            <span className="font-medium text-blue-400">{totalMacGames}</span>
+                            <span className="font-medium text-white">{totalMacGames}</span>
                         </span>
                         <span className="absolute -bottom-2 left-0 w-16 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
                     </h2>
@@ -273,10 +273,10 @@ const HomeClient = ({
                                     {/* Glowing separator line */}
                                     <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
 
-                                    <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
+                                    <div className="text-sm font-medium text-white pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
                                         {ele.title}
                                     </div>
-                                    <div className="text-xs font-normal text-gray-400 flex items-center">
+                                    <div className="text-xs font-normal text-white flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
                                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                         </svg>
@@ -351,10 +351,10 @@ const HomeClient = ({
                                     {/* Glowing separator line */}
                                     <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
 
-                                    <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
+                                    <div className="text-sm font-medium text-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
                                         {ele.title}
                                     </div>
-                                    <div className="text-xs font-normal text-gray-400 flex items-center justify-center">
+                                    <div className="text-xs font-normal text-white flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
                                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                         </svg>
@@ -374,9 +374,9 @@ const HomeClient = ({
                 <div className="cover mb-8 flex justify-between items-center relative">
                     <div className="absolute top-1/2 left-0 w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10 -translate-y-1/2"></div>
                     <h2 className="text-2xl font-bold relative">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                        <span className="text-white">
                             PC Games{' '}
-                            <span className="font-medium text-blue-400">{totalPcGames}</span>
+                            <span className="font-medium text-white">{totalPcGames}</span>
                         </span>
                         <span className="absolute -bottom-2 left-0 w-16 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
                     </h2>
@@ -433,10 +433,10 @@ const HomeClient = ({
                                     {/* Glowing separator line */}
                                     <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
 
-                                    <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
+                                    <div className="text-sm font-medium text-white pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
                                         {ele.title}
                                     </div>
-                                    <div className="text-xs font-normal text-gray-400 flex items-center">
+                                    <div className="text-xs font-normal text-white flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
                                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                         </svg>
@@ -589,10 +589,10 @@ const HomeClient = ({
                                     {/* Glowing separator line */}
                                     <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
 
-                                    <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
+                                    <div className="text-sm font-medium text-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
                                         {ele.title}
                                     </div>
-                                    <div className="text-xs font-normal text-gray-400 flex items-center justify-center">
+                                    <div className="text-xs font-normal text-white flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
                                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                         </svg>
