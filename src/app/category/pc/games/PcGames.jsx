@@ -184,7 +184,7 @@ export default function PcGames({ serverData, initialPage = 1 }) {
             )}
             {/* Random game button - always visible at the bottom right */}
             <div className="fixed bottom-4 right-4 z-20">
-                <RandomGameButton />
+                <RandomGameButton platform='pc' />
             </div>
         </div>
     );
