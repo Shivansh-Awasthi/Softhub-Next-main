@@ -129,7 +129,7 @@ const Sidebar = () => {
           scrollbarWidth: 'none', /* Firefox */
           msOverflowStyle: 'none', /* IE and Edge */
           borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(180deg, rgba(30,30,30,1) 0%, rgba(18,18,18,1) 100%)'
+          background: '#101018'
         }}
       >
         <Link
