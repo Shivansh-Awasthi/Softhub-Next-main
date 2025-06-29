@@ -23,12 +23,27 @@ export const metadata = {
     description: 'Download free PC games and apps',
 };
 
+// Helper: Build query string from searchParams
+function buildQueryString(searchParams, currentPage, itemsPerPage) {
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', itemsPerPage);
+    // Forward relevant filters
+    if (searchParams?.tags) params.set('tags', searchParams.tags);
+    if (searchParams?.gameMode) params.set('gameMode', searchParams.gameMode);
+    if (searchParams?.sizeLimit) params.set('sizeLimit', searchParams.sizeLimit);
+    if (searchParams?.releaseYear) params.set('releaseYear', searchParams.releaseYear);
+    if (searchParams?.sortBy) params.set('sortBy', searchParams.sortBy);
+    // Add more filters as needed
+    return params.toString();
+}
+
 // This component fetches data and renders the PcGames component
-async function PcGamesLoader({ currentPage, itemsPerPage }) {
+async function PcGamesLoader({ currentPage, itemsPerPage, searchParams }) {
     try {
-        // This fetch happens at build time and during revalidation
+        const queryString = buildQueryString(searchParams, currentPage, itemsPerPage);
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/pc?page=${currentPage}&limit=${itemsPerPage}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/pc?${queryString}`,
             {
                 headers: {
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
@@ -63,7 +78,7 @@ export default async function PcGamesPage({ searchParams }) {
 
     return (
         <Suspense fallback={<CategorySkeleton itemCount={16} platform="PC" />}>
-            <PcGamesLoader currentPage={currentPage} itemsPerPage={itemsPerPage} />
+            <PcGamesLoader currentPage={currentPage} itemsPerPage={itemsPerPage} searchParams={searchParams} />
         </Suspense>
     );
 }
