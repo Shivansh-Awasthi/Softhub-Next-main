@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FaCheck, FaTimes, FaDownload, FaExclamationTriangle, FaUsers, FaExternalLinkAlt } from "react-icons/fa";
+import jwtDecode from "jwt-decode";
 
 const STATUS_ORDER = ["pending", "processing", "approved", "rejected"];
 
@@ -190,7 +191,7 @@ function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
                         : "bg-gradient-to-r from-blue-600 to-blue-400 text-white hover:from-blue-700 hover:to-blue-500 shadow-lg hover:shadow-blue-500/40"}`}
                 >
                     {isVoted ? (
-                        <span className="flex items-center justify-center"><FaCheck className="mr-2" />Already Supported</span>
+                        <span className="flex items-center justify-center"><FaCheck className="mr-2" />Supported</span>
                     ) : (
                         <span className="flex items-center justify-center">+ Support Request</span>
                     )}
@@ -273,6 +274,51 @@ export default function GameRequestList() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
     const [cardsToShow, setCardsToShow] = useState(12);
+    const [userId, setUserId] = useState(null);
+
+    // Fetch current user ID from token or API
+    useEffect(() => {
+        const fetchUserId = async () => {
+            try {
+                const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+                if (!token) return;
+                // Try to decode token first
+                try {
+                    const decoded = jwtDecode(token);
+                    if (decoded && (decoded._id || decoded.id)) {
+                        setUserId(decoded._id || decoded.id);
+                        return;
+                    }
+                } catch (err) { }
+                // Fallback: fetch from API
+                try {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                            'Content-Type': 'application/json'
+                        },
+                    });
+                    const data = await res.json();
+                    if (data && data.user && (data.user._id || data.user.id)) {
+                        setUserId(data.user._id || data.user.id);
+                        console.log("User ID set to:", data.user._id || data.user.id);
+                    } else {
+                        console.warn("User data structure unexpected:", data);
+                    }
+
+                } catch (err) { }
+            } catch (err) { }
+        };
+        fetchUserId();
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            console.log("Updated userId:", userId, requests);
+        }
+    }, [userId, requests]);
+
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -341,6 +387,7 @@ export default function GameRequestList() {
         return acc;
     }, {});
 
+
     return (
         <div className="max-w-7xl mx-auto py-10 px-2 md:px-6 bg-[#10131a] min-h-screen">
             <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
@@ -378,7 +425,7 @@ export default function GameRequestList() {
                                     status={status}
                                     onVote={handleVote}
                                     voting={votingId === req._id}
-                                    isVoted={!!voted[req._id] || req.status !== "pending"}
+                                    isVoted={!!voted[req._id] || (userId && req.voters && req.voters.some(v => v.user === userId || v.user?._id === userId)) || req.status !== "pending"}
                                     glow={idx === 3} // Example: 4th card glows
                                 />
                             ))}

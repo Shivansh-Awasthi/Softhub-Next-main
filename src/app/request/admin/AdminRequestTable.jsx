@@ -27,7 +27,7 @@ export default function AdminRequestTable() {
         setError("");
         try {
             const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            const res = await fetch("http://localhost:8080/api/requests/admin/requests", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/admin/requests`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
             });
             const data = await res.json();
@@ -47,7 +47,7 @@ export default function AdminRequestTable() {
         setStatusUpdating(id);
         try {
             const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            const res = await fetch(`http://localhost:8080/api/requests/admin/requests/${id}/status`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/admin/requests/${id}/status`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

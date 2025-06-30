@@ -15,7 +15,7 @@ export default function AdminBulkActions() {
         setMessage("");
         try {
             const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            const res = await fetch("http://localhost:8080/api/requests/admin/requests/bulk-status", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/admin/requests/bulk-status`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
