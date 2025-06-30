@@ -205,23 +205,59 @@ const FilterModal = ({ open, onClose, onApply }) => {
     [yearSearch]
   );
 
-  // Active filters summary
+  // Color palette for badges
+  const BADGE_COLORS = [
+    "bg-blue-500",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-green-500",
+    "bg-yellow-500",
+    "bg-red-500",
+    "bg-indigo-500",
+    "bg-teal-500",
+  ];
+
+  // Active filters summary (with type info for removal)
   const activeFilters = [];
-  if (selectedGenres.length > 0)
-    activeFilters.push(
-      ...GENRES.filter((g) => selectedGenres.includes(g.id)).map((g) => g.name)
-    );
+  selectedGenres.forEach((id) => {
+    const genre = GENRES.find((g) => g.id === id);
+    if (genre) activeFilters.push({ type: "genre", id, label: genre.name });
+  });
   if (selectedGameMode !== "any")
-    activeFilters.push(
-      GAME_MODES.find((m) => m.id === selectedGameMode)?.label
-    );
+    activeFilters.push({
+      type: "gameMode",
+      id: selectedGameMode,
+      label: GAME_MODES.find((m) => m.id === selectedGameMode)?.label,
+    });
   if (selectedSizeRange)
-    activeFilters.push(SIZE_RANGES.find((s) => s.id === selectedSizeRange)?.label);
-  if (selectedReleaseYear) activeFilters.push(selectedReleaseYear);
+    activeFilters.push({
+      type: "size",
+      id: selectedSizeRange,
+      label: SIZE_RANGES.find((s) => s.id === selectedSizeRange)?.label,
+    });
+  if (selectedReleaseYear)
+    activeFilters.push({ type: "year", id: selectedReleaseYear, label: selectedReleaseYear });
   if (selectedPopularity !== "all")
-    activeFilters.push(
-      POPULARITY.find((p) => p.id === selectedPopularity)?.label
-    );
+    activeFilters.push({
+      type: "popularity",
+      id: selectedPopularity,
+      label: POPULARITY.find((p) => p.id === selectedPopularity)?.label,
+    });
+
+  // Remove filter handler
+  const handleRemoveFilter = (filter) => {
+    if (filter.type === "genre") {
+      setSelectedGenres((prev) => prev.filter((id) => id !== filter.id));
+    } else if (filter.type === "gameMode") {
+      setSelectedGameMode("any");
+    } else if (filter.type === "size") {
+      setSelectedSizeRange("");
+    } else if (filter.type === "year") {
+      setSelectedReleaseYear("");
+    } else if (filter.type === "popularity") {
+      setSelectedPopularity("all");
+    }
+  };
 
   const handleApply = () => {
     // Only return selected values
@@ -592,6 +628,21 @@ const FilterModal = ({ open, onClose, onApply }) => {
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Active Filters
                 </h4>
+                {activeFilters.length > 0 && (
+                  <button
+                    type="button"
+                    className="text-xs px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-red-500 hover:text-white transition-all"
+                    onClick={() => {
+                      setSelectedGenres([]);
+                      setSelectedGameMode("any");
+                      setSelectedSizeRange("");
+                      setSelectedReleaseYear("");
+                      setSelectedPopularity("all");
+                    }}
+                  >
+                    Clear All
+                  </button>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {activeFilters.length === 0 ? (
@@ -601,10 +652,20 @@ const FilterModal = ({ open, onClose, onApply }) => {
                 ) : (
                   activeFilters.map((f, i) => (
                     <span
-                      key={i}
-                      className="px-3 py-1 rounded-full bg-[#23263a] border border-primary text-primary-foreground text-xs font-semibold shadow-sm"
+                      key={f.type + f.id}
+                      className={`flex items-center gap-1 px-3 py-1 rounded-full text-white text-xs font-semibold shadow-sm ${BADGE_COLORS[i % BADGE_COLORS.length]} animate-fade-in`}
                     >
-                      {f}
+                      {f.label}
+                      <button
+                        type="button"
+                        className="ml-1 rounded-full hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
+                        aria-label={`Remove ${f.label}`}
+                        onClick={() => handleRemoveFilter(f)}
+                      >
+                        <svg className="h-3 w-3" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 6l8 8M6 14L14 6" />
+                        </svg>
+                      </button>
                     </span>
                   ))
                 )}
