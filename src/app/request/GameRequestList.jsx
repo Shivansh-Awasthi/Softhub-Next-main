@@ -280,7 +280,7 @@ export default function GameRequestList() {
             setError("");
             try {
                 const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-                const res = await fetch("http://localhost:8080/api/requests", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests`, {
                     headers: token ? { Authorization: `Bearer ${token}` } : {},
                 });
                 const data = await res.json();
@@ -308,7 +308,7 @@ export default function GameRequestList() {
         setError("");
         try {
             const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            const res = await fetch(`http://localhost:8080/api/requests/${id}/vote`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/${id}/vote`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
