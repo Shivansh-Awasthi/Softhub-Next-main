@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 // All genres, years, publishers, etc. as per your HTML (truncated for brevity, but you can expand as needed)
 const GENRES = [
@@ -182,7 +182,7 @@ const POPULARITY = [
   { id: "newest", label: "Newest" },
 ];
 
-const FilterModal = ({ open, onClose, onApply }) => {
+const FilterModal = ({ open, onClose, onApply, initialFilters }) => {
   const [genreSearch, setGenreSearch] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [filterModeAny, setFilterModeAny] = useState(true);
@@ -271,6 +271,22 @@ const FilterModal = ({ open, onClose, onApply }) => {
     });
     onClose();
   };
+
+  // Sync local state with initialFilters when modal opens
+  useEffect(() => {
+    if (open && initialFilters) {
+      setSelectedGenres(initialFilters.genres || []);
+      setSelectedGameMode(initialFilters.gameMode || "any");
+      setSelectedSizeRange(initialFilters.size || "");
+      setSelectedReleaseYear(initialFilters.year || "");
+      setSelectedPopularity(initialFilters.popularity || "all");
+      setFilterModeAny(
+        initialFilters.filterModeAny !== undefined
+          ? initialFilters.filterModeAny
+          : true
+      );
+    }
+  }, [open, initialFilters]);
 
   if (!open) return null;
   return (
