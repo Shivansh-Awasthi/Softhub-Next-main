@@ -449,8 +449,8 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           htmlFor={`size${s.id}`}
                           className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg cursor-pointer border transition-all duration-200
     ${selectedSizeRange === s.id
-                            ? `${BADGE_COLORS[1]} text-white border-purple-500 shadow-md scale-105`
-                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                              ? `${BADGE_COLORS[1]} text-white border-purple-500 shadow-md scale-105`
+                              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{s.label}</span>
                         </label>
@@ -522,8 +522,8 @@ const FilterModal = ({ open, onClose, onApply }) => {
                             htmlFor={`year${y || "All"}`}
                             className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg cursor-pointer border transition-all duration-200
     ${selectedReleaseYear === y
-                              ? `${BADGE_COLORS[2]} text-white border-pink-500 shadow-md scale-105`
-                              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                                ? `${BADGE_COLORS[2]} text-white border-pink-500 shadow-md scale-105`
+                                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                           >
                             <span>{y === "" ? "All" : y}</span>
                           </label>
@@ -567,8 +567,8 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           htmlFor={`download${p.id}`}
                           className={`inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm cursor-pointer border transition-all duration-200
     ${selectedPopularity === p.id
-                            ? `${BADGE_COLORS[3]} text-white border-green-500 shadow-md scale-105`
-                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                              ? `${BADGE_COLORS[3]} text-white border-green-500 shadow-md scale-105`
+                              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{p.label}</span>
                         </label>
@@ -611,8 +611,8 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           htmlFor={`mode${m.id}`}
                           className={`inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm cursor-pointer border transition-all duration-200
     ${selectedGameMode === m.id
-                            ? `${BADGE_COLORS[4]} text-white border-yellow-500 shadow-md scale-105`
-                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                              ? `${BADGE_COLORS[4]} text-white border-yellow-500 shadow-md scale-105`
+                              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{m.label}</span>
                         </label>
@@ -682,7 +682,7 @@ const FilterModal = ({ open, onClose, onApply }) => {
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-primary/70 text-white shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-200"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-bold shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-200 scale-100 hover:scale-102 active:scale-95"
               >
                 <span>Apply Filters</span>
               </button>
