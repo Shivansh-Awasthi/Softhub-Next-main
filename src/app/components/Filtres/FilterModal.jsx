@@ -377,10 +377,10 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           />
                           <label
                             htmlFor={`genre${g.id}`}
-                            className={`flex w-full px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedGenres.includes(g.id)
-                              ? "bg-[#28A9E0] text-white border-[#28A9E0]"
-                              : ""
-                              }`}
+                            className={`flex w-full px-3 py-2 text-sm rounded-lg cursor-pointer border transition-all duration-200
+    ${selectedGenres.includes(g.id)
+                                ? `${BADGE_COLORS[0]} text-white border-blue-500 shadow-md scale-105`
+                                : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                           >
                             <span className="truncate">{g.name}</span>
                           </label>
@@ -447,10 +447,10 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         />
                         <label
                           htmlFor={`size${s.id}`}
-                          className={`flex items-center justify-center px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedSizeRange === s.id
-                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
-                            : ""
-                            }`}
+                          className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg cursor-pointer border transition-all duration-200
+    ${selectedSizeRange === s.id
+                            ? `${BADGE_COLORS[1]} text-white border-purple-500 shadow-md scale-105`
+                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{s.label}</span>
                         </label>
@@ -520,10 +520,10 @@ const FilterModal = ({ open, onClose, onApply }) => {
                           />
                           <label
                             htmlFor={`year${y || "All"}`}
-                            className={`flex items-center justify-center px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedReleaseYear === y
-                              ? "bg-[#28A9E0] text-white border-[#28A9E0]"
-                              : ""
-                              }`}
+                            className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg cursor-pointer border transition-all duration-200
+    ${selectedReleaseYear === y
+                              ? `${BADGE_COLORS[2]} text-white border-pink-500 shadow-md scale-105`
+                              : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                           >
                             <span>{y === "" ? "All" : y}</span>
                           </label>
@@ -565,10 +565,10 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         />
                         <label
                           htmlFor={`download${p.id}`}
-                          className={`inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 rounded-lg text-sm cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedPopularity === p.id
-                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
-                            : ""
-                            }`}
+                          className={`inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm cursor-pointer border transition-all duration-200
+    ${selectedPopularity === p.id
+                            ? `${BADGE_COLORS[3]} text-white border-green-500 shadow-md scale-105`
+                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{p.label}</span>
                         </label>
@@ -609,10 +609,10 @@ const FilterModal = ({ open, onClose, onApply }) => {
                         />
                         <label
                           htmlFor={`mode${m.id}`}
-                          className={`inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 rounded-lg text-sm cursor-pointer border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 ${selectedGameMode === m.id
-                            ? "bg-[#28A9E0] text-white border-[#28A9E0]"
-                            : ""
-                            }`}
+                          className={`inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm cursor-pointer border transition-all duration-200
+    ${selectedGameMode === m.id
+                            ? `${BADGE_COLORS[4]} text-white border-yellow-500 shadow-md scale-105`
+                            : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                           <span>{m.label}</span>
                         </label>
