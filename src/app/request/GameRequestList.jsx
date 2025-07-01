@@ -302,7 +302,6 @@ export default function GameRequestList() {
                     const data = await res.json();
                     if (data && data.user && (data.user._id || data.user.id)) {
                         setUserId(data.user._id || data.user.id);
-                        console.log("User ID set to:", data.user._id || data.user.id);
                     } else {
                         console.warn("User data structure unexpected:", data);
                     }
@@ -312,12 +311,6 @@ export default function GameRequestList() {
         };
         fetchUserId();
     }, []);
-
-    useEffect(() => {
-        if (userId) {
-            console.log("Updated userId:", userId, requests);
-        }
-    }, [userId, requests]);
 
 
     useEffect(() => {
