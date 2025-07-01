@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { FaCheck, FaTimes, FaDownload, FaExclamationTriangle, FaUsers, FaExternalLinkAlt } from "react-icons/fa";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const STATUS_ORDER = ["pending", "processing", "approved", "rejected"];
 

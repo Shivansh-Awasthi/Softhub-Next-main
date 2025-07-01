@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { FaHeart, FaPlus, FaClock, FaCog, FaTimesCircle, FaSteam, FaInfoCircle, FaExclamationTriangle, FaCheckCircle, FaGamepad, FaVoteYea, FaBolt } from 'react-icons/fa';
 
-
 // PopupModal: Modern, reusable modal for error/info messages
 function PopupModal({ open, message, onClose }) {
     if (!open) return null;
@@ -44,7 +43,6 @@ function PopupModal({ open, message, onClose }) {
 
 export default function GameRequestForm() {
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
     const [platform, setPlatform] = useState("");
     const [steamLink, setSteamLink] = useState("");
     const [message, setMessage] = useState("");
@@ -83,34 +81,42 @@ export default function GameRequestForm() {
         }
     ];
 
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage("");
-        // Validate Steam link (basic check)
+
+        // Validate Steam link
         if (steamLink && !/^https?:\/\/(store\.)?steampowered\.com\//.test(steamLink)) {
             setModalMessage("Invalid Steam link. Please provide a valid Steam store URL.");
             setModalOpen(true);
             setLoading(false);
             return;
         }
+
+        // Validate platform selection
+        if (!platform) {
+            setModalMessage("Please select a platform (PC or Mac)");
+            setModalOpen(true);
+            setLoading(false);
+            return;
+        }
+
         try {
             const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            const res = await fetch("http://localhost:8080/api/requests", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    'Authorization': `Bearer ${token}`,
+                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, description, platform, steamLink }),
+                body: JSON.stringify({ title, platform, steamLink }),
             });
             const data = await res.json().catch(() => ({}));
             if (res.ok) {
                 setMessage("Request submitted successfully!");
                 setTitle("");
-                setDescription("");
                 setPlatform("");
                 setSteamLink("");
             } else if (res.status === 429) {
@@ -235,8 +241,6 @@ export default function GameRequestForm() {
                                             />
                                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#7b8597]">{title.length}/191</span>
                                         </div>
-                                        {/* Example error message (replace with your error state if needed) */}
-                                        {/* <p className="mt-1 text-sm text-red-400">The title field is required.</p> */}
                                     </div>
 
                                     {/* Steam Store URL */}
@@ -255,9 +259,33 @@ export default function GameRequestForm() {
                                                 onChange={(e) => setSteamLink(e.target.value)}
                                                 className="w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
                                             />
-                                            {/* Example valid/invalid state (replace with your validation logic) */}
-                                            {/* <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-green-400">✓ Valid URL</span> */}
-                                            {/* <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-red-400">The steam link field is required.</span> */}
+                                        </div>
+                                    </div>
+
+                                    {/* Platform Dropdown */}
+                                    <div>
+                                        <label htmlFor="platform" className="block text-base font-semibold text-white mb-2 tracking-wide">
+                                            Platform
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <FaGamepad className="text-xl text-[#7b8597]" />
+                                            </div>
+                                            <select
+                                                value={platform}
+                                                onChange={(e) => setPlatform(e.target.value)}
+                                                required
+                                                className={`w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none appearance-none text-base shadow-inner ${!platform ? 'text-[#7b8597]' : 'text-white'}`}
+                                            >
+                                                <option value="" disabled>Select a platform</option>
+                                                <option value="PC">PC</option>
+                                                <option value="Mac">Mac</option>
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                <svg className="w-4 h-4 text-[#7b8597]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -386,7 +414,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -399,13 +427,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Need 20 votes</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Within 5 days</span>
                                     </div>
@@ -434,13 +462,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                         </svg>
                                         <span>Quality check</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>~24h processing time</span>
                                     </div>
@@ -457,7 +485,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -468,13 +496,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
                                         <span>Ready for download</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Files verified</span>
                                     </div>
@@ -491,7 +519,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -502,13 +530,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Less than 20 votes</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
                                         <span>Removed in 3 days</span>
                                     </div>
