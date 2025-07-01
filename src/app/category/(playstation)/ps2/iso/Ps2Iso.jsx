@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
@@ -12,6 +12,34 @@ export default function Ps2Iso({ serverData }) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const initialPage = parseInt(searchParams.get('page') || '1', 10);
+
+    // Extract filters from URL
+    const extractFiltersFromUrl = () => {
+        const genres = searchParams.get('tags')
+            ? searchParams.get('tags').split(',').map(name => {
+                const GENRES = [
+                    { id: 1, name: 'Action' },
+                    { id: 2, name: 'Adventure' },
+                    { id: 3, name: 'RPG' },
+                    { id: 4, name: 'Racing' },
+                ];
+                const found = GENRES.find(g => g.name === name);
+                return found ? found.id : null;
+            }).filter(Boolean) : [];
+        return {
+            genres,
+            gameMode: searchParams.get('gameMode') === 'Singleplayer' ? 'single' : searchParams.get('gameMode') === 'Multiplayer' ? 'multiplayer' : 'any',
+            size: searchParams.get('sizeLimit') || '',
+            year: searchParams.get('releaseYear') || '',
+            popularity: searchParams.get('sortBy') ? 'popular' : 'all',
+        };
+    };
+
+    // Persistent filters state
+    const [filters, setFilters] = useState(extractFiltersFromUrl());
+    useEffect(() => {
+        setFilters(extractFiltersFromUrl());
+    }, [searchParams]);
 
     // Initialize with server data or handle error from server
     const [data, setData] = useState(serverData.apps || []);
@@ -183,7 +211,7 @@ export default function Ps2Iso({ serverData }) {
                     </button>
                 )}
             </div>
-            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} />
+            <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} initialFilters={filters} />
 
             {/* Background decorative elements */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-purple-600 opacity-5 rounded-full blur-3xl -z-10"></div>
