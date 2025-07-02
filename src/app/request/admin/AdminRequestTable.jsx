@@ -9,7 +9,7 @@ const STATUS_COLORS = {
     deleted: "bg-gray-100 text-gray-500 border-gray-300"
 };
 
-const ITEMS_PER_PAGE = 10; // Should match backend limit or be configurable
+const ITEMS_PER_PAGE = 15; // Should match backend limit or be configurable
 
 export default function AdminRequestTable() {
     const [requests, setRequests] = useState([]);
@@ -191,8 +191,8 @@ export default function AdminRequestTable() {
                                 onClick={() => goToPage(currentPage - 1)}
                                 disabled={currentPage === 1}
                                 className={`px-4 py-2 rounded-lg font-bold ${currentPage === 1
-                                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                        : "bg-blue-700 text-white hover:bg-blue-600"
+                                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                    : "bg-blue-700 text-white hover:bg-blue-600"
                                     }`}
                             >
                                 &larr; Previous
@@ -203,8 +203,8 @@ export default function AdminRequestTable() {
                                     key={page}
                                     onClick={() => goToPage(page)}
                                     className={`w-10 h-10 rounded-lg font-bold ${currentPage === page
-                                            ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white"
-                                            : "bg-blue-900 text-blue-200 hover:bg-blue-800"
+                                        ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white"
+                                        : "bg-blue-900 text-blue-200 hover:bg-blue-800"
                                         }`}
                                 >
                                     {page}
@@ -215,8 +215,8 @@ export default function AdminRequestTable() {
                                 onClick={() => goToPage(currentPage + 1)}
                                 disabled={currentPage === totalPages}
                                 className={`px-4 py-2 rounded-lg font-bold ${currentPage === totalPages
-                                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                        : "bg-blue-700 text-white hover:bg-blue-600"
+                                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                    : "bg-blue-700 text-white hover:bg-blue-600"
                                     }`}
                             >
                                 Next &rarr;
