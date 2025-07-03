@@ -756,32 +756,6 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
                     {/* Decorative line */}
                     <div className="absolute -bottom-6 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
                 </div>
-
-                {/* No games available message */}
-                <div className="text-center py-16 bg-gradient-to-r from-purple-900/10 to-blue-900/10 rounded-xl border border-purple-500/20 animate-fadeInUp">
-                    <div className="inline-block p-6 rounded-full bg-gradient-to-r from-purple-900/20 to-blue-900/20 mb-6 animate-float">
-                        <FaApple className="text-purple-400" size={40} />
-                    </div>
-                    <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-3">No Exclusive Games Available</h3>
-                    <p className="text-gray-400 text-lg max-w-lg mx-auto mb-4">Our exclusive Mac games collection is currently being updated.</p>
-                    <p className="text-gray-500 mt-2">Check back soon for premium exclusive content</p>
-
-                    <div className="mt-8 flex justify-center space-x-4">
-                        <div className="px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-sm text-gray-300 flex items-center animate-pulse-glow">
-                            <FaStar className="text-amber-500 mr-2" size={14} />
-                            Coming Soon
-                        </div>
-                        <button
-                            onClick={() => router.refresh()}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg border border-blue-500/30 text-sm text-gray-300 flex items-center hover:bg-gradient-to-r hover:from-blue-600/30 hover:to-purple-600/30 transition-all duration-300"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Refresh
-                        </button>
-                    </div>
-                </div>
             </div>
         );
     }
@@ -806,24 +780,85 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
             </div>
             <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} initialFilters={filters} />
 
-            {/* Page header - enhanced with glassmorphism and gradient */}
-            <div className="mb-8 text-center relative">
-                {/* Glassmorphism effect */}
-                <div className="absolute inset-0 rounded-lg bg-black/30 blur-md"></div>
+            {/* Premium Header with enhanced styling */}
+            <div className="cover mb-16 text-center relative">
+                {/* Background glow effects */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
+                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-purple-600/20 rounded-full blur-xl -z-10"></div>
+                <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-blue-600/20 rounded-full blur-xl -z-10"></div>
 
-                {/* Main title with gradient and glass effect */}
-                <h1 className="relative text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-4">
-                    Exclusive PS4 Games
-                </h1>
+                {/* Premium badge - responsive for small screens */}
+                <div className="inline-block mb-4 sm:mb-6">
+                    <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full shadow-lg flex items-center">
+                        <FaStar className="mr-1" size={10} />
+                        PREMIUM COLLECTION
+                    </div>
+                </div>
+                <br />
+                {/* Main heading with glass effect - responsive for small screens */}
+                <div className="inline-block relative mb-6 max-w-full">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25 animate-gradient-x"></div>
+                    <div className="relative px-4 sm:px-7 py-4 bg-black/50 rounded-lg leading-none flex flex-col sm:flex-row items-center">
+                        <FaCrown className="text-amber-500 mb-2 sm:mb-0 sm:mr-3" size={24} />
+                        <div className="text-center sm:text-left">
+                            <div className="font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                                    Mac Exclusive Games{' '}
+                                    <span className="font-medium text-blue-400">0</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                {/* Subtitle with glass effect */}
-                <p className="relative text-lg sm:text-xl text-white/90 mb-6">
-                    Handpicked selection of the best PS4 games, available only on our platform.
+                {/* Description text - responsive for small screens */}
+                <p className="text-gray-400 max-w-2xl mx-auto mb-6 text-sm sm:text-base md:text-lg px-4 sm:px-0">
+                    Exclusive premium Mac games available only to our members. Experience the best gaming titles with enhanced graphics and performance.
                 </p>
 
-                {/* Decorative elements - subtle and elegant */}
-                <div className="absolute top-0 left-0 w-32 h-32 bg-purple-600 opacity-10 rounded-full blur-3xl -z-10"></div>
-                <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-600 opacity-10 rounded-full blur-3xl -z-10"></div>
+                {/* Contact buttons container */}
+                <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                    {/* Telegram button */}
+                    <a
+                        href="https://t.me/n0t_ur_type"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 animate-pulse-glow"
+                    >
+                        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2c5.514 0 10 4.486 10 10s-4.486 10-10 10S2 17.514 2 12 6.486 2 12 2zm2.8 14.4c.12 0 .234-.05.318-.134.084-.084.134-.198.134-.318 0-.12-.05-.234-.134-.318-.084-.084-.198-.134-.318-.134H9.2c-.12 0-.234.05-.318.134-.084.084-.134.198-.134.318 0 .12.05.234.134.318.084.084.198.134.318.134h5.6zm-2.8-8.4c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 4.8c-.993 0-1.8-.807-1.8-1.8s.807-1.8 1.8-1.8 1.8.807 1.8 1.8-.807 1.8-1.8 1.8z" />
+                        </svg>
+                        Buy via Telegram
+                    </a>
+
+                    {/* Become a Member button */}
+                    <Link
+                        href="/membership"
+                        className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-full shadow-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
+                    >
+                        <FaCoffee className="mr-2" />
+                        Become a Member
+                    </Link>
+                </div>
+
+                {/* Feature badges - responsive for small screens */}
+                <div className="flex flex-wrap justify-center gap-3">
+                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
+                        <FaStar className="text-amber-500 mr-1 sm:mr-2" size={14} />
+                        Premium Quality
+                    </div>
+                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
+                        <FaApple className="text-blue-400 mr-1 sm:mr-2" size={14} />
+                        Mac Exclusive
+                    </div>
+                    <div className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg border border-purple-500/30 text-xs sm:text-sm text-gray-300 flex items-center">
+                        <FaDownload className="text-green-400 mr-1 sm:mr-2" size={14} />
+                        Easy Download
+                    </div>
+                </div>
+
+                {/* Decorative line */}
+                <div className="absolute -bottom-6 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
             </div>
 
             {/* Game grid - responsive and adaptive */}
