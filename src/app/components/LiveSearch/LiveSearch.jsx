@@ -67,8 +67,8 @@ const ProfileIcon = () => {
 
   return (
     <div className="relative flex items-center ml-4">
-      {/* Request Button (styled, right of profile icon, 8px gap) */}
-      <Link href="/request" className="hidden sm:relative sm:inline-block group mr-2" style={{ marginRight: '24px' }}>
+      {/* Request Button (responsive label) */}
+      <Link href="/request" className="relative inline-block group mr-2" style={{ marginRight: '24px' }}>
         <div className="relative">
           {/* Shadow layers */}
           <div className="absolute top-1 left-1 w-full h-full bg-black rounded-lg"></div>
@@ -76,7 +76,9 @@ const ProfileIcon = () => {
           {/* Main button */}
           <div className="relative bg-[#5865F2] rounded-lg p-3 border-4 border-black transform transition-all duration-100 group-hover:-translate-x-1 group-hover:-translate-y-1 active:translate-x-0 active:translate-y-0">
             <div className="flex items-center gap-2">
-              <span className="text-white font-black text-sm uppercase tracking-tight">Request Game</span>
+              {/* Responsive label: full on md+, short on sm */}
+              <span className="text-white font-black text-sm uppercase tracking-tight hidden sm:inline">Request Game</span>
+              <span className="text-white font-black text-sm uppercase tracking-tight sm:hidden">Request</span>
               {/* Ping effect dot */}
               <div className="relative w-3 h-3">
                 <span className="absolute w-full h-full bg-yellow-300 rounded-full animate-ping opacity-75"></span>
@@ -153,7 +155,7 @@ const ProfileIcon = () => {
                   setShowLogoutWarning(false);
                   setShowDropdown(false);
                   setUser(null);
-                  window.location.href = '/user/logout';
+                  window.location.href = '/'; // Redirect to home page after logout
                 }}
               >
                 Logout
