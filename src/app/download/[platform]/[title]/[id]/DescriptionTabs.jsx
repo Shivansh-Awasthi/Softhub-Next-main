@@ -212,12 +212,14 @@ const DescriptionTabs = ({ data }) => {
                                                     </div>
                                                     <div>
                                                         <h3 className="text-base font-semibold text-gray-900 dark:text-white">Important Notes</h3>
-                                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add your important notes here.</p>
+                                                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">To Enable/Disable Metal Performance HUD follow below guide.</p>
                                                     </div>
                                                 </div>
                                                 <div className="ml-11 space-y-3">
-                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Note 1: Your note here.</p></div>
-                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Note 2: Your note here.</p></div>
+                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Open the Finder, go to the applications and Right click on the game.</p></div>
+                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Then select "show package contents".</p></div>
+                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Then navigate to <span className='text-cyan-500'> contents</span> → <span className='text-cyan-500'>wineskin</span> → <span className='text-cyan-500'>advanced</span> → <span className='text-cyan-500'>advanced</span>.</p></div>
+                                                    <div className="flex gap-3"><div className="shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500 mt-2"></div><p className="flex-1 text-sm text-gray-600 dark:text-gray-300">Then check/uncheck Metal Performance HUD.</p></div>
                                                 </div>
                                             </div>
                                         </div>
