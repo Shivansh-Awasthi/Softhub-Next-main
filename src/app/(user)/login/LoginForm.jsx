@@ -63,8 +63,7 @@ const LoginForm = () => {
 
                 // Redirect to home after 2 seconds
                 setTimeout(() => {
-                    router.push('/');
-                    router.refresh(); // Refresh the page to update auth state
+                    window.location.href = '/'; // Use location.href to force navigation to home
                 }, 2000);
             } else {
                 // Show error toast

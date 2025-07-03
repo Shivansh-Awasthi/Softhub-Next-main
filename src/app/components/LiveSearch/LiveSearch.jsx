@@ -27,26 +27,14 @@ const ProfileIcon = () => {
         setUser(null);
         return;
       }
-      const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
-      const headers = { Authorization: `Bearer ${token}` };
-      if (xAuthToken) headers["X-Auth-Token"] = xAuthToken;
       try {
-        const res = await axios.get(
-          process.env.NEXT_PUBLIC_API_URL + "/api/user/me",
-          { headers }
-        );
-        setUser(res.data.user);
-      } catch (err) {
-        // fallback to JWT decode
-        try {
-          const decoded = jwtDecode(token);
-          setUser({
-            username: decoded.username || decoded.name || "User",
-            avatar: decoded.avatar || DEFAULT_AVATAR,
-          });
-        } catch {
-          setUser(null);
-        }
+        const decoded = jwtDecode(token);
+        setUser({
+          username: decoded.username || decoded.name || "User",
+          avatar: decoded.avatar || DEFAULT_AVATAR,
+        });
+      } catch {
+        setUser(null);
       }
     };
     fetchUser();
@@ -88,19 +76,23 @@ const ProfileIcon = () => {
           </div>
         </div>
       </Link>
-      {/* Profile Icon Button */}
-      <button
-        className="focus:outline-none profile-icon-btn"
-        onClick={() => setShowDropdown((v) => !v)}
-      >
-        <img
-          src={user?.avatar || DEFAULT_AVATAR}
-          alt="avatar"
-          className="w-13 h-13 rounded-full border-2 border-blue-400 bg-gray-800 object-cover shadow-lg"
-          onError={e => (e.target.src = DEFAULT_AVATAR)}
-        />
-      </button>
-      {showDropdown && (
+      {/* Profile Icon Button or Login Button */}
+      {user ? (
+        <button
+          className="focus:outline-none profile-icon-btn"
+          onClick={() => setShowDropdown((v) => !v)}
+        >
+          <img
+            src={user.avatar || DEFAULT_AVATAR}
+            alt="avatar"
+            className="w-13 h-13 rounded-full border-2 border-blue-400 bg-gray-800 object-cover shadow-lg"
+            onError={e => (e.target.src = DEFAULT_AVATAR)}
+          />
+        </button>
+      ) : (
+        <Link href="/login" className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition">Login</Link>
+      )}
+      {user && showDropdown && (
         <div className="profile-dropdown absolute right-0 mt-122 w-64 bg-[#181C23] rounded-2xl shadow-2xl py-4 z-50 border border-[#232323] flex flex-col gap-1" style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}>
           <Link href="/profile" onClick={() => setShowDropdown(false)}>
             <span className="block px-6 py-2 text-gray-200 hover:bg-[#232323] cursor-pointer text-base">My profile</span>
