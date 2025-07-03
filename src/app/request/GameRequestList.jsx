@@ -132,6 +132,63 @@ function CircularProgressBar({ value, max, color, size = 56, stroke = 6 }) {
     );
 }
 
+function PopupModal({ open, message, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
+            <div className="bg-[#232b39] border border-[#2e3748] rounded-2xl shadow-2xl max-w-md w-full p-8 pt-7 relative animate-fadeIn">
+                {/* Top blue border */}
+                <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-indigo-500" />
+                {/* Close button */}
+                <button onClick={onClose} className="absolute top-4 right-4 text-[#7b8597] hover:text-blue-400 text-xl focus:outline-none">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <div className="flex flex-col items-center">
+                    <div className="bg-[#22335a] rounded-full p-4 mb-4">
+                        <svg className="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
+                        </svg>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-2">Daily Vote Used</div>
+                    <div className="text-base text-[#b2b9c9] mb-6 text-center">{message}</div>
+                    <div className="w-full mb-6">
+                        <div className="flex items-center gap-2 bg-[#22335a]/60 border border-blue-700 rounded-xl px-4 py-3">
+                            <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" /></svg>
+                            <span className="text-blue-200 text-sm">Your vote helps determine which games get priority processing!</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 bg-[#313a4d] text-white rounded-xl font-semibold shadow hover:bg-[#3a4560] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all text-lg"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Utility: format time ago
+function formatTimeAgo(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    if (seconds < 60) return `${seconds} seconds ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} day${days !== 1 ? "s" : ""} ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
+    const years = Math.floor(months / 12);
+    return `${years} year${years !== 1 ? "s" : ""} ago`;
+}
+
 function RequestCard({ req, status, onVote, voting, isVoted }) {
     const meta = STATUS_META[status];
     const votesNeeded = Math.max(0, 20 - req.votes);
@@ -176,6 +233,21 @@ function RequestCard({ req, status, onVote, voting, isVoted }) {
     };
 
     const colors = colorClasses[meta.color] || colorClasses.blue;
+
+    // Determine which timestamp to use for each status
+    let timeAgoFormatted = "";
+    if (status === "pending") {
+        timeAgoFormatted = formatTimeAgo(req.createdAt);
+    } else if (status === "processing" && req.processingAt) {
+        timeAgoFormatted = formatTimeAgo(req.processingAt);
+    } else if (status === "approved" && req.approvedAt) {
+        timeAgoFormatted = formatTimeAgo(req.approvedAt);
+    } else if (status === "rejected" && req.rejectedAt) {
+        timeAgoFormatted = formatTimeAgo(req.rejectedAt);
+    } else {
+        // fallback to updatedAt if status-specific timestamp is missing
+        timeAgoFormatted = formatTimeAgo(req.updatedAt);
+    }
 
     return (
         <div className="group relative">
@@ -323,49 +395,11 @@ function RequestCard({ req, status, onVote, voting, isVoted }) {
 
                     {/* Time Info */}
                     <div className="truncate text-xs text-gray-500 dark:text-gray-400">
-                        {status === "pending" && `Requested ${timeAgo}`}
-                        {status === "processing" && `Started processing ${timeAgo}`}
-                        {status === "approved" && `Approved ${timeAgo}`}
-                        {status === "rejected" && `Rejected ${timeAgo}`}
+                        {status === "pending" && `Requested ${timeAgoFormatted}`}
+                        {status === "processing" && `Started processing ${timeAgoFormatted}`}
+                        {status === "approved" && `Approved ${timeAgoFormatted}`}
+                        {status === "rejected" && `Rejected ${timeAgoFormatted}`}
                     </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function PopupModal({ open, message, onClose }) {
-    if (!open) return null;
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
-            <div className="bg-[#232b39] border border-[#2e3748] rounded-2xl shadow-2xl max-w-md w-full p-8 pt-7 relative animate-fadeIn">
-                {/* Top blue border */}
-                <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-indigo-500" />
-                {/* Close button */}
-                <button onClick={onClose} className="absolute top-4 right-4 text-[#7b8597] hover:text-blue-400 text-xl focus:outline-none">
-                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-                <div className="flex flex-col items-center">
-                    <div className="bg-[#22335a] rounded-full p-4 mb-4">
-                        <svg className="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
-                        </svg>
-                    </div>
-                    <div className="text-2xl font-bold text-white mb-2">Daily Vote Used</div>
-                    <div className="text-base text-[#b2b9c9] mb-6 text-center">{message}</div>
-                    <div className="w-full mb-6">
-                        <div className="flex items-center gap-2 bg-[#22335a]/60 border border-blue-700 rounded-xl px-4 py-3">
-                            <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" /></svg>
-                            <span className="text-blue-200 text-sm">Your vote helps determine which games get priority processing!</span>
-                        </div>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="w-full py-3 bg-[#313a4d] text-white rounded-xl font-semibold shadow hover:bg-[#3a4560] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all text-lg"
-                    >
-                        Close
-                    </button>
                 </div>
             </div>
         </div>
