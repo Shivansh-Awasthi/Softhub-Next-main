@@ -39,6 +39,37 @@ const DescriptionTabs = ({ data }) => {
         return <div>Loading description...</div>;
     }
 
+    // Default system requirements for Mac and PC
+    const defaultMacRequirements = {
+        os: 'Apple silicon Chipset',
+        processor: 'Mac Air M1 or later',
+        memory: '8 GB RAM',
+        graphics: 'Apple GPU (integrated)',
+        storage: 'N/A',
+        additionalNotes: '/System/Applications/GameName.app',
+    };
+    const defaultPCRequirements = {
+        os: 'Windows 10',
+        processor: 'i5 10700F or later',
+        memory: '8 GB RAM',
+        graphics: 'NVidia GeForce RTX 3050',
+        storage: 'N/A',
+        additionalNotes: 'GameName.exe',
+    };
+    // Use defaults if data.systemRequirements is missing or incomplete
+    function fillDefaults(defaults, provided) {
+        if (!provided) return defaults;
+        const result = { ...defaults };
+        for (const key in defaults) {
+            if (provided[key] && String(provided[key]).trim() !== '') {
+                result[key] = provided[key];
+            }
+        }
+        return result;
+    }
+    const macReq = isMac ? fillDefaults(defaultMacRequirements, data.systemRequirements) : null;
+    const pcReq = isPC ? fillDefaults(defaultPCRequirements, data.systemRequirements) : null;
+
     return (
         <div className="mt-8 mb-8 bg-[#030712] z-20 rounded-2xl overflow-hidden shadow-2xl border-b-4 border-purple-600">
             {/* Tabs Section - Show for Mac or PC */}
@@ -249,10 +280,10 @@ const DescriptionTabs = ({ data }) => {
                                         </div>
                                         {/* Example requirements, replace with real data if available */}
                                         <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">macOS</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">Apple silicon Chipset</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Processor</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.processor}</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Memory</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.memory}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Processor</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{macReq.processor}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Memory</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{macReq.memory}</dd></div></div></div>
                                         <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Graphics</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">Apple GPU (integrated)</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Storage</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.storage}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Storage</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{macReq.storage}</dd></div></div></div>
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +361,7 @@ const DescriptionTabs = ({ data }) => {
                                             <div className="relative pl-8">
                                                 <div className="absolute left-0 top-0 flex items-center justify-center w-6 h-6 rounded-full border-2 border-blue-500 text-blue-500"><span className="text-xs font-semibold">3</span></div>
                                                 <div className="relative">
-                                                    <div className="text-sm text-gray-600 dark:text-gray-300">Simply launch the game from <span className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20"><svg className="w-4 h-4 text-blue-500 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span className="font-mono text-sm text-blue-700 dark:text-blue-300 font-medium">{data.systemRequirements.additionalNotes}</span></span> inside the game folder</div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300">Simply launch the game from <span className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20"><svg className="w-4 h-4 text-blue-500 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span className="font-mono text-sm text-blue-700 dark:text-blue-300 font-medium">{pcReq.additionalNotes}</span></span> inside the game folder</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -380,12 +411,12 @@ const DescriptionTabs = ({ data }) => {
                                             </div>
                                         </div>
                                         {/* Example requirements, replace with real data if available */}
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">OS</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.os}</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Processor</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.processor}</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Memory</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.memory}</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Graphics</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.graphics}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">OS</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{pcReq.os}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Processor</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{pcReq.processor}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Memory</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{pcReq.memory}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Graphics</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{pcReq.graphics}</dd></div></div></div>
                                         <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">DirectX</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">Version 11</dd></div></div></div>
-                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Storage</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{data.systemRequirements.storage}</dd></div></div></div>
+                                        <div className="relative mb-3 last:mb-0"><div className="absolute inset-0 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"></div><div className="relative p-3"><div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-4"><dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Storage</dt><dd className="text-sm font-semibold text-gray-900 dark:text-white">{pcReq.storage}</dd></div></div></div>
                                     </div>
                                 </div>
                             </div>
