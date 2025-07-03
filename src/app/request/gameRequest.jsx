@@ -288,7 +288,42 @@ export default function GameRequestForm() {
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Left Column - Form */}
-                            <div className="lg:col-span-2 bg-[#101928]/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-[#232c3a]">
+                            <div className="lg:col-span-4 bg-[#101928]/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-[#232c3a]">
+                                {/* New Game Request Header Card (Top of Form) */}
+                                <div className="relative p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-4">
+                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            {/* Icon Container with Glow */}
+                                            <div className="relative shrink-0">
+                                                <div className="absolute inset-0 bg-blue-500 rounded-xl blur-xl opacity-20 animate-pulse"></div>
+                                                <div className="relative p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg">
+                                                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            {/* Title & Description */}
+                                            <div>
+                                                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                                                    Game Request
+                                                </h2>
+                                                <p className="mt-1 text-base text-gray-600 dark:text-gray-400">
+                                                    Fill in the details below to submit your request
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {/* Request Counter */}
+                                        <div className="hidden md:flex flex-col items-end">
+                                            <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/50">
+                                                <span className={`text-xl font-bold ${requestLimit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>{limitLoading ? '-' : requestLimit}</span>
+                                                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">requests left</span>
+                                            </div>
+                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                Resets weekly
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                                 {/* Request Limit Card (Top of Form) */}
                                 <div className="p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-8">
                                     <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 p-4">
@@ -451,7 +486,7 @@ export default function GameRequestForm() {
                                 </form>
                             </div>
                             {/* right card */}
-                            <div className="bg-[#1A2739] rounded-2xl shadow-xl p-8 h-fit">
+                            {/* <div className="bg-[#1A2739] rounded-2xl shadow-xl p-8 h-fit">
                                 <div className="flex items-center mb-4">
                                     <div className="bg-blue-100 p-3 rounded-lg">
                                         <FaCheckCircle className="text-blue-600 text-2xl" />
@@ -486,7 +521,7 @@ export default function GameRequestForm() {
                                         </p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
