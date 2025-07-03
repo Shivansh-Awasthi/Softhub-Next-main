@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaHeart, FaPlus, FaClock, FaCog, FaTimesCircle, FaSteam, FaInfoCircle, FaExclamationTriangle, FaCheckCircle, FaGamepad, FaVoteYea, FaBolt } from 'react-icons/fa';
 
 // PopupModal: Modern, reusable modal for error/info messages
@@ -41,6 +41,21 @@ function PopupModal({ open, message, onClose }) {
     );
 }
 
+function formatTimeLeft(dateString) {
+    if (!dateString) return "";
+    const now = new Date();
+    const target = new Date(dateString);
+    const diff = target - now;
+    if (diff <= 0) return "Now";
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    if (days > 0) return `${days} day${days !== 1 ? "s" : ""} left`;
+    if (hours > 0) return `${hours} hour${hours !== 1 ? "s" : ""} left`;
+    if (minutes > 0) return `${minutes} minute${minutes !== 1 ? "s" : ""} left`;
+    return "Less than a minute left";
+}
+
 export default function GameRequestForm() {
     const [title, setTitle] = useState("");
     const [platform, setPlatform] = useState("");
@@ -49,6 +64,9 @@ export default function GameRequestForm() {
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
+    const [requestLimit, setRequestLimit] = useState(1); // 1 per week
+    const [nextRequestAvailable, setNextRequestAvailable] = useState(null);
+    const [limitLoading, setLimitLoading] = useState(true);
 
     const stages = [
         {
@@ -80,6 +98,47 @@ export default function GameRequestForm() {
             points: ["Less than 20 votes", "Removed in 7 days"]
         }
     ];
+
+    useEffect(() => {
+        // Check if user has a request left this week
+        async function fetchRequestLimit() {
+            setLimitLoading(true);
+            try {
+                const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+                if (!token) {
+                    setRequestLimit(1);
+                    setNextRequestAvailable(null);
+                    setLimitLoading(false);
+                    return;
+                }
+                // Try to submit a dummy request to get the 429 info (not ideal, but backend has no dedicated endpoint)
+                // Instead, try to POST a dummy request and check for 429
+                const dummyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests`, {
+                    method: "POST",
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title: "dummy", platform: "PC", steamLink: "https://store.steampowered.com/app/1/Dummy/" }),
+                });
+                if (dummyRes.status === 429) {
+                    const dummyData = await dummyRes.json();
+                    setRequestLimit(0);
+                    setNextRequestAvailable(dummyData.nextRequestAvailable || null);
+                } else {
+                    setRequestLimit(1);
+                    setNextRequestAvailable(null);
+                }
+            } catch (err) {
+                setRequestLimit(1);
+                setNextRequestAvailable(null);
+            } finally {
+                setLimitLoading(false);
+            }
+        }
+        fetchRequestLimit();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -119,7 +178,14 @@ export default function GameRequestForm() {
                 setTitle("");
                 setPlatform("");
                 setSteamLink("");
+                // After successful submit, update limit state
+                setRequestLimit(0);
+                if (data.createdAt) {
+                    setNextRequestAvailable(new Date(new Date(data.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000));
+                }
             } else if (res.status === 429) {
+                setRequestLimit(0);
+                setNextRequestAvailable(data.nextRequestAvailable || null);
                 setModalMessage("Your request limit exceeded. You can request only a single game in a week.");
                 setModalOpen(true);
             } else {
@@ -223,6 +289,51 @@ export default function GameRequestForm() {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Left Column - Form */}
                             <div className="lg:col-span-2 bg-[#101928]/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-[#232c3a]">
+                                {/* Request Limit Card (Top of Form) */}
+                                <div className="p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-8">
+                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 p-4">
+                                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+                                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="shrink-0">
+                                                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                                                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                                    <div>
+                                                        <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                                            Request Limits & Guidelines
+                                                        </h4>
+                                                        <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                                                            {limitLoading ? (
+                                                                <span className="text-blue-600 font-bold">Checking limit...</span>
+                                                            ) : requestLimit > 0 ? (
+                                                                <>You can submit <span className="font-bold text-blue-600 dark:text-blue-200">{requestLimit} request{requestLimit !== 1 ? 's' : ''}</span> this week.</>
+                                                            ) : (
+                                                                <><span className="font-bold text-red-500">0 requests left</span> <span className="text-gray-400">(Resets weekly)</span></>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        {(!limitLoading && requestLimit === 0 && nextRequestAvailable) && (
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 rounded-full">
+                                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                Next Request: {formatTimeLeft(nextRequestAvailable)}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Form Starts Here */}
                                 <form onSubmit={handleSubmit} className="space-y-7">
                                     {/* Game Title */}
                                     <div>
@@ -345,14 +456,9 @@ export default function GameRequestForm() {
                                     <div className="bg-blue-100 p-3 rounded-lg">
                                         <FaCheckCircle className="text-blue-600 text-2xl" />
                                     </div>
-                                    <h2 className="text-2xl font-bold text-white ml-4">Request Limit & Guidelines</h2>
+                                    <h2 className="text-2xl font-bold text-white ml-4">Submission Guidelines</h2>
                                 </div>
-
                                 <div className="mt-6 bg-[#1A2739] rounded-xl p-6">
-                                    <p className="text-lg text-gray-300 mb-4">
-                                        You can submit <span className="font-bold text-blue-600">1  requests</span> this week.
-                                    </p>
-
                                     <div className="mt-8 space-y-4">
                                         <h3 className="text-lg font-semibold text-purple-300">Submission Guidelines:</h3>
                                         <ul className="space-y-3 text-gray-600">
@@ -374,7 +480,6 @@ export default function GameRequestForm() {
                                             </li>
                                         </ul>
                                     </div>
-
                                     <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5">
                                         <p className="text-gray-700">
                                             <span className="font-semibold">Note:</span> Requests with incomplete or inaccurate information will be rejected automatically.
@@ -414,7 +519,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -427,13 +532,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Need 20 votes</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Within 5 days</span>
                                     </div>
@@ -462,13 +567,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                         </svg>
                                         <span>Quality check</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>~24h processing time</span>
                                     </div>
@@ -485,7 +590,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -496,13 +601,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
                                         <span>Ready for download</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Files verified</span>
                                     </div>
@@ -519,7 +624,7 @@ export default function GameRequestForm() {
                                 <div className="mb-4">
                                     <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center">
                                         <svg className="w-6 h-6 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </div>
                                 </div>
@@ -530,13 +635,13 @@ export default function GameRequestForm() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         <span>Less than 20 votes</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                         <svg className="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
                                         <span>Removed in 3 days</span>
                                     </div>
