@@ -54,38 +54,42 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
         }
     }, [serverData, searchParams]);
 
+    // Unified GENRES list for both mapping and extraction
+    const GENRES = [
+        { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
+        { id: 83, name: "Agriculture" }, { id: 33, name: "Anime" }, { id: 40, name: "Apps" }, { id: 71, name: "Arcade" },
+        { id: 115, name: "Artificial Intelligence" }, { id: 129, name: "Assassin" }, { id: 60, name: "Atmospheric" },
+        { id: 109, name: "Automation" }, { id: 133, name: "Blood" }, { id: 24, name: "Building" }, { id: 95, name: "Cartoon" },
+        { id: 22, name: "Casual" }, { id: 107, name: "Character Customization" }, { id: 68, name: "Cinematic*" },
+        { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 108, name: "Colony Sim" }, { id: 70, name: "Colorful" },
+        { id: 86, name: "Combat" }, { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" },
+        { id: 105, name: "Controller" }, { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" },
+        { id: 67, name: "Cyberpunk" }, { id: 91, name: "Dark Humor" }, { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" },
+        { id: 126, name: "Driving" }, { id: 118, name: "Early Access" }, { id: 46, name: "eSport" }, { id: 125, name: "Exploration" },
+        { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" }, { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" },
+        { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" }, { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" },
+        { id: 88, name: "Flight" }, { id: 43, name: "FPS" }, { id: 64, name: "Funny" }, { id: 76, name: "Gore" },
+        { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" }, { id: 10, name: "History" }, { id: 11, name: "Horror" },
+        { id: 57, name: "Hunting" }, { id: 69, name: "Idler" }, { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" },
+        { id: 25, name: "Indie" }, { id: 101, name: "LEGO" }, { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" },
+        { id: 113, name: "Management" }, { id: 61, name: "Mature" }, { id: 96, name: "Memes" }, { id: 50, name: "Military" },
+        { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" }, { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" },
+        { id: 26, name: "Open World" }, { id: 74, name: "Parkour" }, { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" },
+        { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" }, { id: 48, name: "PvP" }, { id: 28, name: "Racing" },
+        { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" }, { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" },
+        { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" }, { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" },
+        { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" }, { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" },
+        { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" }, { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" },
+        { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" }, { id: 37, name: "Survival" }, { id: 47, name: "Tactical" },
+        { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" }, { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" },
+        { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" }, { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" },
+        { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
+        { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
+    ];
+
     // Helper: Map filter modal values to backend query params
     const mapFiltersToQuery = (filters) => {
         const params = new URLSearchParams(searchParams.toString());
-        // Genres (tags)
-        const GENRES = [
-            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
-            { id: 40, name: "Apps" }, { id: 71, name: "Arcade" }, { id: 115, name: "Artificial Intelligence" },
-            { id: 60, name: "Atmospheric" }, { id: 24, name: "Building" }, { id: 22, name: "Casual" }, { id: 68, name: "Cinematic*" },
-            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 70, name: "Colorful" }, { id: 86, name: "Combat" },
-            { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" }, { id: 105, name: "Controller" },
-            { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" }, { id: 67, name: "Cyberpunk" },
-            { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" }, { id: 126, name: "Driving" }, { id: 118, name: "Early Access" },
-            { id: 46, name: "eSport" }, { id: 125, name: "Exploration" }, { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" },
-            { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" }, { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" },
-            { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" }, { id: 88, name: "Flight" }, { id: 43, name: "FPS" },
-            { id: 64, name: "Funny" }, { id: 76, name: "Gore" }, { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" },
-            { id: 10, name: "History" }, { id: 11, name: "Horror" }, { id: 57, name: "Hunting" }, { id: 69, name: "Idler" },
-            { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" }, { id: 25, name: "Indie" }, { id: 101, name: "LEGO" },
-            { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" }, { id: 113, name: "Management" }, { id: 61, name: "Mature" },
-            { id: 96, name: "Memes" }, { id: 50, name: "Military" }, { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" },
-            { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" }, { id: 26, name: "Open World" }, { id: 74, name: "Parkour" },
-            { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" }, { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" },
-            { id: 48, name: "PvP" }, { id: 28, name: "Racing" }, { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" },
-            { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" }, { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" },
-            { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" }, { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" },
-            { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" }, { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" },
-            { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" }, { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" },
-            { id: 37, name: "Survival" }, { id: 47, name: "Tactical" }, { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" },
-            { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" }, { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" },
-            { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" }, { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" },
-            { id: 75, name: "Violent" }, { id: 20, name: "VR" }, { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
-        ];
         const genreNames = filters.genres?.map(id => {
             const found = GENRES.find(g => g.id === id);
             return found ? found.name : null;
@@ -180,38 +184,10 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
     const extractFiltersFromUrl = () => {
         let genres = [];
         const tags = searchParams.get('tags');
-        const GENRES = [
-            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
-            { id: 40, name: "Apps" }, { id: 71, name: "Arcade" }, { id: 115, name: "Artificial Intelligence" },
-            { id: 60, name: "Atmospheric" }, { id: 24, name: "Building" }, { id: 22, name: "Casual" }, { id: 68, name: "Cinematic*" },
-            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 70, name: "Colorful" }, { id: 86, name: "Combat" },
-            { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" }, { id: 105, name: "Controller" },
-            { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" }, { id: 67, name: "Cyberpunk" },
-            { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" }, { id: 126, name: "Driving" }, { id: 118, name: "Early Access" },
-            { id: 46, name: "eSport" }, { id: 125, name: "Exploration" }, { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" },
-            { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" }, { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" },
-            { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" }, { id: 88, name: "Flight" }, { id: 43, name: "FPS" },
-            { id: 64, name: "Funny" }, { id: 76, name: "Gore" }, { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" },
-            { id: 10, name: "History" }, { id: 11, name: "Horror" }, { id: 57, name: "Hunting" }, { id: 69, name: "Idler" },
-            { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" }, { id: 25, name: "Indie" }, { id: 101, name: "LEGO" },
-            { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" }, { id: 113, name: "Management" }, { id: 61, name: "Mature" },
-            { id: 96, name: "Memes" }, { id: 50, name: "Military" }, { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" },
-            { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" }, { id: 26, name: "Open World" }, { id: 74, name: "Parkour" },
-            { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" }, { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" },
-            { id: 48, name: "PvP" }, { id: 28, name: "Racing" }, { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" },
-            { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" }, { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" },
-            { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" }, { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" },
-            { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" }, { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" },
-            { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" }, { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" },
-            { id: 37, name: "Survival" }, { id: 47, name: "Tactical" }, { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" },
-            { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" }, { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" },
-            { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" }, { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" },
-            { id: 75, name: "Violent" }, { id: 20, name: "VR" }, { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
-        ];
         if (tags) {
             const tagNames = tags.split(',');
             genres = tagNames.map(name => {
-                const found = GENRES.find(g => g.name === name);
+                const found = GENRES.find(g => g.name.toLowerCase().trim() === name.toLowerCase().trim());
                 return found ? found.id : null;
             }).filter(Boolean);
         }
@@ -347,19 +323,14 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
                                     </div>
                                 )}
                             </div>
-
-                            <div className="flex flex-col p-3 bg-gradient-to-br from-[#1E1E1E] to-[#121212] flex-grow relative">
-                                {/* Glowing separator line */}
-                                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
-
-                                <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
+                            {/* Title and info */}
+                            <div className="flex-1 flex flex-col justify-between p-3">
+                                <div className="font-semibold text-base text-gray-100 truncate mb-1">
                                     {ele.title}
                                 </div>
-                                <div className="text-xs font-normal text-gray-400 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
-                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                                    </svg>
-                                    {ele.size}
+                                <div className="flex items-center justify-between text-xs text-gray-400">
+                                    <span>{ele.size || 'Unknown size'}</span>
+                                    <span>{ele.releaseYear || 'Year?'}</span>
                                 </div>
                             </div>
                         </Link>
