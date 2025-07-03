@@ -56,7 +56,10 @@ const ProfileIcon = () => {
   useEffect(() => {
     if (!showDropdown) return;
     const handleClick = (e) => {
-      if (!e.target.closest('.profile-dropdown')) setShowDropdown(false);
+      // If click is outside dropdown and not on the profile button, close
+      if (!e.target.closest('.profile-dropdown') && !e.target.closest('.profile-icon-btn')) {
+        setShowDropdown(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -85,7 +88,7 @@ const ProfileIcon = () => {
       </Link>
       {/* Profile Icon Button */}
       <button
-        className="focus:outline-none"
+        className="focus:outline-none profile-icon-btn"
         onClick={() => setShowDropdown((v) => !v)}
       >
         <img
