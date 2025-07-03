@@ -10,7 +10,7 @@ const STATUS_META = {
         color: "blue",
         heading: "Pending Requests",
         headingGradient: "bg-gradient-to-r from-blue-400 to-blue-600",
-        badge: "bg-blue-700 text-blue-100",
+        badge: "bg-blue-500 text-blue-100",
         glow: "shadow-[0_0_24px_0_rgba(59,130,246,0.4)]",
         border: "border-blue-600",
         textColor: "text-blue-400",
@@ -61,167 +61,274 @@ function CircularProgressBar({ value, max, color, size = 56, stroke = 6 }) {
     const radius = (size - stroke) / 2;
     const circumference = 2 * Math.PI * radius;
     const dashoffset = circumference * (1 - progress / 100);
+
+    // Map color names to actual hex values
+    const colorMap = {
+        blue: "#3b82f6",
+        yellow: "#eab308",
+        green: "#22c55e",
+        red: "#ef4444"
+    };
+
+    const colorHex = colorMap[color] || "#3b82f6";
+    const darkColorMap = {
+        blue: "#60a5fa",
+        yellow: "#facc15",
+        green: "#4ade80",
+        red: "#f87171"
+    };
+    const darkColorHex = darkColorMap[color] || "#60a5fa";
+
     return (
         <div className="relative flex items-center justify-center" style={{ width: `${size}px`, height: `${size}px` }}>
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke="#232b3a"
+                    stroke="#e5e7eb"
                     strokeWidth={stroke}
+                    className="dark:hidden"
                 />
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke={color}
+                    stroke="#4b5563"
+                    strokeWidth={stroke}
+                    className="hidden dark:block"
+                />
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={colorHex}
                     strokeWidth={stroke}
                     strokeDasharray={circumference}
                     strokeDashoffset={dashoffset}
                     strokeLinecap="round"
                     style={{ transition: "stroke-dashoffset 0.5s" }}
+                    className="dark:hidden"
+                />
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={darkColorHex}
+                    strokeWidth={stroke}
+                    strokeDasharray={circumference}
+                    strokeDashoffset={dashoffset}
+                    strokeLinecap="round"
+                    style={{ transition: "stroke-dashoffset 0.5s" }}
+                    className="hidden dark:block"
                 />
             </svg>
-            <span className="absolute text-lg font-bold text-white">{value}</span>
+            <span className="absolute text-sm font-bold text-blue-600 dark:text-blue-400">{value}</span>
         </div>
     );
 }
 
-function RequestCard({ req, status, onVote, voting, isVoted, glow }) {
+function RequestCard({ req, status, onVote, voting, isVoted }) {
     const meta = STATUS_META[status];
     const votesNeeded = Math.max(0, 20 - req.votes);
     const percent = Math.round((req.votes / 20) * 100);
     const timeAgo = req.timeAgo || "3 days ago";
     const platform = req.platform || "PC";
 
+    // Get color classes for current status
+    const colorClasses = {
+        blue: {
+            gradient: "from-blue-400 to-blue-600",
+            hoverBorder: "from-blue-500/50 via-blue-500/50 to-blue-500/50",
+            cardBg: "bg-blue-50/50 dark:bg-blue-900/20",
+            buttonGradient: "from-blue-500 to-blue-600",
+            text: "text-blue-700 dark:text-blue-300",
+            darkText: "text-blue-600 dark:text-blue-400"
+        },
+        yellow: {
+            gradient: "from-yellow-500 to-yellow-600",
+            hoverBorder: "from-yellow-500/50 via-yellow-500/50 to-yellow-500/50",
+            cardBg: "bg-yellow-50/50 dark:bg-yellow-900/20",
+            buttonGradient: "from-yellow-500 to-yellow-600",
+            text: "text-yellow-700 dark:text-yellow-300",
+            darkText: "text-yellow-600 dark:text-yellow-400"
+        },
+        green: {
+            gradient: "from-green-500 to-green-600",
+            hoverBorder: "from-green-500/50 via-green-500/50 to-green-500/50",
+            cardBg: "bg-green-50/50 dark:bg-green-900/20",
+            buttonGradient: "from-green-500 to-green-600",
+            text: "text-green-700 dark:text-green-300",
+            darkText: "text-green-600 dark:text-green-400"
+        },
+        red: {
+            gradient: "from-red-500 to-red-600",
+            hoverBorder: "from-red-500/50 via-red-500/50 to-red-500/50",
+            cardBg: "bg-red-50/50 dark:bg-red-900/20",
+            buttonGradient: "from-red-500 to-red-600",
+            text: "text-red-700 dark:text-red-300",
+            darkText: "text-red-600 dark:text-red-400"
+        }
+    };
+
+    const colors = colorClasses[meta.color] || colorClasses.blue;
+
     return (
-        <div
-            className={`relative bg-[#181e29] rounded-2xl border ${meta.border} pt-5 pb-5 px-5 p flex flex-col min-h-[320px] transition-all duration-200 ${glow ? meta.glow : "hover:shadow-xl hover:scale-[1.03]"}`}
-        >
-            {/* Centered Platform Tag */}
-            <div className="flex justify-center -mt-3 mb-2">
-                <div className={`px-3 py-1 rounded-full text-xs font-bold ${meta.tagColor} shadow-lg`}>
-                    {platform}
+        <div className="group relative">
+            {/* Gradient hover effect border */}
+            <div className={`absolute -inset-px rounded-2xl bg-gradient-to-r ${colors.hoverBorder} opacity-0 blur-lg transition-all duration-500 group-hover:opacity-100`}></div>
+
+            {/* Card Container */}
+            <div className="relative h-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/90 backdrop-blur-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.15)]">
+                {/* Top status bar */}
+                <div className={`absolute top-0 left-0 right-0 h-1.5 overflow-hidden rounded-t-2xl bg-gradient-to-r ${colors.gradient}`}></div>
+
+                <div className="space-y-4 p-4 pt-6">
+                    {/* Header with Title & Status */}
+                    <div className="flex items-start justify-between gap-2">
+                        <h3 className="line-clamp-2 text-base font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-500 dark:text-white dark:group-hover:text-blue-400">
+                            {req.title}
+                        </h3>
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap ${colors.text} backdrop-blur-sm`}>
+                            {status === "pending" && `${req.votes}/20`}
+                            {status === "processing" && `${req.votes} votes`}
+                            {status === "approved" && "Approved"}
+                            {status === "rejected" && "Rejected"}
+                        </span>
+                    </div>
+
+                    {/* Platform Tag */}
+                    <div className="flex justify-center -mt-1 mb-1">
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold bg-gray-800/10 dark:bg-gray-700/80 text-gray-700 dark:text-gray-300 shadow`}>
+                            {platform}
+                        </div>
+                    </div>
+
+                    {/* Status-specific content */}
+                    <div className={`flex items-center gap-3 rounded-xl p-3 ${colors.cardBg}`}>
+                        {status === "pending" && (
+                            <>
+                                <CircularProgressBar
+                                    value={req.votes}
+                                    max={20}
+                                    color={meta.color}
+                                    size={48}
+                                    stroke={6}
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        {votesNeeded === 0 ? "0 votes needed" : `${votesNeeded} votes needed`}
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {percent}% complete
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {status === "processing" && (
+                            <>
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-900/30">
+                                    <FaExclamationTriangle className="text-yellow-400 text-2xl" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        Status Update
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        Quality check in progress
+                                    </div>
+                                    <div className="text-xs font-bold mt-1 text-yellow-500 dark:text-yellow-400">
+                                        {req.votes} votes
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {status === "approved" && (
+                            <>
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-green-900/30">
+                                    <FaDownload className="text-green-400 text-2xl" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        Ready for Download
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        Files verified and tested
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {status === "rejected" && (
+                            <>
+                                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-900/30">
+                                    <FaExclamationTriangle className="text-red-400 text-2xl" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        {req.votes} of 20 votes received
+                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        Insufficient community support
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* View on Steam */}
+                    {req.steamLink && (
+                        <a
+                            href={req.steamLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex w-full items-center gap-2 rounded-lg bg-gray-100/80 px-3 py-1.5 text-sm text-gray-600 transition-colors duration-200 hover:bg-gray-200/80 dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-600/50"
+                        >
+                            <FaExternalLinkAlt className="text-base" />
+                            <span className="truncate">View on Steam</span>
+                        </a>
+                    )}
+
+                    {/* Vote Button */}
+                    {status === "pending" && (
+                        <button
+                            onClick={() => onVote(req._id)}
+                            disabled={voting || isVoted}
+                            className="group/btn relative w-full"
+                        >
+                            <div className={`absolute -inset-px rounded-xl bg-gradient-to-r ${colors.hoverBorder} opacity-70 blur-sm transition-opacity duration-300 group-hover/btn:opacity-100`}></div>
+                            <div className={`relative flex h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${colors.buttonGradient} text-sm font-medium text-white shadow-lg ${voting || isVoted ? "opacity-80" : ""}`}>
+                                {isVoted ? (
+                                    <>
+                                        <FaCheck className="mr-1" />
+                                        <span className="truncate">Supported</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        <span className="truncate">Support Request</span>
+                                    </>
+                                )}
+                            </div>
+                        </button>
+                    )}
+
+                    {/* Time Info */}
+                    <div className="truncate text-xs text-gray-500 dark:text-gray-400">
+                        {status === "pending" && `Requested ${timeAgo}`}
+                        {status === "processing" && `Started processing ${timeAgo}`}
+                        {status === "approved" && `Approved ${timeAgo}`}
+                        {status === "rejected" && `Rejected ${timeAgo}`}
+                    </div>
                 </div>
-            </div>
-
-            {/* Top bar */}
-            <div className="flex items-center justify-between mb-4">
-                <span className="text-white font-bold text-lg truncate max-w-[70%]">{req.title}</span>
-                {status === "pending" ? (
-                    <span className="bg-[#232b3a] text-blue-200 px-3 py-1 rounded-full text-xs font-bold">{req.votes}/20</span>
-                ) : status === "processing" ? (
-                    <span className="bg-[#232b3a] text-yellow-200 px-3 py-1 rounded-full text-xs font-bold">{req.votes} votes</span>
-                ) : status === "approved" ? (
-                    <span className="bg-[#232b3a] text-green-200 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><FaCheck className="inline" /> Approved</span>
-                ) : (
-                    <span className="bg-[#232b3a] text-red-200 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"><FaTimes className="inline" /> Rejected</span>
-                )}
-            </div>
-
-            {/* Progress/Status */}
-            <div className="flex flex-col items-center mb-4">
-                {status === "pending" && (
-                    <div className="w-full flex items-center gap-3 bg-[#20283a] rounded-xl p-3 mb-2">
-                        <CircularProgressBar value={req.votes} max={20} color="#3b82f6" />
-                        <div>
-                            <div className="text-blue-100 font-bold text-base">{votesNeeded === 0 ? "0 votes needed" : `${votesNeeded} votes needed`}</div>
-                            <div className="text-blue-400 text-xs font-semibold">{percent}% complete</div>
-                        </div>
-                    </div>
-                )}
-                {status === "processing" && (
-                    <div className="w-full flex items-center gap-3 bg-[#23201e] rounded-xl p-3 mb-2">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-900/30">
-                            <FaExclamationTriangle className="text-yellow-400 text-2xl" />
-                        </div>
-                        <div>
-                            <div className="text-yellow-100 font-bold text-base">Status Update</div>
-                            <div className="text-yellow-400 text-xs font-semibold">Quality check in progress</div>
-                            <div className="text-yellow-400 text-xs font-bold mt-1">{req.votes} votes</div>
-                        </div>
-                    </div>
-                )}
-                {status === "approved" && (
-                    <div className="w-full flex items-center gap-3 bg-[#1a2b22] rounded-xl p-3 mb-2">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-green-900/30">
-                            <FaDownload className="text-green-400 text-2xl" />
-                        </div>
-                        <div>
-                            <div className="text-green-100 font-bold text-base">Ready for Download</div>
-                            <div className="text-green-400 text-xs font-semibold">Files verified and tested</div>
-                        </div>
-                    </div>
-                )}
-                {status === "rejected" && (
-                    <div className="w-full flex items-center gap-3 bg-[#2a1a1a] rounded-xl p-3 mb-2">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-900/30">
-                            <FaExclamationTriangle className="text-red-400 text-2xl" />
-                        </div>
-                        <div>
-                            <div className="text-red-100 font-bold text-base">{req.votes} of 20 votes received</div>
-                            <div className="text-red-400 text-xs font-semibold">Insufficient community support</div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* View on Steam */}
-            {req.steamLink && (
-                <a
-                    href={req.steamLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-[#232b3a] hover:bg-opacity-80 text-gray-200 font-medium rounded-lg px-4 py-2 mb-3 transition-all border border-transparent hover:border-blue-500"
-                >
-                    <FaExternalLinkAlt className="text-base" /> View on Steam
-                </a>
-            )}
-
-            {/* Vote/Share Button */}
-            {status === "pending" && (
-                <button
-                    onClick={() => onVote(req._id)}
-                    disabled={voting || isVoted}
-                    className={`w-full py-3 mt-1 rounded-xl font-bold text-base transition-all ${voting || isVoted
-                        ? "bg-[#232b3a] text-blue-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-600 to-blue-400 text-white hover:from-blue-700 hover:to-blue-500 shadow-lg hover:shadow-blue-500/40"}`}
-                >
-                    {isVoted ? (
-                        <span className="flex items-center justify-center"><FaCheck className="mr-2" />Supported</span>
-                    ) : (
-                        <span className="flex items-center justify-center">+ Support Request</span>
-                    )}
-                </button>
-            )}
-
-            {/* Footer */}
-            <div className="flex items-center justify-between mt-4 text-xs text-gray-400">
-                <span>
-                    {status === "pending" && `Requested ${timeAgo}`}
-                    {status === "processing" && (
-                        <div>
-                            Started processing<br />
-                            {timeAgo}
-                        </div>
-                    )}
-                    {status === "approved" && `Approved ${timeAgo}`}
-                    {status === "rejected" && (
-                        <>
-                            Rejected {timeAgo}
-                            <br />
-                            Auto deleted in 7 days
-                        </>
-                    )}
-
-                </span>
-                <span className="flex items-center gap-1">
-                    <FaUsers className={meta.textColor} />
-                    <span className={`font-bold ${meta.textColor}`}>{req.votes} requests</span>
-                </span>
             </div>
         </div>
     );
@@ -382,7 +489,7 @@ export default function GameRequestList() {
 
 
     return (
-        <div className="max-w-7xl mx-auto py-10 px-2 md:px-6 bg-[#10131a] min-h-screen">
+        <div className="max-w-7xl mx-auto py-10 px-2 md:px-6 bg-[#f8fafc] dark:bg-[#10131a] min-h-screen">
             <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
             {STATUS_ORDER.map((status) => {
                 const meta = STATUS_META[status];
@@ -398,20 +505,20 @@ export default function GameRequestList() {
                                     {meta.heading}
                                     <span className={`ml-3 px-4 py-1 rounded-full font-bold text-lg ${meta.badge}`}>{cards.length}</span>
                                 </h2>
-                                <p className="text-gray-400 text-lg max-w-2xl mt-1">{meta.desc}</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mt-1">{meta.desc}</p>
                             </div>
-                            <div className="flex items-center gap-4 bg-[#181e29] rounded-xl px-6 py-3 border border-[#232b3a]">
+                            <div className="flex items-center gap-4 bg-white dark:bg-[#181e29] rounded-xl px-6 py-3 border border-gray-200 dark:border-[#232b3a] shadow-sm">
                                 <span className={`flex items-center gap-2 font-semibold ${meta.success.color}`}>
                                     {meta.success.label === "Success Rate" ? <FaCheck /> : <FaExclamationTriangle />}
                                     {meta.success.label}
                                 </span>
                                 <span className={`text-3xl font-extrabold ml-2 ${meta.success.color}`}>{meta.success.value}</span>
-                                {meta.success.label === "Est. Time" && <span className="text-xs text-gray-400 ml-2">Last 30 days</span>}
+                                {meta.success.label === "Est. Time" && <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">Last 30 days</span>}
                             </div>
                         </div>
                         {/* Cards Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {cards.slice(0, cardsToShow).map((req, idx) => (
+                            {cards.slice(0, cardsToShow).map((req) => (
                                 <RequestCard
                                     key={req._id}
                                     req={req}
@@ -419,7 +526,6 @@ export default function GameRequestList() {
                                     onVote={handleVote}
                                     voting={votingId === req._id}
                                     isVoted={!!voted[req._id] || (userId && req.voters && req.voters.some(v => v.user === userId || v.user?._id === userId)) || req.status !== "pending"}
-                                    glow={idx === 3} // Example: 4th card glows
                                 />
                             ))}
                         </div>
@@ -427,7 +533,7 @@ export default function GameRequestList() {
                         {showLoadMore && (
                             <div className="flex justify-center mt-10">
                                 <button
-                                    className={`px-8 py-3 rounded-2xl bg-[#181e29] border ${meta.border} ${meta.textColor} font-bold text-lg flex items-center gap-2 shadow hover:shadow-lg hover:bg-opacity-80 transition-all`}
+                                    className={`px-8 py-3 rounded-2xl bg-white dark:bg-[#181e29] border border-gray-300 dark:border-[#232b3a] ${meta.textColor} font-bold text-lg flex items-center gap-2 shadow hover:shadow-lg hover:bg-opacity-80 transition-all`}
                                     onClick={() => setCardsToShow(cardsToShow + 12)}
                                 >
                                     Load More {meta.heading.split(" ")[0]}
