@@ -64,8 +64,28 @@ const ProfileIcon = () => {
 
   return (
     <div className="relative flex items-center ml-4">
+      {/* Request Button (styled, right of profile icon, 8px gap) */}
+      <Link href="/request" className="hidden sm:relative sm:inline-block group mr-2" style={{ marginRight: '24px' }}>
+        <div className="relative">
+          {/* Shadow layers */}
+          <div className="absolute top-1 left-1 w-full h-full bg-black rounded-lg"></div>
+          <div className="absolute top-0.5 left-0.5 w-full h-full bg-purple-700 rounded-lg"></div>
+          {/* Main button */}
+          <div className="relative bg-[#5865F2] rounded-lg p-3 border-4 border-black transform transition-all duration-100 group-hover:-translate-x-1 group-hover:-translate-y-1 active:translate-x-0 active:translate-y-0">
+            <div className="flex items-center gap-2">
+              <span className="text-white font-black text-sm uppercase tracking-tight">Request Game</span>
+              {/* Ping effect dot */}
+              <div className="relative w-3 h-3">
+                <span className="absolute w-full h-full bg-yellow-300 rounded-full animate-ping opacity-75"></span>
+                <span className="absolute w-full h-full bg-yellow-300 rounded-full"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+      {/* Profile Icon Button */}
       <button
-        className="focus:outline-none mr-2made the caed design like "
+        className="focus:outline-none"
         onClick={() => setShowDropdown((v) => !v)}
       >
         <img
