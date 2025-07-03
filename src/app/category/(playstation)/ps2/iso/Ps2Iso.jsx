@@ -13,25 +13,74 @@ export default function Ps2Iso({ serverData }) {
     const router = useRouter();
     const initialPage = parseInt(searchParams.get('page') || '1', 10);
 
-    // Extract filters from URL
+    // Extract filters from URL (robust, like Android)
     const extractFiltersFromUrl = () => {
-        const genres = searchParams.get('tags')
-            ? searchParams.get('tags').split(',').map(name => {
-                const GENRES = [
-                    { id: 1, name: 'Action' },
-                    { id: 2, name: 'Adventure' },
-                    { id: 3, name: 'RPG' },
-                    { id: 4, name: 'Racing' },
-                ];
+        let genres = [];
+        const tags = searchParams.get('tags');
+        const GENRES = [
+            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
+            { id: 83, name: "Agriculture" }, { id: 33, name: "Anime" }, { id: 40, name: "Apps" }, { id: 71, name: "Arcade" },
+            { id: 115, name: "Artificial Intelligence" }, { id: 129, name: "Assassin" }, { id: 60, name: "Atmospheric" },
+            { id: 109, name: "Automation" }, { id: 133, name: "Blood" }, { id: 24, name: "Building" }, { id: 95, name: "Cartoon" },
+            { id: 22, name: "Casual" }, { id: 107, name: "Character Customization" }, { id: 68, name: "Cinematic*" },
+            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 108, name: "Colony Sim" }, { id: 70, name: "Colorful" },
+            { id: 86, name: "Combat" }, { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" },
+            { id: 105, name: "Controller" }, { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" },
+            { id: 67, name: "Cyberpunk" }, { id: 91, name: "Dark Humor" }, { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" },
+            { id: 126, name: "Driving" }, { id: 118, name: "Early Access" }, { id: 46, name: "eSport" }, { id: 125, name: "Exploration" },
+            { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" }, { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" },
+            { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" }, { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" },
+            { id: 88, name: "Flight" }, { id: 43, name: "FPS" }, { id: 64, name: "Funny" }, { id: 76, name: "Gore" },
+            { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" }, { id: 10, name: "History" }, { id: 11, name: "Horror" },
+            { id: 57, name: "Hunting" }, { id: 69, name: "Idler" }, { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" },
+            { id: 25, name: "Indie" }, { id: 101, name: "LEGO" }, { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" },
+            { id: 113, name: "Management" }, { id: 61, name: "Mature" }, { id: 96, name: "Memes" }, { id: 50, name: "Military" },
+            { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" }, { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" },
+            { id: 26, name: "Open World" }, { id: 74, name: "Parkour" }, { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" },
+            { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" }, { id: 48, name: "PvP" }, { id: 28, name: "Racing" },
+            { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" }, { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" },
+            { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" }, { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" },
+            { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" }, { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" },
+            { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" }, { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" },
+            { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" }, { id: 37, name: "Survival" }, { id: 47, name: "Tactical" },
+            { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" }, { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" },
+            { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" }, { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" },
+            { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
+            { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
+        ];
+        if (tags) {
+            const tagNames = tags.split(',');
+            genres = tagNames.map(name => {
                 const found = GENRES.find(g => g.name === name);
                 return found ? found.id : null;
-            }).filter(Boolean) : [];
+            }).filter(Boolean);
+        }
+        let gameMode = searchParams.get('gameMode');
+        if (gameMode === 'Singleplayer') gameMode = 'single';
+        else if (gameMode === 'Multiplayer') gameMode = 'multi';
+        else gameMode = 'any';
+        const size = searchParams.get('sizeLimit') || '';
+        const year = searchParams.get('releaseYear') || '';
+        let popularity = 'all';
+        const sortBy = searchParams.get('sortBy');
+        if (sortBy) {
+            switch (sortBy) {
+                case 'popular': popularity = 'popular'; break;
+                case 'relevance': popularity = 'relevance'; break;
+                case 'sizeAsc': popularity = 'sizeAsc'; break;
+                case 'sizeDesc': popularity = 'sizeDesc'; break;
+                case 'oldest': popularity = 'oldest'; break;
+                case 'newest': popularity = 'newest'; break;
+                default: popularity = 'all';
+            }
+        }
         return {
             genres,
-            gameMode: searchParams.get('gameMode') === 'Singleplayer' ? 'single' : searchParams.get('gameMode') === 'Multiplayer' ? 'multiplayer' : 'any',
-            size: searchParams.get('sizeLimit') || '',
-            year: searchParams.get('releaseYear') || '',
-            popularity: searchParams.get('sortBy') ? 'popular' : 'all',
+            filterModeAny: true,
+            gameMode,
+            size,
+            year,
+            popularity,
         };
     };
 
