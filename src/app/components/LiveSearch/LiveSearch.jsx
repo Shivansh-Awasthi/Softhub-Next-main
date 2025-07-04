@@ -395,8 +395,10 @@ const LiveSearch = () => {
           </div>
         </div>
         {/* Buttons: Request & Profile/Login - below search on mobile, right on md+ */}
-        <div className="flex flex-row md:flex-row items-center justify-end mt-2 md:mt-0 ml-0 md:ml-4 gap-2 w-full md:w-auto">
-          <ProfileIcon />
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-end mt-2 md:mt-0 ml-0 md:ml-4 w-full md:w-auto gap-0 space-y-2 md:space-y-0 md:gap-2">
+          <div className="flex flex-col w-full gap-2 md:flex-row md:w-auto md:gap-2">
+            <ProfileIcon />
+          </div>
         </div>
       </div>
       {/* Profile dropdown and logout warning remain unchanged */}
