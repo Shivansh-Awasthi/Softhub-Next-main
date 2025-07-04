@@ -67,6 +67,7 @@ export default function GameRequestForm() {
     const [requestLimit, setRequestLimit] = useState(1); // 1 per week
     const [nextRequestAvailable, setNextRequestAvailable] = useState(null);
     const [limitLoading, setLimitLoading] = useState(true);
+    const [showDenuvoModal, setShowDenuvoModal] = useState(false);
 
     const stages = [
         {
@@ -445,9 +446,9 @@ export default function GameRequestForm() {
                                         />
                                         <label htmlFor="verification" className="ml-3 text-[#b2b9c9] text-sm select-none">
                                             I verify that this game has been officially released and is patched by Scene groups or P2P community.
-                                            <a href="#" className="text-blue-400 hover:underline ml-1 inline-flex items-center">
+                                            <button type="button" onClick={() => setShowDenuvoModal(true)} className="text-blue-400 hover:underline ml-1 inline-flex items-center focus:outline-none">
                                                 What is Denuvo? <FaInfoCircle className="ml-1" />
-                                            </a>
+                                            </button>
                                         </label>
                                     </div>
 
@@ -686,6 +687,63 @@ export default function GameRequestForm() {
                     </div>
                 </div>
             </div>
+
+            {/* Denuvo Info Modal */}
+            {showDenuvoModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
+                    <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-lg mx-auto animate-fadeIn">
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                What is Denuvo DRM?
+                            </h4>
+                            <button onClick={() => setShowDenuvoModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        {/* Content */}
+                        <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-base leading-relaxed">
+                                Denuvo Anti-Tamper is a DRM technology that prevents games from being cracked. Games protected by Denuvo are extremely difficult to bypass.
+                            </p>
+                            <div>
+                                <p className="font-semibold text-gray-900 dark:text-white mb-2">How to check:</p>
+                                <ul className="list-disc list-inside space-y-1.5 ml-2">
+                                    <li>Look at the Steam store page system requirements</li>
+                                    <li>Check for "Denuvo Anti-Tamper" in DRM notices</li>
+                                    <li>Search "Does [game name] use Denuvo?" online</li>
+                                </ul>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span className="text-sm font-semibold text-green-700 dark:text-green-400">Safe to Request</span>
+                                    </div>
+                                    <p className="text-sm text-green-600 dark:text-green-300">
+                                        Older games, indie titles, games without DRM
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span className="text-sm font-semibold text-red-700 dark:text-red-400">Avoid Requesting</span>
+                                    </div>
+                                    <p className="text-sm text-red-600 dark:text-red-300">
+                                        New AAA games, EA titles, recent releases
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
