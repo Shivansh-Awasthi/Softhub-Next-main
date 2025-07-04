@@ -143,7 +143,7 @@ const HomeClient = ({
                 </div>
 
                 {/* Pagination Dots */}
-                <div className="absolute flex space-x-3 bottom-7 left-1/2 transform -translate-x-1/2 z-20">
+                <div className="absolute flex space-x-3 bottom-7 left-1/2 transform -translate-x-1/2">
                     {images.map((_, index) => (
                         <button
                             key={index}
@@ -160,7 +160,7 @@ const HomeClient = ({
                 {/* Previous Button */}
                 <button
                     type="button"
-                    className="absolute top-1/2 -translate-y-1/2 left-4 z-20"
+                    className="absolute top-1/2 -translate-y-1/2 left-4"
                     onClick={() => setCurrentIndex((currentIndex - 1 + images.length) % images.length)}
                 >
                     <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-gradient-to-l hover:from-purple-600/80 hover:to-blue-600/80 border border-purple-500/30 transition-all duration-300 shadow-lg">
@@ -184,7 +184,7 @@ const HomeClient = ({
                 {/* Next Button */}
                 <button
                     type="button"
-                    className="absolute top-1/2 -translate-y-1/2 right-4 z-20"
+                    className="absolute top-1/2 -translate-y-1/2 right-4 "
                     onClick={() => setCurrentIndex((currentIndex + 1) % images.length)}
                 >
                     <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-gradient-to-r hover:from-purple-600/80 hover:to-blue-600/80 border border-purple-500/30 transition-all duration-300 shadow-lg">
