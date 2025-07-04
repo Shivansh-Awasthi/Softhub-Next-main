@@ -46,7 +46,7 @@ const DescriptionTabs = ({ data }) => {
         memory: '8 GB RAM',
         graphics: 'Apple GPU (integrated)',
         storage: 'N/A',
-        additionalNotes: '/System/Applications/GameName.app',
+        additionalNotes: '/System/Applications/Application-Name.app',
     };
     const defaultPCRequirements = {
         os: 'Windows 10',
@@ -229,7 +229,9 @@ const DescriptionTabs = ({ data }) => {
                                             <div className="relative pl-8">
                                                 <div className="absolute left-0 top-0 flex items-center justify-center w-6 h-6 rounded-full border-2 border-blue-500 text-blue-500"><span className="text-xs font-semibold">3</span></div>
                                                 <div className="relative">
-                                                    <div className="text-sm text-gray-600 dark:text-gray-300">Enter the folllowing command: <span className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20"><svg className="w-4 h-4 text-blue-500 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span className="font-mono text-sm text-blue-700 dark:text-blue-300 font-medium">{data.systemRequirements.additionalNotes}</span></span> to the Terminal then press enter.</div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                                                        Enter the folllowing command: <span className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-md border border-blue-200 dark:border-blue-500/20"><svg className="w-4 h-4 text-blue-500 dark:text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span className="font-mono text-sm text-blue-700 dark:text-blue-300 font-medium">{macReq && macReq.additionalNotes && String(macReq.additionalNotes).trim() !== '' ? macReq.additionalNotes : 'xattr -cr /Applications/Application_Name.app'}</span></span> to the Terminal then press enter.
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
