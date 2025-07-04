@@ -68,6 +68,7 @@ export default function GameRequestForm() {
     const [nextRequestAvailable, setNextRequestAvailable] = useState(null);
     const [limitLoading, setLimitLoading] = useState(true);
     const [showDenuvoModal, setShowDenuvoModal] = useState(false);
+    const [showSuccessCard, setShowSuccessCard] = useState(false);
 
     const stages = [
         {
@@ -179,6 +180,7 @@ export default function GameRequestForm() {
                 setTitle("");
                 setPlatform("");
                 setSteamLink("");
+                setShowSuccessCard(true); // Show success card
                 // After successful submit, update limit state
                 setRequestLimit(0);
                 if (data.createdAt) {
@@ -291,85 +293,158 @@ export default function GameRequestForm() {
                             {/* Left Column - Form */}
                             <div className="lg:col-span-4 bg-[#101928]/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-[#232c3a]">
                                 {/* New Game Request Header Card (Top of Form) */}
-                                <div className="relative p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-4">
-                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            {/* Icon Container with Glow */}
-                                            <div className="relative shrink-0">
-                                                <div className="absolute inset-0 bg-blue-500 rounded-xl blur-xl opacity-20 animate-pulse"></div>
-                                                <div className="relative p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg">
-                                                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                    </svg>
+                                {!showSuccessCard && (
+                                    <div className="relative p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-4">
+                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                {/* Icon Container with Glow */}
+                                                <div className="relative shrink-0">
+                                                    <div className="absolute inset-0 bg-blue-500 rounded-xl blur-xl opacity-20 animate-pulse"></div>
+                                                    <div className="relative p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg">
+                                                        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                {/* Title & Description */}
+                                                <div>
+                                                    <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                                                        Game Request
+                                                    </h2>
+                                                    <p className="mt-1 text-base text-gray-600 dark:text-gray-400">
+                                                        Fill in the details below to submit your request
+                                                    </p>
                                                 </div>
                                             </div>
-                                            {/* Title & Description */}
-                                            <div>
-                                                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
-                                                    Game Request
-                                                </h2>
-                                                <p className="mt-1 text-base text-gray-600 dark:text-gray-400">
-                                                    Fill in the details below to submit your request
+                                            {/* Request Counter */}
+                                            <div className="hidden md:flex flex-col items-end">
+                                                <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/50">
+                                                    <span className={`text-xl font-bold ${requestLimit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>{limitLoading ? '-' : requestLimit}</span>
+                                                    <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">requests left</span>
+                                                </div>
+                                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    Resets weekly
                                                 </p>
                                             </div>
                                         </div>
-                                        {/* Request Counter */}
-                                        <div className="hidden md:flex flex-col items-end">
-                                            <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/50">
-                                                <span className={`text-xl font-bold ${requestLimit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>{limitLoading ? '-' : requestLimit}</span>
-                                                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">requests left</span>
+                                    </div>
+                                )}
+                                {/* Request Limit Card (Top of Form) */}
+                                {!showSuccessCard && (
+                                    <div className="p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-8">
+                                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 p-4">
+                                            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+                                            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+                                            <div className="flex items-start gap-4">
+                                                <div className="shrink-0">
+                                                    <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+                                                        <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                                        <div>
+                                                            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                                                Request Limits & Guidelines
+                                                            </h4>
+                                                            <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                                                                {limitLoading ? (
+                                                                    <span className="text-blue-600 font-bold">Checking limit...</span>
+                                                                ) : requestLimit > 0 ? (
+                                                                    <>You can submit <span className="font-bold text-blue-600 dark:text-blue-200">{requestLimit} request{requestLimit !== 1 ? 's' : ''}</span> this week.</>
+                                                                ) : (
+                                                                    <><span className="font-bold text-red-500">0 requests left</span> <span className="text-gray-400">(Resets weekly)</span></>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            {(!limitLoading && requestLimit === 0 && nextRequestAvailable) && (
+                                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 rounded-full">
+                                                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    Next Request: {formatTimeLeft(nextRequestAvailable)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                Resets weekly
-                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                                {/* Request Limit Card (Top of Form) */}
-                                <div className="p-6 border-b border-gray-200/80 dark:border-gray-700/80 mb-8">
-                                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 p-4">
-                                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
-                                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
-                                        <div className="flex items-start gap-4">
-                                            <div className="shrink-0">
-                                                <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
-                                                    <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                )}
+                                {/* Form Starts Here */}
+                                {showSuccessCard ? (
+                                    <div className="relative backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl ring-1 ring-gray-900/5 dark:ring-gray-700/30 p-8">
+                                        <div className="flex flex-col items-center text-center space-y-6">
+                                            {/* Success Icon */}
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-emerald-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                                                <div className="relative w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center">
+                                                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                                                     </svg>
                                                 </div>
                                             </div>
-                                            <div className="flex-1">
-                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                                            Request Limits & Guidelines
-                                                        </h4>
-                                                        <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                                                            {limitLoading ? (
-                                                                <span className="text-blue-600 font-bold">Checking limit...</span>
-                                                            ) : requestLimit > 0 ? (
-                                                                <>You can submit <span className="font-bold text-blue-600 dark:text-blue-200">{requestLimit} request{requestLimit !== 1 ? 's' : ''}</span> this week.</>
-                                                            ) : (
-                                                                <><span className="font-bold text-red-500">0 requests left</span> <span className="text-gray-400">(Resets weekly)</span></>
-                                                            )}
-                                                        </p>
+                                            {/* Success Title */}
+                                            <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 bg-clip-text text-transparent">
+                                                Request Submitted Successfully!
+                                            </h2>
+                                            {/* Success Message */}
+                                            <p className="text-gray-600 dark:text-gray-400 max-w-md">
+                                                Your game request has been submitted and is now pending community support. Share it with others to gather more support!
+                                            </p>
+                                            {/* Status Info */}
+                                            <div className="bg-emerald-50/50 dark:bg-emerald-900/20 rounded-xl p-4 w-full max-w-md">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg">
+                                                        <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                        </svg>
                                                     </div>
-                                                    <div className="flex items-center gap-3">
-                                                        {(!limitLoading && requestLimit === 0 && nextRequestAvailable) && (
-                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 rounded-full">
-                                                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
-                                                                Next Request: {formatTimeLeft(nextRequestAvailable)}
-                                                            </span>
-                                                        )}
+                                                    <div>
+                                                        <div className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+                                                            Next Steps
+                                                        </div>
+                                                        <div className="text-sm text-emerald-700 dark:text-emerald-300">
+                                                            Your request needs 20 community votes for priority processing
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            {/* Animated Stats Card */}
+                                            <div className="backdrop-blur-xl bg-white/50 dark:bg-gray-800/50 rounded-xl border border-white/20 dark:border-gray-700/30 p-4 w-full max-w-md">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                                                            <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Processing Time</span>
+                                                    </div>
+                                                    <div className="border-l border-gray-200 dark:border-gray-700/50 pl-6">
+                                                        <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">24h</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                            After reaching threshold</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/* Action Button */}
+                                            <button type="button" className="relative group" onClick={() => { setShowSuccessCard(false); setMessage(""); }}>
+                                                <div className="absolute -inset-px bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-500 rounded-xl opacity-70 group-hover:opacity-100 blur-sm transition-all duration-300"></div>
+                                                <div className="relative px-6 py-3 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-500 rounded-xl flex items-center gap-2 text-sm font-medium text-white">
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                    </svg>
+                                                    <span>Submit Another Request</span>
+                                                </div>
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
-                                {/* Form Starts Here */}
+                                ) : (
                                 <form onSubmit={handleSubmit} className="space-y-7">
                                     {/* Game Title */}
                                     <div>
@@ -485,44 +560,10 @@ export default function GameRequestForm() {
                                     </button>
                                     {message && <div className="text-center text-sm mt-2 text-green-400">{message}</div>}
                                 </form>
+                                )}
                             </div>
                             {/* right card */}
-                            {/* <div className="bg-[#1A2739] rounded-2xl shadow-xl p-8 h-fit">
-                                <div className="flex items-center mb-4">
-                                    <div className="bg-blue-100 p-3 rounded-lg">
-                                        <FaCheckCircle className="text-blue-600 text-2xl" />
-                                    </div>
-                                    <h2 className="text-2xl font-bold text-white ml-4">Submission Guidelines</h2>
-                                </div>
-                                <div className="mt-6 bg-[#1A2739] rounded-xl p-6">
-                                    <div className="mt-8 space-y-4">
-                                        <h3 className="text-lg font-semibold text-purple-300">Submission Guidelines:</h3>
-                                        <ul className="space-y-3 text-gray-600">
-                                            <li className="flex items-start">
-                                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mt-2 mr-3"></span>
-                                                <span className='text-gray-300'>Only submit officially released games</span>
-                                            </li>
-                                            <li className="flex items-start">
-                                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mt-2 mr-3"></span>
-                                                <span className='text-gray-300'>Verify Denuvo status before submission</span>
-                                            </li>
-                                            <li className="flex items-start">
-                                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mt-2 mr-3"></span>
-                                                <span className='text-gray-300'>Provide accurate Steam store URLs</span>
-                                            </li>
-                                            <li className="flex items-start">
-                                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mt-2 mr-3"></span>
-                                                <span className='text-gray-300'>No duplicate requests for the same game</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5">
-                                        <p className="text-gray-700">
-                                            <span className="font-semibold">Note:</span> Requests with incomplete or inaccurate information will be rejected automatically.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div> */}
+
                         </div>
                     </div>
                 </div>

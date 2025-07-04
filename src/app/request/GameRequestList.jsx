@@ -52,7 +52,7 @@ const STATUS_META = {
         textColor: "text-red-400",
         tagColor: "bg-red-900/30 text-red-200",
         desc: "These requests did not meet our requirements or lacked sufficient community support. They will be automatically removed after 3 days.",
-        success: { label: "Auto Removal", value: "3 Days", color: "text-red-400" },
+        success: { label: "Auto Removal", value: "7 Days", color: "text-red-400" },
     },
 };
 
@@ -164,6 +164,47 @@ function PopupModal({ open, message, onClose }) {
                     >
                         Close
                     </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SuccessModal({ open, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-[110] flex min-h-screen items-center justify-center p-4 bg-black/60 backdrop-blur-[6px] transition-all">
+            <div className="relative w-full max-w-sm animate-fadeIn">
+                <div className="relative overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl dark:border-gray-700/50 dark:bg-gray-800">
+                    {/* Status Bar */}
+                    <div className="h-1 w-full bg-gradient-to-r from-green-500 to-emerald-500" />
+                    {/* Content */}
+                    <div className="p-6">
+                        {/* Header */}
+                        <div className="mb-4 flex items-start gap-4">
+                            {/* Icon */}
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            {/* Content */}
+                            <div className="min-w-0 flex-1">
+                                <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Success!</h3>
+                                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">Support added successfully! Thank you for helping this request reach the processing threshold.</p>
+                            </div>
+                            {/* Close Button */}
+                            <button onClick={onClose} className="shrink-0 rounded-full p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        {/* Actions */}
+                        <div className="flex gap-3">
+                            <button onClick={onClose} className="flex-1 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Close</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -416,6 +457,8 @@ export default function GameRequestList() {
     const [modalMessage, setModalMessage] = useState("");
     const [cardsToShow, setCardsToShow] = useState(12);
     const [userId, setUserId] = useState(null);
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [pendingVotedId, setPendingVotedId] = useState(null); // Track which card is waiting for success modal
 
     // Fetch current user ID from token or API
     useEffect(() => {
@@ -500,7 +543,9 @@ export default function GameRequestList() {
                 setRequests((prev) =>
                     prev.map((r) => (r._id === id ? { ...r, votes: r.votes + 1 } : r))
                 );
-                setVoted((prev) => ({ ...prev, [id]: true }));
+                setPendingVotedId(id); // Show success modal for this card
+                setSuccessModalOpen(true);
+                // Don't setVoted yet; wait for modal close
             } else if (res.status === 429) {
                 setModalMessage("Your daily vote is used. Try again tomorrow.");
                 setModalOpen(true);
@@ -524,6 +569,13 @@ export default function GameRequestList() {
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-2 md:px-6 bg-[#f8fafc] dark:bg-[#10131a] min-h-screen">
+            <SuccessModal open={successModalOpen} onClose={() => {
+                setSuccessModalOpen(false);
+                if (pendingVotedId) {
+                    setVoted((prev) => ({ ...prev, [pendingVotedId]: true }));
+                    setPendingVotedId(null);
+                }
+            }} />
             <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
             {STATUS_ORDER.map((status) => {
                 const meta = STATUS_META[status];
