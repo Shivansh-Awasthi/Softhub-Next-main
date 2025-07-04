@@ -4,7 +4,6 @@ import SidebarWrapper from './components/Sidebar/SidebarWrapper';
 import GlobalHeader from './components/GlobalHeader/page';
 import { LoadingProvider } from './context/LoadingContext';
 import ClientScrollProgressBar from './components/ClientScrollProgressBar';
-import UserDataSynchronizer from './components/UserDataSynchronizer';
 import SecurityRestrictions from './components/Restrict/SecurityRestrictions';
 import SnowEffect from './components/SnowEffect';
 import { Suspense } from "react";
@@ -33,7 +32,6 @@ export default function RootLayout({ children }) {
       >
         <SnowEffect count={70} startAfterSidebar={true} />
         <ClientScrollProgressBar />
-        {/* <UserDataSynchronizer /> */}
         {/* <SecurityRestrictions /> */}
         <div className="flex min-h-screen">
           <SidebarWrapper />
