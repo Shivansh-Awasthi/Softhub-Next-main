@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { jwtDecode } from 'jwt-decode';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { FaApple, FaDownload, FaLock, FaStar, FaCoffee } from "react-icons/fa";
 import { FaCrown } from "react-icons/fa";
@@ -11,6 +10,7 @@ import { useLoading } from '@/app/context/LoadingContext';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
+import axios from 'axios';
 
 // Utility function to create URL-friendly slugs
 function createSlug(text) {
@@ -68,6 +68,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
         { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
     ];
+
     function getFiltersFromUrl(searchParams) {
         // Genres/tags
         let tags = searchParams.get('tags') || '';
@@ -105,8 +106,10 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
             popularity
         };
     }
+
     // Persistent filter state
     const [filters, setFilters] = useState(() => getFiltersFromUrl(searchParams));
+
     // Sync filters state with URL
     useEffect(() => {
         setFilters(getFiltersFromUrl(searchParams));
@@ -140,10 +143,58 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
     const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || initialPage.toString(), 10));
     const [isPageTransitioning, setIsPageTransitioning] = useState(false);
     const [error, setError] = useState(serverData?.error || null);
-    const [purchasedGames, setPurchasedGames] = useState([]);
-    const [isAdmin, setIsAdmin] = useState(false);
     const [userData, setUserData] = useState(null);
     const [filterModalOpen, setFilterModalOpen] = useState(false);
+
+    // Fetch user data
+    const fetchUserData = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setUserData(null);
+                return;
+            }
+
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN
+                    }
+                }
+            );
+
+            if (res.data?.user) {
+                setUserData(res.data.user);
+            } else {
+                setUserData(null);
+            }
+        } catch (error) {
+            setUserData(null);
+        }
+    }, []);
+
+    // Log user data changes
+    // useEffect(() => {
+    //     console.log("User data updated:", userData);
+    //     console.log("Purchased games:", userData?.purchasedGames || []);
+    // }, [userData]);
+
+    // Fetch user data on component mount and set up event listeners
+    useEffect(() => {
+        fetchUserData();
+
+        const handleAuthChange = () => {
+            fetchUserData();
+        };
+
+        window.addEventListener('auth-change', handleAuthChange);
+
+        return () => {
+            window.removeEventListener('auth-change', handleAuthChange);
+        };
+    }, [fetchUserData]);
 
     // Calculate total pages
     const totalPages = Math.max(1, Math.ceil(totalApps / ITEMS_PER_PAGE));
@@ -167,26 +218,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [serverData, searchParams]);
-
-    // Load user data from localStorage on client side
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            // Read JWT token from localStorage (or cookie if you have that setup)
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const decoded = jwtDecode(token);
-                    setUserData(decoded);
-                } catch (err) {
-                    console.error('Failed to decode JWT token:', err);
-                    setUserData(null);
-                }
-            } else {
-                setUserData(null);
-            }
-        }
-    }, []);
+    }, [serverData, searchParams, currentPage]);
 
     // Fetch data when page changes (client-side)
     useEffect(() => {
@@ -215,7 +247,6 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
                 setError(null);
             } catch (err) {
                 setError('Failed to load data: ' + err.message);
-                console.error("Client fetch failed:", err.message);
             } finally {
                 setIsPageTransitioning(false);
             }
@@ -224,40 +255,9 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         fetchData();
     }, [currentPage, ITEMS_PER_PAGE]);
 
-    // Helper: Map filter modal values to backend query params (same as Mac)
+    // Helper: Map filter modal values to backend query params
     const mapFiltersToQuery = (filters) => {
         const params = new URLSearchParams(searchParams.toString());
-        const GENRES = [
-            { id: 42, name: "2D" }, { id: 85, name: "3D" }, { id: 1, name: "Action" }, { id: 2, name: "Adventure" },
-            { id: 83, name: "Agriculture" }, { id: 33, name: "Anime" }, { id: 40, name: "Apps" }, { id: 71, name: "Arcade" },
-            { id: 115, name: "Artificial Intelligence" }, { id: 129, name: "Assassin" }, { id: 60, name: "Atmospheric" },
-            { id: 109, name: "Automation" }, { id: 133, name: "Blood" }, { id: 24, name: "Building" }, { id: 95, name: "Cartoon" },
-            { id: 22, name: "Casual" }, { id: 107, name: "Character Customization" }, { id: 68, name: "Cinematic*" },
-            { id: 106, name: "Classic" }, { id: 49, name: "Co-Op" }, { id: 108, name: "Colony Sim" }, { id: 70, name: "Colorful" },
-            { id: 86, name: "Combat" }, { id: 78, name: "Comedy" }, { id: 103, name: "Comic Book" }, { id: 44, name: "Comptetitive" },
-            { id: 105, name: "Controller" }, { id: 72, name: "Crafting" }, { id: 5, name: "Crime" }, { id: 59, name: "Cute" },
-            { id: 67, name: "Cyberpunk" }, { id: 91, name: "Dark Humor" }, { id: 51, name: "Difficult" }, { id: 58, name: "Dragons" },
-            { id: 126, name: "Driving" }, { id: 118, name: "Early Access" }, { id: 46, name: "eSport" }, { id: 125, name: "Exploration" },
-            { id: 102, name: "Family Friendly" }, { id: 9, name: "Fantasy" }, { id: 79, name: "Farming Sim" }, { id: 124, name: "Fast-Paced" },
-            { id: 135, name: "Female Protagonist" }, { id: 36, name: "Fighting" }, { id: 121, name: "First-Person" }, { id: 84, name: "Fishing" },
-            { id: 88, name: "Flight" }, { id: 43, name: "FPS" }, { id: 64, name: "Funny" }, { id: 76, name: "Gore" },
-            { id: 134, name: "Great Soundtrack" }, { id: 73, name: "Hack and Slash" }, { id: 10, name: "History" }, { id: 11, name: "Horror" },
-            { id: 57, name: "Hunting" }, { id: 69, name: "Idler" }, { id: 100, name: "Illuminati" }, { id: 120, name: "Immersive Sim" },
-            { id: 25, name: "Indie" }, { id: 101, name: "LEGO" }, { id: 81, name: "Life Sim" }, { id: 66, name: "Loot" },
-            { id: 113, name: "Management" }, { id: 61, name: "Mature" }, { id: 96, name: "Memes" }, { id: 50, name: "Military" },
-            { id: 89, name: "Modern" }, { id: 32, name: "Multiplayer" }, { id: 13, name: "Mystery" }, { id: 77, name: "Nudity" },
-            { id: 26, name: "Open World" }, { id: 74, name: "Parkour" }, { id: 122, name: "Physics" }, { id: 80, name: "Pixel Graphics" },
-            { id: 127, name: "Post-apocalyptic" }, { id: 35, name: "Puzzle" }, { id: 48, name: "PvP" }, { id: 28, name: "Racing" },
-            { id: 53, name: "Realistic" }, { id: 82, name: "Relaxing" }, { id: 112, name: "Resource Management" }, { id: 23, name: "RPG" },
-            { id: 65, name: "Sandbox" }, { id: 34, name: "Sci-fi" }, { id: 114, name: "Science" }, { id: 15, name: "Science Fiction" },
-            { id: 99, name: "Sexual Content" }, { id: 31, name: "Shooters" }, { id: 21, name: "Simulation" }, { id: 93, name: "Singleplayer" },
-            { id: 29, name: "Sports" }, { id: 38, name: "Stealth Game" }, { id: 97, name: "Story Rich" }, { id: 27, name: "Strategy" },
-            { id: 92, name: "Superhero" }, { id: 117, name: "Surreal" }, { id: 37, name: "Survival" }, { id: 47, name: "Tactical" },
-            { id: 87, name: "Tanks" }, { id: 45, name: "Team-Based" }, { id: 104, name: "Third Person" }, { id: 54, name: "Third-Person-Shooter" },
-            { id: 17, name: "Thriller" }, { id: 56, name: "Tower Defense" }, { id: 52, name: "Trading" }, { id: 94, name: "Turn-Based" },
-            { id: 111, name: "Underwater" }, { id: 41, name: "Utilities" }, { id: 75, name: "Violent" }, { id: 20, name: "VR" },
-            { id: 18, name: "War" }, { id: 123, name: "Wargame" }, { id: 119, name: "Zombie" }
-        ];
         const genreNames = filters.genres?.map(id => {
             const found = GENRES.find(g => g.id === id);
             return found ? found.name : null;
@@ -321,82 +321,6 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         router.push(`${pathname}?${params.toString()}`);
     };
 
-    // Update state when props or URL changes
-    useEffect(() => {
-        // Update data and total from server data
-        const { games, total } = extractData(serverData);
-        setData(games);
-        setTotalApps(total);
-
-        // Update current page from URL
-        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
-        if (pageFromUrl !== currentPage) {
-            setCurrentPage(pageFromUrl);
-        }
-
-        // Reset page transition state
-        const timer = setTimeout(() => {
-            setIsPageTransitioning(false);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [serverData, searchParams]);
-
-    // Load user data from localStorage on client side
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            // Read JWT token from localStorage (or cookie if you have that setup)
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const decoded = jwtDecode(token);
-                    setUserData(decoded);
-                } catch (err) {
-                    console.error('Failed to decode JWT token:', err);
-                    setUserData(null);
-                }
-            } else {
-                setUserData(null);
-            }
-        }
-    }, []);
-
-    // Fetch data when page changes (client-side)
-    useEffect(() => {
-        if (currentPage === 1) return; // already have page 1 data from server
-
-        const fetchData = async () => {
-            setIsPageTransitioning(true);
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ps4?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
-                    {
-                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
-                    }
-                );
-
-                if (!res.ok) {
-                    throw new Error(`API error: ${res.status}`);
-                }
-
-                const json = await res.json();
-
-                // Handle API response structure
-                const { games, total } = extractData(json);
-                setData(games);
-                setTotalApps(total);
-                setError(null);
-            } catch (err) {
-                setError('Failed to load data: ' + err.message);
-                console.error("Client fetch failed:", err.message);
-            } finally {
-                setIsPageTransitioning(false);
-            }
-        };
-
-        fetchData();
-    }, [currentPage, ITEMS_PER_PAGE]);
-
     // Handle page change with improved UX
     const handlePageChange = (newPage) => {
         if (newPage === currentPage || newPage < 1 || newPage > totalPages || isPageTransitioning) {
@@ -416,8 +340,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
     // Game card component with prefetching
     const GameCard = ({ game = {} }) => {
         const isAdmin = userData?.role === 'ADMIN';
-        const purchasedGamesFromToken = userData?.purchasedGames || [];
-        const isPurchased = purchasedGamesFromToken.includes(game._id);
+        const isPurchased = userData?.purchasedGames?.includes(game._id) || false;
         const isUnlocked = isAdmin || !game.isPaid || isPurchased;
 
         // Always create a valid download URL
