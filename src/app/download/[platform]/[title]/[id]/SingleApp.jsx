@@ -232,8 +232,14 @@ const SingleApp = ({ appData }) => {
             {/* Admin Edit Floating Button */}
             {userData?.isAdmin && (
                 <button
-                    className="fixed top-32 right-8 z-50 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-5 py-3 rounded-full shadow-xl font-bold uppercase tracking-wider flex items-center gap-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-                    style={{ boxShadow: '0 4px 24px 0 rgba(80, 0, 200, 0.18)' }}
+                    className="absolute top-8 right-8 z-[100] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-5 py-3 rounded-full shadow-xl font-bold uppercase tracking-wider flex items-center gap-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 pointer-events-auto"
+                    style={{
+                        boxShadow: '0 4px 24px 0 rgba(80, 0, 200, 0.18)',
+                        position: 'absolute',
+                        top: '2rem',
+                        right: '2rem',
+                        zIndex: 100
+                    }}
                     onClick={() => window.location.href = `/admin/apps/update/${data._id}`}
                     title="Edit this app"
                 >
