@@ -85,7 +85,7 @@ const ProfileIcon = () => {
           <img
             src={user.avatar || DEFAULT_AVATAR}
             alt="avatar"
-            className="w-13 h-13 rounded-full border-2 border-blue-400 bg-gray-800 object-cover shadow-lg"
+            className="w-13 h-13 rounded-full border-2 border-blue-400 bg-gray-800 object-cover shadow-lg hover: pointer hover: ring-1 hover:ring-purple-500 transition duration-200"
             onError={e => (e.target.src = DEFAULT_AVATAR)}
           />
         </button>
@@ -129,29 +129,40 @@ const ProfileIcon = () => {
       )}
       {/* Logout warning card */}
       {showLogoutWarning && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40" onClick={() => setShowLogoutWarning(false)}>
-          <div className="bg-[#232323] rounded-lg p-6 shadow-lg w-80" onClick={e => e.stopPropagation()}>
-            <div className="text-lg font-semibold text-white mb-2">Are you sure you want to logout?</div>
-            <div className="text-gray-400 mb-4">You will need to login again to access your account.</div>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-700 text-gray-200 hover:bg-gray-600"
-                onClick={() => setShowLogoutWarning(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  setShowLogoutWarning(false);
-                  setShowDropdown(false);
-                  setUser(null);
-                  window.location.href = '/'; // Redirect to home page after logout
-                }}
-              >
-                Logout
-              </button>
+        <div className="fixed inset-0 flex items-center justify-center z-[300] bg-black/60 backdrop-blur-[8px] transition-all" onClick={() => setShowLogoutWarning(false)}>
+          <div className="relative overflow-hidden backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-0" onClick={e => e.stopPropagation()}>
+            {/* Top Border Gradient */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500" />
+            <div className="p-8 sm:p-10">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center mb-2 shadow-lg">
+                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Are you sure you want to logout?</div>
+                <div className="text-gray-500 dark:text-gray-300 mb-4 text-base">You will need to login again to access your account.</div>
+                <div className="flex justify-center gap-4 w-full mt-4">
+                  <button
+                    className="flex-1 py-3 px-6 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl font-semibold shadow hover:bg-gray-300 dark:hover:bg-gray-700 transition-all text-lg"
+                    onClick={() => setShowLogoutWarning(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="flex-1 py-3 px-6 bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl shadow-lg hover:from-red-600 hover:to-pink-600 transition-all text-lg"
+                    onClick={() => {
+                      localStorage.removeItem('token');
+                      setShowLogoutWarning(false);
+                      setShowDropdown(false);
+                      setUser(null);
+                      window.location.href = '/';
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -257,130 +268,139 @@ const LiveSearch = () => {
   // We're now using the imported createSlug utility function
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex-1">
-        <div
-          ref={searchRef}
-          className="flex flex-wrap relative ring-1 ring-[#3E3E3E] rounded-lg w-full max-w-[760px] z-550"
-        >
-          <form onSubmit={handleSearch} className="w-full flex items-center">
-            <input
-              type="text"
-              placeholder="Search the site"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="bg-[#242424] hover:bg-[#262626] rounded-lg text-white py-3 pl-4 pr-12 h-12 flex-grow focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-opacity-80 transition duration-200"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={handleClear}
-                className="absolute right-14 top-0 h-full w-4 flex items-center justify-center rounded-full"
-              >
-                <RxCross2 className="text-xxl h-7 w-7 text-[#8e8e8e] hover:text-[#ffffff]" />
-              </button>
-            )}
-            <button type="submit" className="absolute right-1 top-0 h-full w-12 flex items-center justify-center rounded-full">
-              <CiSearch className="text-xxl h-7 w-7 text-[#8e8e8e] hover:text-[#ffffff]" />
-            </button>
-          </form>
-
-          {/* Live Search Results Dropdown */}
-          {showResults && searchQuery.trim() && (
-            <>
-              {/* Show skeleton while loading */}
-              {isPending ? (
-                <LiveSearchSkeleton itemCount={7} />
-              ) : searchResults.apps && searchResults.apps.length > 0 ? (
-                // Show actual results when loaded
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-lg border border-purple-600/20 shadow-lg z-50">
-                  {/* Ambient background elements */}
-                  <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
-                  <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
-
-                  <ul className="divide-y divide-gray-700/30 relative z-10">
-                    {searchResults.apps.map((app) => {
-                      // Check if the game is paid and whether the user has purchased it
-                      const isPurchased = userData.purchasedGames.includes(app._id);
-                      const isUnlocked = userData.isAdmin || !app.isPaid || isPurchased;
-                      const isLocked = !isUnlocked;
-
-
-                      return (
-                        <li
-                          key={app._id}
-                          className={`py-2 px-4 hover:bg-black/20 transition-all duration-200 relative ${isLocked ? 'opacity-30 pointer-events-none' : ''}`}
-                        >
-                          <Link
-                            href={isLocked ? '#' : `/download/${createSlug(app.platform)}/${createSlug(app.title)}/${app._id}`}
-                            className="flex items-center"
-                            onClick={(e) => {
-                              setShowResults(false);
-                              // Don't force navigation for download links, only for search results
-                            }}
-                          >
-                            <div className="relative flex-shrink-0">
-                              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25"></div>
-                              <img
-                                className="relative w-10 h-10 rounded-lg object-cover border border-purple-500/20"
-                                src={app.thumbnail[0]}
-                                alt={app.title}
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <p className={`font-medium truncate ${getPlatformColorClass(app.platform)}`}>
-                                {app.title}
-                              </p>
-                              <p className="text-xs text-gray-400">{app.platform}</p>
-                            </div>
-                          </Link>
-
-                          {/* Lock Icon for Locked Games */}
-                          {isLocked && (
-                            <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center z-10 opacity-100">
-                              <CiLock className="text-white font-bold text-2xl" />
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-
-                    {/* View all results link */}
-                    <li className="py-2 px-4 bg-black/30">
-                      <button
-                        className="text-center block w-full text-sm text-purple-400 hover:text-purple-300 font-medium"
-                        onClick={() => {
-                          setShowResults(false);
-                          // Force a full page navigation with timestamp to ensure fresh results
-                          const timestamp = Date.now();
-                          window.location.href = `/search?query=${encodeURIComponent(searchQuery.trim())}&t=${timestamp}`;
-                        }}
-                      >
-                        View all {searchResults.total} results
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              ) : (
-                // No results found
-                <div className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-lg border border-purple-600/20 shadow-lg overflow-hidden z-50">
-                  {/* Ambient background elements */}
-                  <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
-                  <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
-
-                  <div className="p-4 text-center relative z-10">
-                    <p className="text-gray-300 text-sm">No results found for "{searchQuery}"</p>
-                    <p className="text-gray-400 text-xs mt-1">Try different keywords or check spelling</p>
-                  </div>
-                </div>
+    <div className="w-full">
+      {/* Responsive: Search bar on top, buttons below on mobile; side-by-side on md+ */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-2">
+        {/* Search Bar */}
+        <div className="flex-1">
+          <div
+            ref={searchRef}
+            className="flex flex-wrap relative ring-1 ring-[#3E3E3E] rounded-lg w-full max-w-[760px] z-20"
+          >
+            <form onSubmit={handleSearch} className="w-full flex items-center">
+              <input
+                type="text"
+                placeholder="Search the site"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="bg-[#242424] hover:bg-[#262626] rounded-lg text-white py-3 pl-4 pr-12 h-12 flex-grow focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-opacity-80 transition duration-200"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="absolute right-14 top-0 h-full w-4 flex items-center justify-center rounded-full"
+                >
+                  <RxCross2 className="text-xxl h-7 w-7 text-[#8e8e8e] hover:text-[#ffffff]" />
+                </button>
               )}
-            </>
-          )}
+              <button type="submit" className="absolute right-1 top-0 h-full w-12 flex items-center justify-center rounded-full">
+                <CiSearch className="text-xxl h-7 w-7 text-[#8e8e8e] hover:text-[#ffffff]" />
+              </button>
+            </form>
 
-          {/* No loading indicator - removed */}
+            {/* Live Search Results Dropdown */}
+            {showResults && searchQuery.trim() && (
+              <>
+                {/* Show skeleton while loading */}
+                {isPending ? (
+                  <LiveSearchSkeleton itemCount={7} />
+                ) : searchResults.apps && searchResults.apps.length > 0 ? (
+                  // Show actual results when loaded
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-lg border border-purple-600/20 shadow-lg z-50">
+                    {/* Ambient background elements */}
+                    <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
+                    <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
+
+                    <ul className="divide-y divide-gray-700/30 relative z-10">
+                      {searchResults.apps.map((app) => {
+                        // Check if the game is paid and whether the user has purchased it
+                        const isPurchased = userData.purchasedGames.includes(app._id);
+                        const isUnlocked = userData.isAdmin || !app.isPaid || isPurchased;
+                        const isLocked = !isUnlocked;
+
+
+                        return (
+                          <li
+                            key={app._id}
+                            className={`py-2 px-4 hover:bg-black/20 transition-all duration-200 relative ${isLocked ? 'opacity-30 pointer-events-none' : ''}`}
+                          >
+                            <Link
+                              href={isLocked ? '#' : `/download/${createSlug(app.platform)}/${createSlug(app.title)}/${app._id}`}
+                              className="flex items-center"
+                              onClick={(e) => {
+                                setShowResults(false);
+                                // Don't force navigation for download links, only for search results
+                              }}
+                            >
+                              <div className="relative flex-shrink-0">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25"></div>
+                                <img
+                                  className="relative w-10 h-10 rounded-lg object-cover border border-purple-500/20"
+                                  src={app.thumbnail[0]}
+                                  alt={app.title}
+                                />
+                              </div>
+                              <div className="ml-3">
+                                <p className={`font-medium truncate ${getPlatformColorClass(app.platform)}`}>
+                                  {app.title}
+                                </p>
+                                <p className="text-xs text-gray-400">{app.platform}</p>
+                              </div>
+                            </Link>
+
+                            {/* Lock Icon for Locked Games */}
+                            {isLocked && (
+                              <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center z-10 opacity-100">
+                                <CiLock className="text-white font-bold text-2xl" />
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+
+                      {/* View all results link */}
+                      <li className="py-2 px-4 bg-black/30">
+                        <button
+                          className="text-center block w-full text-sm text-purple-400 hover:text-purple-300 font-medium"
+                          onClick={() => {
+                            setShowResults(false);
+                            // Force a full page navigation with timestamp to ensure fresh results
+                            const timestamp = Date.now();
+                            window.location.href = `/search?query=${encodeURIComponent(searchQuery.trim())}&t=${timestamp}`;
+                          }}
+                        >
+                          View all {searchResults.total} results
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                ) : (
+                  // No results found
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-lg border border-purple-600/20 shadow-lg overflow-hidden z-50">
+                    {/* Ambient background elements */}
+                    <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
+                    <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
+
+                    <div className="p-4 text-center relative z-10">
+                      <p className="text-gray-300 text-sm">No results found for "{searchQuery}"</p>
+                      <p className="text-gray-400 text-xs mt-1">Try different keywords or check spelling</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* No loading indicator - removed */}
+          </div>
+        </div>
+        {/* Buttons: Request & Profile/Login - below search on mobile, right on md+ */}
+        <div className="flex flex-row md:flex-row items-center justify-end mt-2 md:mt-0 ml-0 md:ml-4 gap-2 w-full md:w-auto">
+          <ProfileIcon />
         </div>
       </div>
-      <ProfileIcon />
+      {/* Profile dropdown and logout warning remain unchanged */}
+      {/* (Removed user && showDropdown && ... block, as this logic is handled inside ProfileIcon) */}
     </div>
   );
 };
