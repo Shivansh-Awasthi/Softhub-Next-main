@@ -89,7 +89,22 @@ const LoginForm = () => {
                 <div className="relative overflow-hidden backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-0">
                     {/* Top Border Gradient */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500" />
-                    <div className="p-8 sm:p-10">
+                    {/* Logo */}
+                    <div className="flex justify-center items-center pt-4 pb-1">
+                        <img src="https://i.postimg.cc/9fxCdJDc/image-removebg-preview.png" alt="Site Logo" className="h-34 w-auto object-contain drop-shadow-xl opacity-90" style={{ filter: 'drop-shadow(0 2px 8px rgba(60,60,120,0.15))' }} />
+                    </div>
+                    {/* Back Button */}
+                    <button
+                        type="button"
+                        className="mt-10 absolute top-4 left-4 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-white/70 dark:bg-gray-800/70 rounded-full px-3 py-2 shadow-md z-10 transition-all"
+                        onClick={() => window.location.href = '/'}
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span className="font-medium text-sm">Back</span>
+                    </button>
+                    <div className="p-8 sm:pt-1 pt-2">
                         <form
                             ref={formRef}
                             className="space-y-7"
