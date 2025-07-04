@@ -1,60 +1,112 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import GiscusComments from './GiscusComments';
 import GameAnnouncement from './GameAnnouncement';
 import DownloadSection from './DownloadSection';
 import DescriptionTabs from './DescriptionTabs';
 import { jwtDecode } from 'jwt-decode';
-
+import axios from 'axios';
+import Link from 'next/link';
 
 const SingleApp = ({ appData }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [data, setData] = useState(appData); // Use the provided data
-    const [showModal, setShowModal] = useState(false); // State to control modal visibility
-    const [error, setError] = useState(null); // State to handle errors
-    const [hasAccess, setHasAccess] = useState(null); // Start with null instead of true
-    const [userInfo, setUserInfo] = useState(null);
+    const [data, setData] = useState(appData);
+    const [showModal, setShowModal] = useState(false);
+    const [error, setError] = useState(null);
+    const [hasAccess, setHasAccess] = useState(null); // Start with null (loading)
+    const [userData, setUserData] = useState(null);
+    const [isCheckingAccess, setIsCheckingAccess] = useState(true);
 
+    // Robust user data fetching with API + JWT fallback
+    const fetchUserData = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
 
-    // Check if user has access to the app
-    const checkAccess = (appData, purchasedGames, isAdmin) => {
-        if (!appData) return;
-
-        // Simplified logic
-        if (isAdmin) {
-            setHasAccess(true);
-        } else {
-            // If the user is not an admin, check if app is free or they purchased it
-            setHasAccess(!appData.isPaid || purchasedGames.includes(appData._id));
-        }
-    };
-
-    // Load user data from localStorage on client side
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                const userRole = decoded?.role?.toUpperCase() || 'USER';
-                const purchasedGames = decoded?.purchasedGames || [];
-
-                const isAdmin = userRole === 'ADMIN';
-                const hasPurchased = purchasedGames.map(String).includes(String(appData._id));
-
-                setHasAccess(isAdmin || !appData.isPaid || hasPurchased);
-
-            } catch (err) {
-                console.error('Invalid token:', err);
-                setHasAccess(false); // Treat as guest
+            if (!token) {
+                setUserData(null);
+                return null;
             }
-        } else {
-            setHasAccess(false); // No token = guest
+
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                ...(xAuthToken && { 'X-Auth-Token': xAuthToken })
+            };
+
+            let userData;
+            try {
+                const res = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
+                    { headers }
+                );
+                userData = res.data?.user || null;
+            } catch (backendError) {
+                // Fallback to JWT decode if backend fails
+                try {
+                    const decoded = jwtDecode(token);
+                    userData = {
+                        username: decoded.username || decoded.name || "User",
+                        email: decoded.email || "",
+                        avatar: decoded.avatar || "https://ui-avatars.com/api/?name=U&background=random",
+                        purchasedGames: decoded.purchasedGames || [],
+                        createdAt: decoded.iat ? new Date(decoded.iat * 1000) : undefined,
+                        role: decoded.role || 'USER',
+                        isAdmin: decoded.role === 'ADMIN'
+                    };
+                } catch (decodeError) {
+                    console.error("Failed to decode token:", decodeError);
+                    userData = null;
+                }
+            }
+
+            return userData;
+        } catch (error) {
+            console.error("User fetch error:", error);
+            return null;
         }
-    }, [appData]);
+    }, []);
 
+    // Main function to load user data and check access
+    const loadUserDataAndCheckAccess = useCallback(async () => {
+        setIsCheckingAccess(true);
+        try {
+            const user = await fetchUserData();
+            setUserData(user);
 
+            if (user) {
+                const isAdmin = user.role === 'ADMIN';
+                const hasPurchased = user.purchasedGames?.map(String).includes(String(appData._id));
+                const shouldHaveAccess = isAdmin || !appData.isPaid || hasPurchased;
+
+                setHasAccess(shouldHaveAccess);
+            } else {
+                // No user = guest
+                setHasAccess(!appData.isPaid);
+            }
+        } catch (error) {
+            console.error("Access check error:", error);
+            setHasAccess(false);
+        } finally {
+            setIsCheckingAccess(false);
+        }
+    }, [appData, fetchUserData]);
+
+    // Initial load and event listeners
+    useEffect(() => {
+        loadUserDataAndCheckAccess();
+
+        const handleAuthChange = () => loadUserDataAndCheckAccess();
+        const handlePurchaseEvent = () => loadUserDataAndCheckAccess();
+
+        window.addEventListener('auth-change', handleAuthChange);
+        window.addEventListener('purchase-completed', handlePurchaseEvent);
+
+        return () => {
+            window.removeEventListener('auth-change', handleAuthChange);
+            window.removeEventListener('purchase-completed', handlePurchaseEvent);
+        };
+    }, [loadUserDataAndCheckAccess]);
 
     // Slide handling functions
     const nextSlide = () => {
@@ -77,14 +129,11 @@ const SingleApp = ({ appData }) => {
         return `${day}.${month}.${year}`;
     };
 
-    // This function is used in the description tabs component
-    // Keeping it here for future use if needed
-
     // Function to handle body scroll locking
     const lockScroll = () => {
         if (typeof document !== 'undefined') {
             document.body.style.overflow = 'hidden';
-            document.body.style.paddingRight = '15px'; // Prevent layout shift
+            document.body.style.paddingRight = '15px';
         }
     };
 
@@ -96,13 +145,13 @@ const SingleApp = ({ appData }) => {
     };
 
     const handleDownloadClick = () => {
-        setShowModal(true); // Show the modal when the button is clicked
-        lockScroll(); // Lock scrolling
+        setShowModal(true);
+        lockScroll();
     };
 
     const closeModal = () => {
-        setShowModal(false); // Hide the modal
-        unlockScroll(); // Unlock scrolling
+        setShowModal(false);
+        unlockScroll();
     };
 
     // Clean up scroll lock when component unmounts
@@ -112,32 +161,65 @@ const SingleApp = ({ appData }) => {
         };
     }, []);
 
+    // Loading state
+    if (isCheckingAccess || hasAccess === null) {
+        return (
+            <div className="flex justify-center items-center h-[40rem]">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
+                    <h1 className="text-xl text-gray-300">Checking access...</h1>
+                </div>
+            </div>
+        );
+    }
+
     // If there's an error, show an error message
     if (error) {
         return (
-            <div className="flex justify-center items-center h-[40rem] ">
+            <div className="flex justify-center items-center h-[40rem]">
                 <h1 className="text-2xl text-red-500">{error}</h1>
             </div>
         );
     }
 
-    // Show "Loading..." when app data or user data is still being loaded
-    if (!data) {
+    // If the app is paid and the user doesn't have access
+    if (!hasAccess) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <h1 className="text-2xl text-gray-500">Loading...</h1>
+            <div className="flex justify-center items-center h-[40rem]">
+                <div className="text-center p-8 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-xl border border-purple-600/20 max-w-md">
+                    <div className="mb-6">
+                        <div className="bg-red-500/20 p-4 rounded-full inline-block">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h1 className="text-2xl font-bold text-red-400 mb-4">Access Restricted</h1>
+                    <p className="text-gray-300 mb-6">
+                        {appData.isPaid
+                            ? "This is a premium app. Please purchase it to access the download."
+                            : "You don't have permission to access this content."
+                        }
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <Link
+                            href="/membership"
+                            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
+                        >
+                            Get Membership
+                        </Link>
+                        <button
+                            onClick={() => window.history.back()}
+                            className="px-6 py-3 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors duration-300"
+                        >
+                            Go Back
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
 
-    // If the app is paid and the user doesn't have access, show "You don't have access"
-    if (!hasAccess) {
-        return (
-            <div className="flex justify-center items-center h-[40rem] ">
-                <h1 className="text-2xl text-red-500">You don't have access to this app</h1>
-            </div>
-        );
-    }
 
 
 
