@@ -159,10 +159,13 @@ const ProfilePage = () => {
             <div className="w-full h-32 bg-blue-500 rounded-b-2xl mb-[-64px] relative">
                 <button
                     onClick={() => router.push('/settings')}
-                    className="absolute right-6 bottom-4 bg-gradient-to-r from-red-500 to-pink-500 hover: cursor-pointer text-white font-semibold rounded-xl shadow-lg px-6 py-2 text-base flex items-center gap-2 transition-all duration-200 hover:pointer"
+                    className="absolute right-6 bottom-4 bg-gradient-to-r from-[#b1001e] to-[#ff006a] text-white font-bold rounded-2xl shadow-2xl px-7 py-2.5 text-base flex items-center gap-3 transition-all duration-200 border-2 border-[#b1001e]/80 focus:outline-none focus:ring-2 focus:ring-[#ff006a]/60 focus:ring-offset-2 backdrop-blur-md group cursor-pointer hover:scale-105 hover:shadow-[0_0_24px_4px_rgba(255,0,106,0.25)]"
+                    style={{ boxShadow: '0 0 16px 2px #b1001e99, 0 2px 24px 0 #ff006a55' }}
                 >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                    Edit Profile
+                    <span className="font-bold tracking-wide">Edit Profile</span>
+                    <svg className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
                 </button>
             </div>
             <div className="max-w-4xl mx-auto relative z-10">
