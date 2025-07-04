@@ -16,6 +16,9 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     const [isExploding, setIsExploding] = useState(false);
     const [blessing, setBlessing] = useState("");
     const [showBlessing, setShowBlessing] = useState(false);
+    // Animation state for image transition
+    const [imageTransitioning, setImageTransitioning] = useState(false);
+    const [pendingGame, setPendingGame] = useState(null); // Hold next game for animation
 
     const blessingMessages = [
         "The gods have chosen this game for you!",
@@ -69,8 +72,33 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     const handleShuffleClick = async () => {
         setIsExploding(true);
         setTimeout(() => setIsExploding(false), 700);
-        await fetchRandomGame(true); // preserve card on shuffle
         showRandomBlessing();
+        setLoading(true);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/random/${platform}`
+            );
+            const data = await res.json();
+            if (data.success && data.game) {
+                setImageTransitioning(true); // Start fade out
+                setPendingGame(data.game); // Hold next game
+                setTimeout(() => {
+                    setGame(data.game); // Swap to new game after fade out
+                    setImageTransitioning(false); // Fade in
+                    setPendingGame(null);
+                    if (onGameFetched) onGameFetched(data.game);
+                    setLoading(false);
+                }, 400); // 0.4s fade out, then swap
+            } else {
+                setError(data.message || "No game found.");
+                setImageTransitioning(false);
+                setLoading(false);
+            }
+        } catch (err) {
+            setError("Failed to fetch game.");
+            setImageTransitioning(false);
+            setLoading(false);
+        }
     };
 
     return (
@@ -88,10 +116,14 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
                             {blessing}
                         </div>
                     )}
-                    {/* Background image */}
-                    {game.thumbnail?.[2] && (
-                        <img src={game.thumbnail[2]} alt="background" className="absolute inset-0 w-full h-full object-cover object-center opacity-70" style={{ zIndex: 1 }} />
-                    )}
+                    {/* Background image with fade animation */}
+                    <div style={{ zIndex: 1, position: 'absolute', inset: 0 }}>
+                        <img
+                            src={imageTransitioning && pendingGame?.thumbnail?.[2] ? pendingGame.thumbnail[2] : game?.thumbnail?.[2] || ''}
+                            alt="background"
+                            className={imageTransitioning ? "transition-opacity duration-400 opacity-0 w-full h-full object-cover object-center" : "transition-opacity duration-400 opacity-100 w-full h-full object-cover object-center"}
+                        />
+                    </div>
                     {/* Overlay for darkening */}
                     <div className="absolute inset-0 bg-black/40 z-10"></div>
                     {/* Back button */}
