@@ -1,218 +1,132 @@
 'use client';
 
-import { useEffect } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
 
-/**
- * Component that implements security restrictions for non-admin users:
- * - Disables right-click context menu
- * - Prevents access to developer tools (inspect element)
- * - Blocks keyboard shortcuts for developer tools
- * - Detects if developer tools are open
- *
- * IMPORTANT: This component MUST only run on the client side.
- * It uses browser APIs that are not available during server-side rendering.
- */
 const SecurityRestrictions = () => {
-  // Use a ref to track if the component is mounted
-  // This avoids React hydration issues with useState
-  const hasMounted = typeof window !== 'undefined' ? { current: false } : null;
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Initialize the component on the client side
+  // Fetch user info and determine if user is admin
   useEffect(() => {
-    // This effect only runs once on the client side
-    if (typeof window === 'undefined' || !hasMounted) return;
-    hasMounted.current = true;
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
 
-    // Check if user is admin
-    try {
-      const userRole = localStorage.getItem('role');
+        if (!token) {
+          return;
+        }
 
-      // If user is admin, don't apply any restrictions
-      if (userRole === 'ADMIN') return;
-    } catch (e) {
-      // Handle any localStorage errors
-      console.error('Error accessing localStorage:', e);
-      return;
-    }
+        const headers = { Authorization: `Bearer ${token}` };
+        if (xAuthToken) headers['X-Auth-Token'] = xAuthToken;
 
-    // Function to detect if DevTools is open
-    function isDevToolsOpen() {
-      const threshold = 160;
-      const devToolsOpened =
-        window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold;
-      return devToolsOpened;
-    }
+        try {
+          const res = await axios.get(
+            process.env.NEXT_PUBLIC_API_URL + '/api/user/me',
+            { headers }
+          );
 
-    // Monitor DevTools and show console error if detected
-    const monitorDevTools = () => {
-      if (isDevToolsOpen()) {
-        console.error("Failed to load resource: net::ERR_BLOCKED_BY_CLIENT");
+          const role = res.data?.user?.role;
+          if (role === 'ADMIN') {
+            setIsAdmin(true);
+          }
+
+        } catch (apiError) {
+          // Fallback to decoding token
+          try {
+            const decoded = jwtDecode(token);
+            const role = decoded?.role;
+
+            if (role === 'ADMIN') {
+              setIsAdmin(true);
+            }
+          } catch (decodeError) {
+            console.error('Token decode failed:', decodeError);
+          }
+        }
+      } catch (err) {
+        console.error('User fetch failed:', err);
       }
     };
 
-    // Check periodically (every 10 seconds)
-    const interval = setInterval(() => {
-      monitorDevTools();
-    }, 10000);
-
-    // Cleanup function
-    return () => clearInterval(interval);
+    fetchUser();
   }, []);
 
-  // Second useEffect: Block console input and keyboard shortcuts
+  // Apply restrictions for non-admin users
   useEffect(() => {
-    // Only run on client side after mounting
-    if (!hasMounted) return;
+    if (typeof window === 'undefined') return;
+    if (isAdmin) return;
 
-    // Check if user is admin
-    try {
-      const userRole = localStorage.getItem('role');
+    console.log('Non-admin user detected. Applying security restrictions.');
 
-      // If user is admin, don't apply any restrictions
-      if (userRole === 'ADMIN') return;
-    } catch (e) {
-      // Handle any localStorage errors
-      console.error('Error accessing localStorage:', e);
-      return;
-    }
+    // Save original console methods
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+    const originalConsoleDebug = console.debug;
 
-    const blockConsoleInput = () => {
-      // Store original console methods
-      const originalConsoleLog = console.log;
-      const originalConsoleWarn = console.warn;
-      const originalConsoleError = console.error;
-      const originalConsoleDebug = console.debug;
+    // Disable console output
+    console.log = () => { };
+    console.warn = () => { };
+    console.error = () => { };
+    console.debug = () => { };
 
-      // Override console methods
-      console.log = function () { };
-      console.warn = function () { };
-      console.error = function () { };
-      console.debug = function () { };
+    // Disable right-click
+    const handleContextMenu = (e) => e.preventDefault();
+    document.addEventListener('contextmenu', handleContextMenu);
 
-      // Block keyboard shortcuts for developer tools
-      const preventKeyPress = (e) => {
-        if (
-          (e.key === 'F12') ||
-          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) ||
-          (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'i')) ||
-          ((e.key === 'J' || e.key === 'j') && (e.ctrlKey || e.metaKey) && e.shiftKey)
-        ) {
-          e.preventDefault();
-        }
-      };
-
-      // Prevent right-click context menu
-      const preventRightClick = (e) => {
+    // Block DevTools shortcuts
+    const handleKeyDown = (e) => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.metaKey && e.altKey && e.key.toLowerCase() === 'i') ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u')
+      ) {
         e.preventDefault();
-      };
-
-      // Add event listeners
-      document.addEventListener('keydown', preventKeyPress);
-      document.addEventListener('contextmenu', preventRightClick);
-
-      // Check for DevTools periodically
-      const checkDevTools = () => {
-        const devToolsOpen =
-          window.outerWidth - window.innerWidth > 200 ||
-          window.outerHeight - window.innerHeight > 200;
-
-        if (devToolsOpen) {
-          // Just show an alert instead of replacing the entire page
-          alert('Developer tools are not allowed on this site.');
-        }
-      };
-
-      // Check every 2 seconds
-      const interval = setInterval(checkDevTools, 2000);
-
-      // Return cleanup function
-      return () => {
-        clearInterval(interval);
-        console.log = originalConsoleLog;
-        console.warn = originalConsoleWarn;
-        console.error = originalConsoleError;
-        console.debug = originalConsoleDebug;
-        document.removeEventListener('keydown', preventKeyPress);
-        document.removeEventListener('contextmenu', preventRightClick);
-      };
+      }
     };
+    document.addEventListener('keydown', handleKeyDown);
 
-    // Start blocking console input
-    const cleanup = blockConsoleInput();
+    // Block user selection and copy
+    const style = document.createElement('style');
+    style.textContent = `
+      body {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Return cleanup function
-    return cleanup;
-  }, []);
+    // Detect DevTools via window size diff
+    const detectDevTools = () => {
+      const threshold = 160;
+      const widthDiff = window.outerWidth - window.innerWidth;
+      const heightDiff = window.outerHeight - window.innerHeight;
 
-  // Third useEffect: Additional protections that won't break the page
-  useEffect(() => {
-    // Only run on client side after mounting
-    if (!hasMounted) return;
-
-    // Check if user is admin
-    try {
-      const userRole = localStorage.getItem('role');
-
-      // If user is admin, don't apply any restrictions
-      if (userRole === 'ADMIN') return;
-    } catch (e) {
-      // Handle any localStorage errors
-      console.error('Error accessing localStorage:', e);
-      return;
-    }
-
-    // Disable source viewing
-    const disableSourceViewing = () => {
-      document.addEventListener('keydown', function (e) {
-        // Ctrl+U / Cmd+U (View Source)
-        if ((e.ctrlKey && (e.key === 'u' || e.key === 'U')) ||
-          (e.metaKey && (e.key === 'u' || e.key === 'U'))) {
-          e.preventDefault();
-          return false;
-        }
-      });
+      if (widthDiff > threshold || heightDiff > threshold) {
+        alert('Developer tools are not allowed on this site.');
+      }
     };
+    const devToolsInterval = setInterval(detectDevTools, 2000);
 
-    // Disable selection and copy (optional - uncomment if needed)
-    const disableSelectionAndCopy = () => {
-      // Add CSS to disable selection
-      const style = document.createElement('style');
-      style.textContent = `
-        .protected-content {
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -khtml-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-      `;
-      document.head.appendChild(style);
-
-      // Return cleanup function
-      return () => {
-        document.head.removeChild(style);
-      };
-    };
-
-    // Apply protections
-    disableSourceViewing();
-    const cleanupSelectionDisable = disableSelectionAndCopy();
-
-    // Return cleanup function
+    // Cleanup on unmount
     return () => {
-      if (cleanupSelectionDisable) cleanupSelectionDisable();
+      clearInterval(devToolsInterval);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.head.removeChild(style);
+      console.log = originalConsoleLog;
+      console.warn = originalConsoleWarn;
+      console.error = originalConsoleError;
+      console.debug = originalConsoleDebug;
     };
-  }, []);
+  }, [isAdmin]);
 
-  // Special check to ensure this component only runs on the client side
-  // This prevents server-side rendering errors with useContext
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  // This component doesn't render anything visible
+  // Client-only component; doesn't render anything
   return null;
 };
 
