@@ -399,9 +399,8 @@ export default function MacSoftwares({ serverData, initialPage = 1 }) {
                                 <div className="font-semibold text-base text-gray-100 truncate mb-1">
                                     {ele.title}
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-gray-400">
+                                <div className="flex items-center justify-center text-xs text-gray-400">
                                     <span>{ele.size || 'Unknown size'}</span>
-                                    <span>{ele.releaseYear || 'Year?'}</span>
                                 </div>
                             </div>
                         </Link>

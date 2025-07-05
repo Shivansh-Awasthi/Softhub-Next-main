@@ -12,8 +12,8 @@ import axios from 'axios';
 
 const images = [
     'https://i.postimg.cc/BbS29P7N/large-4e95cb1c3581c16b158ac86839992bb3-Skyrim-20header.jpg',
-    'https://img.playbook.com/fEFoQgs0r1pXKzOJcJIfIevmy08UHSLlInS1-Fcp8uc/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljL2RkZGUzOTQ1/LTQwNzMtNDMxNy05/N2QyLTk3OTJkNDFi/OTBlNQ',
     'https://i.postimg.cc/9fymd8Xw/img-5817.avif',
+    'https://img.playbook.com/fEFoQgs0r1pXKzOJcJIfIevmy08UHSLlInS1-Fcp8uc/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljL2RkZGUzOTQ1/LTQwNzMtNDMxNy05/N2QyLTk3OTJkNDFi/OTBlNQ',
     'https://img.playbook.com/X0CxPl24l4RbK0kdRTk7NAtbQVW_5S9PYB05cE4vFZk/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzM1MThlMDAx/LTNiYWQtNGQxZS1i/OWQ0LTY1MmM5MWQx/OTU4Yw'
 ];
 
@@ -33,7 +33,7 @@ const HomeClient = ({
     const pathname = usePathname();
 
     // For count visitors accessible/visible only for the admins
-    const [isAdmin, setIsAdmin] = useState(false); ð
+    const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState(null);
 
     // Check the role in localStorage on component mount
@@ -172,7 +172,7 @@ const HomeClient = ({
                                     </div>
                                 </div>
                             )}
-                            {index === 1 && (
+                            {index === 2 && (
                                 <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
                                     <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">Macbook Games</h2>
                                     <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Download Your Favourite Games for Free.</p>
@@ -185,7 +185,7 @@ const HomeClient = ({
                                     </div>
                                 </div>
                             )}
-                            {index === 2 && (
+                            {index === 1 && (
                                 <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
                                     <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">Game Request</h2>
                                     <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Request your favourite games here.</p>

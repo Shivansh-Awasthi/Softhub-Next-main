@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=U&background=random";

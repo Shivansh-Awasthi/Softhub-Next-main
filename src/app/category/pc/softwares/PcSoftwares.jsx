@@ -405,12 +405,9 @@ export default function PcSoftwares({ serverData, initialPage = 1 }) {
                                 <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">
                                     {ele.shortDesc}
                                 </p>
-                                <div className="flex items-center justify-between mt-auto">
+                                <div className="flex items-center justify-center mt-auto">
                                     <span className="text-xs text-gray-400 dark:text-gray-500">
                                         {ele.size}
-                                    </span>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                                        {ele.year}
                                     </span>
                                 </div>
                             </div>

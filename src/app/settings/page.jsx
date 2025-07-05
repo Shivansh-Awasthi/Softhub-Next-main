@@ -1,7 +1,7 @@
 "use client";
 import SettingsForm from "./SettingsForm";
 import { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export default function SettingsPage() {
     const [user, setUser] = useState(null);

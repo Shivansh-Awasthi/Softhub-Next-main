@@ -231,6 +231,18 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
             {/* Heading and filter/clear buttons layout */}
             <div className="cover mb-12 relative">
                 <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="w-full sm:w-auto flex justify-center">
+                        <div className="relative inline-block text-center">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
+                            <h1 className="font-bold text-4xl mb-3 relative">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                                    Android Softwares{' '}
+                                    <span className="font-medium text-blue-400">{totalItems}</span>
+                                </span>
+                                <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
+                            </h1>
+                        </div>
+                    </div>
                     {/* Filter and clear buttons */}
                     <div className="flex flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                         <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
@@ -247,18 +259,7 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
                         )}
                     </div>
                     {/* Centered heading */}
-                    <div className="w-full sm:w-auto flex justify-center">
-                        <div className="relative inline-block text-center">
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
-                            <h1 className="font-bold text-4xl mb-3 relative">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                                    Android Softwares{' '}
-                                    <span className="font-medium text-blue-400">{totalItems}</span>
-                                </span>
-                                <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
-                            </h1>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} initialFilters={filters} />
@@ -334,9 +335,8 @@ export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
                                 <div className="font-semibold text-base text-gray-100 truncate mb-1">
                                     {ele.title}
                                 </div>
-                                <div className="flex items-center justify-between text-xs text-gray-400">
+                                <div className="flex items-center justify-center text-xs text-gray-400">
                                     <span>{ele.size || 'Unknown size'}</span>
-                                    <span>{ele.releaseYear || 'Year?'}</span>
                                 </div>
                             </div>
                         </Link>
