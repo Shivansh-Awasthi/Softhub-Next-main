@@ -283,20 +283,39 @@ export default function PcGames({ serverData, initialPage = 1 }) {
 
     return (
         <div className="container mx-auto p-2 relative">
-            {/* Filter Bar at the top */}
-            <div className="mb-6 flex justify-end items-center gap-3">
-                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
-                {isFilterActive() && (
-                    <button
-                        onClick={handleClearFilters}
-                        className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300 ml-2"
-                    >
-                        <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span className="relative flex items-center gap-2 font-medium">
-                            Clear Filters
-                        </span>
-                    </button>
-                )}
+            {/* Heading and filter/clear buttons layout */}
+            <div className="cover mb-12 relative">
+                <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4">
+
+                    {/* Centered heading */}
+                    <div className="w-full sm:w-auto flex justify-center">
+                        <div className="relative inline-block text-center">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
+                            <h1 className="font-bold text-4xl mb-3 relative">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+                                    PC Games{' '}
+                                    <span className="font-medium text-blue-400">{totalItems}</span>
+                                </span>
+                                <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
+                            </h1>
+                        </div>
+                    </div>
+                    {/* Filter and clear buttons */}
+                    <div className="flex flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                        {isFilterActive() && (
+                            <button
+                                onClick={handleClearFilters}
+                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
+                            >
+                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <span className="relative flex items-center gap-2 font-medium">
+                                    Clear Filters
+                                </span>
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
             {/* Filter Modal */}
             <FilterModal
@@ -314,18 +333,7 @@ export default function PcGames({ serverData, initialPage = 1 }) {
             {/* Decorative grid lines */}
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-40 -z-10"></div>
 
-            {/* Header with enhanced styling */}
-            <div className="cover mb-12 text-center relative">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full opacity-10 blur-xl -z-10"></div>
-                <h1 className="inline-block font-bold text-4xl mb-3 relative">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                        PC Games{' '}
-                        <span className="font-medium text-blue-400">{totalItems}</span>
-                    </span>
-                    <span className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></span>
-                </h1>
-            </div>
-
+            {/* Content: Loading, Error, No Data, or Data Grid */}
             {!serverData ? (
                 <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
