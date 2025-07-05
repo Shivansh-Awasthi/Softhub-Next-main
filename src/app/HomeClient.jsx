@@ -33,7 +33,7 @@ const HomeClient = ({
     const pathname = usePathname();
 
     // For count visitors accessible/visible only for the admins
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false); ð
     const [user, setUser] = useState(null);
 
     // Check the role in localStorage on component mount

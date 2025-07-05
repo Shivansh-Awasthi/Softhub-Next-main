@@ -115,7 +115,7 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     };
 
     return (
-        <div className="w-full max-w-xl mx-auto flex flex-col items-center gap-4">
+        <div className="w-full max-w-lg min-w-lg mx-auto flex flex-col items-center gap-4">
             {/* Confetti for dice/shuffle */}
             <div className="pointer-events-none absolute left-1/2 top-16 z-50" style={{ transform: 'translateX(-50%)' }}>
                 <Confetti active={isExploding} />
@@ -132,7 +132,7 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
                     {/* Background image with fade animation */}
                     <div style={{ zIndex: 1, position: 'absolute', inset: 0 }}>
                         <img
-                            src={imageTransitioning && pendingGame?.thumbnail?.[2] ? pendingGame.thumbnail[2] : game?.thumbnail?.[2] || ''}
+                            src={imageTransitioning && pendingGame?.thumbnail?.[2] ? pendingGame.thumbnail[2] : game?.thumbnail?.[2]}
                             alt="background"
                             className={imageTransitioning ? "transition-opacity duration-400 opacity-0 w-full h-full object-cover object-center" : "transition-opacity duration-400 opacity-100 w-full h-full object-cover object-center"}
                         />
