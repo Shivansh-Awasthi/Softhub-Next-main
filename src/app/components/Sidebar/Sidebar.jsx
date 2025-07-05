@@ -10,7 +10,8 @@ import { FaApple } from "react-icons/fa";
 
 
 const Sidebar = () => {
-  const [logo, setLogo] = useState("https://i.postimg.cc/7L4jmwf7/image2.png");
+  const [logo, setLogo] = useState(``);
+
   const [selected, setSelected] = useState('');
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -134,16 +135,15 @@ const Sidebar = () => {
       >
         <Link
           href="/"
-          className='flex items-center  px-2 py-1 rounded-lg transition-all duration-300 hover:bg-white/5'
+          className='flex items-center px-2 py-1 rounded-lg transition-all duration-300 hover:bg-white/5'
           onClick={() => {
             handleClick();
             closeSidebar();
             showSkeleton('Home');
           }}
-          onMouseEnter={() => setLogo("https://i.postimg.cc/KcVfdJrH/image-removebg-preview-removebg-preview.png")}
-          onMouseLeave={() => setLogo("https://i.postimg.cc/KcVfdJrH/image-removebg-preview-removebg-preview.png")}
         >
-          <img className="h-22 w-22 mr- mt-7 rotate-[-5deg]" src={logo} alt="Logo" />
+          <img className="h-22 w-22 mr- mt-7 rotate-[-5deg]" src="https://i.postimg.cc/KcVfdJrH/image-removebg-preview-removebg-preview.png" alt="Logo" />
+
           <img className='h-14 w-28 rotate-[-5deg]' src="https://i.postimg.cc/0Q2F1nGy/image.png" alt="logo" />
         </Link>
 
