@@ -120,7 +120,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <aside
-        className={`sidebar top-0 z-20 flex flex-col h-screen px-3 py-4
+        className={`sidebar top-0 z-20 flex flex-col h-screen px-3 pb-4
                 ${isMobileView ? 'fixed left-0 w-[280px] max-w-[80vw] bg-[#121212] shadow-xl' : 'md:sticky w-60'}
                 transition-transform duration-300 ease-in-out
                 ${isSidebarVisible || !isMobileView ? 'transform-none' : '-translate-x-full'}`}
@@ -134,16 +134,16 @@ const Sidebar = () => {
       >
         <Link
           href="/"
-          className='flex items-center mb-8 px-2 py-1 rounded-lg transition-all duration-300 hover:bg-white/5'
+          className='flex items-center  px-2 py-1 rounded-lg transition-all duration-300 hover:bg-white/5'
           onClick={() => {
             handleClick();
             closeSidebar();
             showSkeleton('Home');
           }}
-          onMouseEnter={() => setLogo("https://i.postimg.cc/FKx868L6/image1.png")}
-          onMouseLeave={() => setLogo("https://i.postimg.cc/7L4jmwf7/image2.png")}
+          onMouseEnter={() => setLogo("https://i.postimg.cc/KcVfdJrH/image-removebg-preview-removebg-preview.png")}
+          onMouseLeave={() => setLogo("https://i.postimg.cc/KcVfdJrH/image-removebg-preview-removebg-preview.png")}
         >
-          <img className="h-11 w-11 mr-2 mt-6 rotate-[-5deg]" src={logo} alt="Logo" />
+          <img className="h-22 w-22 mr- mt-7 rotate-[-5deg]" src={logo} alt="Logo" />
           <img className='h-14 w-28 rotate-[-5deg]' src="https://i.postimg.cc/0Q2F1nGy/image.png" alt="logo" />
         </Link>
 
