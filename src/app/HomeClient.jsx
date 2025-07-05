@@ -11,9 +11,9 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
 const images = [
-    'https://img.playbook.com/NzGgc9TjLeq_Ic9CZ4VLwiUBrK82Gigj4VqjhcTTlwE/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzIwYTYzOTJj/LWEyNWUtNDdjYy05/Y2E5LWFjMmQ2ZGQy/YmRkNw',
+    'https://i.postimg.cc/BbS29P7N/large-4e95cb1c3581c16b158ac86839992bb3-Skyrim-20header.jpg',
     'https://img.playbook.com/fEFoQgs0r1pXKzOJcJIfIevmy08UHSLlInS1-Fcp8uc/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljL2RkZGUzOTQ1/LTQwNzMtNDMxNy05/N2QyLTk3OTJkNDFi/OTBlNQ',
-    'https://img.playbook.com/Z_dmnLQyanAMg7VIdnAATqzc7KTX-op4jBsdjexfxWk/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzk5NTkyOWI1/LWE3YWQtNGUyZS1h/YWJmLWFiZTU3ZDE5/YTI4Nw',
+    'https://i.postimg.cc/9fymd8Xw/img-5817.avif',
     'https://img.playbook.com/X0CxPl24l4RbK0kdRTk7NAtbQVW_5S9PYB05cE4vFZk/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzM1MThlMDAx/LTNiYWQtNGQxZS1i/OWQ0LTY1MmM5MWQx/OTU4Yw'
 ];
 
@@ -187,14 +187,14 @@ const HomeClient = ({
                             )}
                             {index === 2 && (
                                 <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
-                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">TELEGRAM CHAT</h2>
-                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Join Our Channel @freemacgames</p>
+                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">Game Request</h2>
+                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Request your favourite games here.</p>
                                     <div className='w-fill'>
-                                        <a href="https://t.me/freemacgames" target="_blank" rel="noopener noreferrer">
+                                        <Link href="/request" rel="noopener noreferrer">
                                             <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
-                                                Join our Telegram
+                                                Request Now!
                                             </button>
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             )}
