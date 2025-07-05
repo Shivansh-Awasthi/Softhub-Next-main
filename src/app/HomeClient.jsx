@@ -103,6 +103,14 @@ const HomeClient = ({
             || 'untitled'; // Fallback if empty
     };
 
+    // Auto-advance slider every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % images.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <div className="relative">
             {/* Background decorative elements */}
@@ -113,8 +121,8 @@ const HomeClient = ({
             {/* Decorative grid lines */}
             <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-40 -z-10"></div>
 
-            {/* Modern Glassy Slider */}
-            <div className="hidden md:block pb-6 lg:pb-8 w-full">
+            {/* Unified Modern Glassy Slider for all screens */}
+            <div className="pb-6 lg:pb-8 w-full">
                 <div className="relative w-full aspect-[2.4/1] rounded-lg overflow-hidden">
                     {/* Edge overlays for glassy effect */}
                     <div className="absolute inset-0 pointer-events-none z-20">
@@ -225,145 +233,22 @@ const HomeClient = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* Pagination Dots for all screens */}
+                    <div className="absolute flex space-x-3 bottom-7 left-1/2 transform -translate-x-1/2">
+                        {images.map((_, index) => (
+                            <button
+                                key={index}
+                                type="button"
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex
+                                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 w-6 shadow-lg'
+                                    : 'bg-white/50 hover:bg-white/80'
+                                    }`}
+                                onClick={() => setCurrentIndex(index)}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
-
-            {/* Mobile Slider (existing code) */}
-            <div id="default-carousel" className="relative w-full mb-16 md:hidden" data-carousel="slide">
-                {/* Carousel Container */}
-                <div className="relative h-56 sm:h-72 md:h-88 lg:h-[25rem] overflow-hidden rounded-xl shadow-lg border border-purple-600/20 bg-gradient-to-br from-[#1E1E1E]/50 to-[#121212]/50">
-                    {images.map((image, index) => (
-                        <div
-                            key={index}
-                            className={`transition-opacity duration-700 ease-in-out absolute inset-0 ${index === currentIndex ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                        >
-                            <img src={image} className="block w-full h-full object-cover" alt={`Slide ${index + 1}`} />
-
-                            {/* Overlay text and button on the 4th image (index === 0) */}
-                            {index === 3 && (
-                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-0 w-full ">
-                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">SOFTWARE</h2>
-                                    <p className="mb-4 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Download Free Softwares On Your Mac</p>
-                                    <div className='w-fill'>
-                                        <Link href="/category/mac/softwares">
-                                            <button className="mx-auto ml-0 px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
-                                                Download Now
-                                            </button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Overlay text and button on the 4th image (index === 3) */}
-                            {index === 0 && (
-                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-0">
-                                    <h2 className="text-lg font-base mb-4 sm:text-base md:text-lg">Exclusive Games</h2>
-                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">To get our Exclusive Mac games Messege on my <a href="https://t.me/n0t_ur_type" className='text-cyan-500' target='_blank'>Telegram</a></p>
-                                    <div className='w-fill'>
-                                        <a href="https://t.me/n0t_ur_type" target='_blank' rel="noopener noreferrer">
-                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
-                                                Send message..
-                                            </button>
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Overlay text and button on the 4th image (index === 2) */}
-                            {index === 1 && (
-                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-0">
-                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">Macbook Games</h2>
-                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Download Your Favourite Games for Free.</p>
-                                    <div className='w-fill'>
-                                        <Link href="/category/mac/games">
-                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
-                                                Download Now..
-                                            </button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Overlay text and button on the 4th image (index === 3) */}
-                            {index === 2 && (
-                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-0">
-                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">TELEGRAM CHAT</h2>
-                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Join Our Channel @freemacgames</p>
-                                    <div className='w-fill'>
-                                        <a href="https://t.me/freemacgames" target="_blank" rel="noopener noreferrer">
-                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
-                                                Join our Telegram
-                                            </button>
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Pagination Dots */}
-                <div className="absolute flex space-x-3 bottom-7 left-1/2 transform -translate-x-1/2">
-                    {images.map((_, index) => (
-                        <button
-                            key={index}
-                            type="button"
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                ? 'bg-gradient-to-r from-purple-500 to-blue-500 w-6 shadow-lg'
-                                : 'bg-white/50 hover:bg-white/80'
-                                }`}
-                            onClick={() => setCurrentIndex(index)}
-                        />
-                    ))}
-                </div>
-
-                {/* Previous Button */}
-                <button
-                    type="button"
-                    className="absolute top-1/2 -translate-y-1/2 left-4"
-                    onClick={() => setCurrentIndex((currentIndex - 1 + images.length) % images.length)}
-                >
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-gradient-to-l hover:from-purple-600/80 hover:to-blue-600/80 border border-purple-500/30 transition-all duration-300 shadow-lg">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-white"
-                        >
-                            <path d="m15 18-6-6 6-6" />
-                        </svg>
-                    </span>
-                </button>
-
-                {/* Next Button */}
-                <button
-                    type="button"
-                    className="absolute top-1/2 -translate-y-1/2 right-4 "
-                    onClick={() => setCurrentIndex((currentIndex + 1) % images.length)}
-                >
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-gradient-to-r hover:from-purple-600/80 hover:to-blue-600/80 border border-purple-500/30 transition-all duration-300 shadow-lg">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-white"
-                        >
-                            <path d="m9 18 6-6-6-6" />
-                        </svg>
-                    </span>
-                </button>
             </div>
 
             <div>
