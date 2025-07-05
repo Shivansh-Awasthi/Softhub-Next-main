@@ -113,8 +113,123 @@ const HomeClient = ({
             {/* Decorative grid lines */}
             <div className="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-40 -z-10"></div>
 
-            {/* Slider Logic */}
-            <div id="default-carousel" className="relative w-full mb-16" data-carousel="slide">
+            {/* Modern Glassy Slider */}
+            <div className="hidden md:block pb-6 lg:pb-8 w-full">
+                <div className="relative w-full aspect-[2.4/1] rounded-lg overflow-hidden">
+                    {/* Edge overlays for glassy effect */}
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                        <div className="absolute top-0 inset-x-0">
+                            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-gray-950 via-gray-950/60 to-transparent"></div>
+                        </div>
+                        <div className="absolute bottom-0 inset-x-0">
+                            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent"></div>
+                        </div>
+                        <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-gray-950 via-gray-950/60 to-transparent"></div>
+                        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-gray-950 via-gray-950/60 to-transparent"></div>
+                    </div>
+
+                    {/* Slides */}
+                    {images.map((image, index) => (
+                        <div
+                            key={index}
+                            className={`transition-opacity duration-700 ease-in-out absolute inset-0 ${index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none z-0'}`}
+                        >
+                            <img src={image} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 scale-105" alt={`Slide ${index + 1}`} />
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/90 via-[#0f172a]/50 to-transparent"></div>
+
+                            {/* Overlay content (reuse your overlays) */}
+                            {index === 3 && (
+                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10 w-full">
+                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">SOFTWARE</h2>
+                                    <p className="mb-4 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Download Free Softwares On Your Mac</p>
+                                    <div className='w-fill'>
+                                        <Link href="/category/mac/softwares">
+                                            <button className="mx-auto ml-0 px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
+                                                Download Now
+                                            </button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                            {index === 0 && (
+                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
+                                    <h2 className="text-lg font-base mb-4 sm:text-base md:text-lg">Exclusive Games</h2>
+                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">To get our Exclusive Mac games Messege on my <a href="https://t.me/n0t_ur_type" className='text-cyan-500' target='_blank'>Telegram</a></p>
+                                    <div className='w-fill'>
+                                        <a href="https://t.me/n0t_ur_type" target='_blank' rel="noopener noreferrer">
+                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
+                                                Send message..
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                            {index === 1 && (
+                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
+                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">Macbook Games</h2>
+                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Download Your Favourite Games for Free.</p>
+                                    <div className='w-fill'>
+                                        <Link href="/category/mac/games">
+                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
+                                                Download Now..
+                                            </button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                            {index === 2 && (
+                                <div className="absolute inset-0 flex flex-col text-white p-8 ml-6 mt-4 md:p-0 md:ml-20 md:mt-28 z-10">
+                                    <h2 className="text-lg font-thin mb-4 sm:text-base md:text-lg">TELEGRAM CHAT</h2>
+                                    <p className="mb-6 font-semibold sm:text-sm md:text-base overflow-hidden whitespace-nowrap text-ellipsis">Join Our Channel @freemacgames</p>
+                                    <div className='w-fill'>
+                                        <a href="https://t.me/freemacgames" target="_blank" rel="noopener noreferrer">
+                                            <button className="mx-auto ml-0 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 sm:px-4 sm:py-2 md:px-6 md:py-3 overflow-hidden whitespace-nowrap text-ellipsis">
+                                                Join our Telegram
+                                            </button>
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* Progress bar and nav buttons */}
+                    <div className="container mx-auto px-6 lg:px-8">
+                        <div className="absolute bottom-8 left-0 right-0 z-30 flex items-center justify-between">
+                            {/* Progress bar */}
+                            <div className="w-1/3">
+                                <div className="h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
+                                    <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full transition-all duration-700" style={{ width: `${((currentIndex + 1) / images.length) * 100}%` }}></div>
+                                </div>
+                            </div>
+                            {/* Nav buttons */}
+                            <div className="flex items-center gap-4">
+                                <button
+                                    className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-all duration-300"
+                                    aria-label="Previous slide"
+                                    onClick={() => setCurrentIndex((currentIndex - 1 + images.length) % images.length)}
+                                >
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white/20 transition-all duration-300"
+                                    aria-label="Next slide"
+                                    onClick={() => setCurrentIndex((currentIndex + 1) % images.length)}
+                                >
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Slider (existing code) */}
+            <div id="default-carousel" className="relative w-full mb-16 md:hidden" data-carousel="slide">
                 {/* Carousel Container */}
                 <div className="relative h-56 sm:h-72 md:h-88 lg:h-[25rem] overflow-hidden rounded-xl shadow-lg border border-purple-600/20 bg-gradient-to-br from-[#1E1E1E]/50 to-[#121212]/50">
                     {images.map((image, index) => (
