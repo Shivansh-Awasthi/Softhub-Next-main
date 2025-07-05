@@ -38,7 +38,7 @@ export default function AdminRequestTable() {
             url.searchParams.append("limit", ITEMS_PER_PAGE);
 
             const res = await fetch(url, {
-                headers: token ? { Authorization: `Bearer ${token}` } : {},
+                headers: token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN, } : {},
             });
 
             const data = await res.json();
@@ -65,7 +65,10 @@ export default function AdminRequestTable() {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
                 body: JSON.stringify({ status }),
             });

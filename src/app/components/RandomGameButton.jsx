@@ -41,7 +41,11 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
         if (!preserveCard) setGame(null); // Only clear card if not preserving
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/random/${platform}`
+                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/random/${platform}`, {
+                headers: {
+                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                }
+            }
             );
             const data = await res.json();
             if (data.success && data.game) {
@@ -81,7 +85,11 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
         setLoading(true);
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/random/${platform}`
+                `${process.env.NEXT_PUBLIC_API_URL || ""}/api/random/${platform}`, {
+                headers: {
+                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                },
+            }
             );
             const data = await res.json();
             if (data.success && data.game) {

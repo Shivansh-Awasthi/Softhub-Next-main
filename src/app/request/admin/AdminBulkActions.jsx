@@ -19,7 +19,10 @@ export default function AdminBulkActions() {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
                 body: JSON.stringify({ ids: selected, status }),
             });
