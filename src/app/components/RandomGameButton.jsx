@@ -115,14 +115,14 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     };
 
     return (
-        <div className="w-full max-w-lg min-w-lg mx-auto flex flex-col items-center gap-4">
+        <div className="w-full max-w-lg mx-auto flex flex-col items-center gap-4">
             {/* Confetti for dice/shuffle */}
             <div className="pointer-events-none absolute left-1/2 top-16 z-50" style={{ transform: 'translateX(-50%)' }}>
                 <Confetti active={isExploding} />
             </div>
             {/* If a game is fetched, show the card instead of the button */}
             {game ? (
-                <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#121212] border border-purple-600/20 shadow-lg overflow-hidden min-h-[180px]">
+                <div className="relative w-full rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#121212] border border-purple-600/20 shadow-lg overflow-hidden min-h-[180px] max-h-[210px]">
                     {/* Blessing message overlay */}
                     {showBlessing && (
                         <div className="absolute left-1/2 top-8 z-40 px-4 py-1.5 rounded-lg bg-black/20 backdrop-blur-sm text-white text-sm font-medium shadow-lg shadow-black/70 animate-fadeInOut" style={{ transform: 'translateX(-50%)' }}>
