@@ -19,6 +19,8 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     // Animation state for image transition
     const [imageTransitioning, setImageTransitioning] = useState(false);
     const [pendingGame, setPendingGame] = useState(null); // Hold next game for animation
+    // Add cooldown state for shuffle button
+    const [shuffleCooldown, setShuffleCooldown] = useState(false);
 
     const blessingMessages = [
         "The gods have chosen this game for you!",
@@ -70,6 +72,9 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     };
 
     const handleShuffleClick = async () => {
+        if (shuffleCooldown) return; // Prevent rapid clicks
+        setShuffleCooldown(true);
+        setTimeout(() => setShuffleCooldown(false), 1500); // 2s cooldown
         setIsExploding(true);
         setTimeout(() => setIsExploding(false), 700);
         showRandomBlessing();
@@ -173,7 +178,7 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
                             {/* Right Side - Action Buttons */}
                             <div className="ml-2 flex flex-shrink-0 items-center gap-2 sm:ml-3 sm:gap-3">
                                 {/* Shuffle Button */}
-                                <button onClick={handleShuffleClick} disabled={loading} className="group flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/15 focus:outline-none sm:h-9 sm:w-9">
+                                <button onClick={handleShuffleClick} disabled={loading || shuffleCooldown} className="group flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/15 focus:outline-none sm:h-9 sm:w-9">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 transform text-white transition-transform duration-500 group-hover:rotate-180 sm:h-4.5 sm:w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                                 </button>
                                 {/* View Details Button */}
