@@ -7,6 +7,8 @@ import { LiveCounter } from './components/Counter/LiveCounter';
 import { LuAppWindowMac } from "react-icons/lu";
 import { FaAndroid } from "react-icons/fa";
 import { FaPlaystation } from "react-icons/fa";
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 const images = [
     'https://img.playbook.com/NzGgc9TjLeq_Ic9CZ4VLwiUBrK82Gigj4VqjhcTTlwE/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzIwYTYzOTJj/LWEyNWUtNDdjYy05/Y2E5LWFjMmQ2ZGQy/YmRkNw',
@@ -32,15 +34,58 @@ const HomeClient = ({
 
     // For count visitors accessible/visible only for the admins
     const [isAdmin, setIsAdmin] = useState(false);
+    const [user, setUser] = useState(null);
 
     // Check the role in localStorage on component mount
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const role = localStorage.getItem('role');
-            if (role === 'ADMIN') {
-                setIsAdmin(true); // If the role is "ADMIN", set state to true
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
+                if (!token) {
+                    setUserData(null);
+                    return null;
+                }
+                // Always send Authorization, and send X-Auth-Token if available
+                const headers = { Authorization: `Bearer ${token}` };
+                if (xAuthToken) headers["X-Auth-Token"] = xAuthToken;
+                let data;
+                let decoded = null;
+                try {
+                    const res = await axios.get(
+                        process.env.NEXT_PUBLIC_API_URL + "/api/user/me",
+                        { headers }
+                    );
+                    data = res.data;
+                    let admin = data.user.role
+                    if (admin === "ADMIN") {
+                        setIsAdmin(true);
+                    }
+
+
+
+                } catch (err) {
+                    // If backend fails, try to decode token on frontend
+                    try {
+                        decoded = jwtDecode(token);
+                        setUser({
+                            username: decoded.role || decoded.role || "user",
+                        });
+
+                        if (decoded.role === "ADMIN") {
+                            setIsAdmin(true);
+                        }
+                        return;
+                    } catch (decodeErr) {
+                        setUser(null);
+                        return;
+                    }
+                }
+            } catch (err) {
+                setUser(null);
             }
-        }
+        };
+        fetchUser();
     }, []);
 
     const createSlug = (text = '') => {
