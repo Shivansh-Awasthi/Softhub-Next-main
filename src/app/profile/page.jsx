@@ -159,7 +159,7 @@ const ProfilePage = () => {
             <div className="w-full h-32 bg-blue-500 rounded-b-2xl mb-[-64px] relative">
                 <button
                     onClick={() => router.push('/settings')}
-                    className="absolute right-6 bottom-4 bg-gradient-to-r from-[#b1001e] to-[#ff006a] text-white font-bold rounded-2xl shadow-2xl px-7 py-2.5 text-base flex items-center gap-3 transition-all duration-200 border-2 border-[#b1001e]/80 focus:outline-none focus:ring-2 focus:ring-[#ff006a]/60 focus:ring-offset-2 backdrop-blur-md group cursor-pointer hover:scale-105 hover:shadow-[0_0_24px_4px_rgba(255,0,106,0.25)]"
+                    className="z-20 absolute right-6 bottom-4 bg-gradient-to-r from-[#b1001e] to-[#ff006a] text-white font-bold rounded-2xl shadow-2xl px-7 py-2.5 text-base flex items-center gap-3 transition-all duration-200 border-2 border-[#b1001e]/80 focus:outline-none focus:ring-2 focus:ring-[#ff006a]/60 focus:ring-offset-2 backdrop-blur-md group cursor-pointer hover:scale-105 hover:shadow-[0_0_24px_4px_rgba(255,0,106,0.25)]"
                     style={{ boxShadow: '0 0 16px 2px #b1001e99, 0 2px 24px 0 #ff006a55' }}
                 >
                     <span className="font-bold tracking-wide">Edit Profile</span>
