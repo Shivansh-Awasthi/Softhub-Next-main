@@ -203,7 +203,7 @@ const HomeClient = ({
 
                     {/* Progress bar and nav buttons */}
                     <div className="container mx-auto px-6 lg:px-8">
-                        <div className="absolute bottom-8 left-0 right-0 z-30 flex items-center justify-between">
+                        <div className="absolute bottom-8 left-0 right-0 z-12 flex items-center justify-between">
                             {/* Progress bar */}
                             <div className="w-1/3">
                                 <div className="h-1 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
