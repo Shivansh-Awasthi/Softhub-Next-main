@@ -1,9 +1,9 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
 
 const PaidGameAdminPage = () => {
     const [email, setEmail] = useState("");
@@ -15,35 +15,49 @@ const PaidGameAdminPage = () => {
     const [message, setMessage] = useState("");
     const router = useRouter();
 
-    // Check admin status on mount (client-side)
-    React.useEffect(() => {
-        async function checkAdmin() {
-            const res = await fetch(`${apiUrl}/api/user/me`, {
-                credentials: 'include',
-                headers: {
-                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
-                },
-            });
+    // ✅ Get token once
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-            const data = await res.json();
-            if (!data.success || data.user.role !== "ADMIN") {
+
+    // Check admin status on mount
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/api/user/me`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? {
+                            Authorization: `Bearer ${token}`,
+                            'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                        } : {}),
+                    },
+                });
+                const data = await res.json();
+                if (!data.success || data.user.role !== "ADMIN") {
+                    router.replace("/");
+                }
+            } catch (e) {
+                console.error("Admin check failed:", e);
                 router.replace("/");
             }
-        }
+        };
+
         checkAdmin();
         fetchRecentUsers();
         fetchPs4PaidGames();
     }, []);
 
-    // Fetch recent 10 users
-    async function fetchRecentUsers() {
+    const fetchRecentUsers = async () => {
         setLoading(true);
         setMessage("");
         try {
-            const res = await fetch(`${apiUrl}/api/user/recent`, {
-                credentials: 'include',
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/recent`, {
                 headers: {
-                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    "Content-Type": "application/json",
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
             });
             const data = await res.json();
@@ -52,17 +66,19 @@ const PaidGameAdminPage = () => {
             setMessage("Failed to fetch users");
         }
         setLoading(false);
-    }
+    };
 
-    // Search user by email
-    async function searchUserByEmail() {
+    const searchUserByEmail = async () => {
         setLoading(true);
         setMessage("");
         try {
             const res = await fetch(`${apiUrl}/api/user/by-email?email=${encodeURIComponent(email)}`, {
-                credentials: 'include',
                 headers: {
-                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    "Content-Type": "application/json",
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
             });
             const data = await res.json();
@@ -76,30 +92,31 @@ const PaidGameAdminPage = () => {
             setMessage("Failed to search user");
         }
         setLoading(false);
-    }
+    };
 
-    // Fetch paid PS4 games
-    async function fetchPs4PaidGames() {
+    const fetchPs4PaidGames = async () => {
         setLoading(true);
         setMessage("");
         try {
             const res = await fetch(`${apiUrl}/api/apps/category/ps4`, {
                 headers: {
-                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    "Content-Type": "application/json",
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
             });
             const data = await res.json();
-            // Only show paid games
             const paidGames = (data.apps || data.games || []).filter(game => game.isPaid);
             setPs4Games(paidGames);
         } catch (e) {
             setMessage("Failed to fetch games");
         }
         setLoading(false);
-    }
+    };
 
-    // Add game to user
-    async function addGameToUser() {
+    const addGameToUser = async () => {
         if (!selectedUser || !selectedGame) return;
         setLoading(true);
         setMessage("");
@@ -108,18 +125,23 @@ const PaidGameAdminPage = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    ...(token ? {
+                        Authorization: `Bearer ${token}`,
+                        'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                    } : {}),
                 },
-                credentials: 'include',
-                body: JSON.stringify({ userId: selectedUser._id, gameId: selectedGame })
+                body: JSON.stringify({
+                    userId: selectedUser._id,
+                    gameId: selectedGame,
+                }),
             });
             const data = await res.json();
-            setMessage(data.message);
+            setMessage(data.message || "Game added.");
         } catch (e) {
-            setMessage("Failed to add game");
+            setMessage("Failed to add game.");
         }
         setLoading(false);
-    }
+    };
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-10 border border-gray-200">
