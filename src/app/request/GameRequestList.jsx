@@ -447,6 +447,64 @@ function RequestCard({ req, status, onVote, voting, isVoted }) {
     );
 }
 
+function NewAccountVoteCard({ daysLeft }) {
+    return (
+        <div className="group relative">
+            <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600 opacity-20 blur-lg"></div>
+            <div className="relative h-full rounded-2xl border-2 border-blue-400 bg-white/80 dark:bg-blue-900/40 backdrop-blur-xl flex flex-col items-center justify-center p-8 shadow-lg">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-800">
+                        <svg className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
+                        </svg>
+                    </div>
+                    <div className="text-xl font-bold text-blue-700 dark:text-blue-300 text-center">New Account</div>
+                    <div className="text-base text-blue-600 dark:text-blue-200 text-center max-w-xs">
+                        Your account is too new to vote on requests.<br />
+                        You can vote after <span className="font-semibold">{daysLeft} day{daysLeft !== 1 ? 's' : ''}</span>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function NewAccountModal({ open, daysLeft, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
+            <div className="bg-[#232b39] border border-[#2e3748] rounded-2xl shadow-2xl max-w-md w-full p-8 pt-7 relative animate-fadeIn flex flex-col items-center">
+                {/* Top blue border */}
+                <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-indigo-500" />
+                {/* Close button */}
+                <button onClick={onClose} className="absolute top-4 right-4 text-[#7b8597] hover:text-blue-400 text-xl focus:outline-none">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <div className="flex flex-col items-center gap-3 mt-4">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-800">
+                        <svg className="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
+                        </svg>
+                    </div>
+                    <div className="text-2xl font-bold text-blue-700 dark:text-blue-300 text-center">New Account</div>
+                    <div className="text-base text-blue-600 dark:text-blue-200 text-center max-w-xs">
+                        Your account is too new to vote on requests.<br />
+                        You can vote after <span className="font-semibold">{daysLeft} day{daysLeft !== 1 ? 's' : ''}</span>.
+                    </div>
+                </div>
+                <button
+                    onClick={onClose}
+                    className="w-full mt-8 py-3 bg-[#313a4d] text-white rounded-xl font-semibold shadow hover:bg-[#3a4560] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all text-lg"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function GameRequestList() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -459,6 +517,9 @@ export default function GameRequestList() {
     const [userId, setUserId] = useState(null);
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [pendingVotedId, setPendingVotedId] = useState(null); // Track which card is waiting for success modal
+    const [accountTooNew, setAccountTooNew] = useState(false);
+    const [daysLeft, setDaysLeft] = useState(7);
+    const [newAccountModalOpen, setNewAccountModalOpen] = useState(false);
 
     // Fetch current user ID from token or API
     useEffect(() => {
@@ -496,6 +557,28 @@ export default function GameRequestList() {
         fetchUserId();
     }, []);
 
+    // Check if user is too new to vote (call once on mount)
+    useEffect(() => {
+        const checkAccountAge = async () => {
+            const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+            if (!token) return;
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/limit`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                const data = await res.json();
+                if (data && data.newUser && data.daysLeft) {
+                    setAccountTooNew(true);
+                    setDaysLeft(data.daysLeft);
+                } else {
+                    setAccountTooNew(false);
+                }
+            } catch (err) {
+                // ignore
+            }
+        };
+        checkAccountAge();
+    }, []);
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -546,6 +629,9 @@ export default function GameRequestList() {
                 setPendingVotedId(id); // Show success modal for this card
                 setSuccessModalOpen(true);
                 // Don't setVoted yet; wait for modal close
+            } else if (res.status === 403 && data.error && data.error.toLowerCase().includes('7 days old')) {
+                setDaysLeft(data.daysLeft || 7);
+                setNewAccountModalOpen(true);
             } else if (res.status === 429) {
                 setModalMessage("Your daily vote is used. Try again tomorrow.");
                 setModalOpen(true);
@@ -569,6 +655,13 @@ export default function GameRequestList() {
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-2 md:px-6 bg-[#f8fafc] dark:bg-[#10131a] min-h-screen">
+            {/* Show new user card if account is too new */}
+            {accountTooNew && (
+                <div className="mb-10">
+                    <NewAccountVoteCard daysLeft={daysLeft} />
+                </div>
+            )}
+            <NewAccountModal open={newAccountModalOpen} daysLeft={daysLeft} onClose={() => setNewAccountModalOpen(false)} />
             <SuccessModal open={successModalOpen} onClose={() => {
                 setSuccessModalOpen(false);
                 if (pendingVotedId) {
