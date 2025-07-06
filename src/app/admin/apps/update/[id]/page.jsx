@@ -55,7 +55,7 @@ const UpdateApps = () => {
                 try {
                     const decoded = jwtDecode(token);
                     setUserData(decoded);
-                    if (decoded.role === 'ADMIN') {
+                    if (decoded.role === 'ADMIN' || 'MOD') {
                         setIsAdmin(true);
                     } else {
                         toast.error('Unauthorized access. Redirecting to home page...');
@@ -178,8 +178,8 @@ const UpdateApps = () => {
                 return;
             }
         }
-        if (!decoded || decoded.role !== 'ADMIN') {
-            toast.error('Unauthorized access. Only admins can update apps.');
+        if (!decoded || decoded.role !== 'ADMIN' || decoded.role !== 'MOD') {
+            toast.error('Unauthorized access. Only admins or moderators can update apps.');
             setTimeout(() => router.push('/'), 2000);
             setUpdating(false);
             return;

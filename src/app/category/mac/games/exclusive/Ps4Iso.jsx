@@ -339,7 +339,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
 
     // Game card component with prefetching
     const GameCard = ({ game = {} }) => {
-        const isAdmin = userData?.role === 'ADMIN';
+        const isAdmin = userData?.role === 'ADMIN' || userData?.role === 'MOD' || userData?.role === 'PREMIUM';
         const isPurchased = userData?.purchasedGames?.includes(game._id) || false;
         const isUnlocked = isAdmin || !game.isPaid || isPurchased;
 

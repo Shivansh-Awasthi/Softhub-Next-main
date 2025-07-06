@@ -52,7 +52,9 @@ const SingleApp = ({ appData }) => {
                         purchasedGames: decoded.purchasedGames || [],
                         createdAt: decoded.iat ? new Date(decoded.iat * 1000) : undefined,
                         role: decoded.role || 'USER',
-                        isAdmin: decoded.role === 'ADMIN'
+                        isAdmin: decoded.role === 'ADMIN',
+                        isMod: decoded.role === 'MOD',
+                        isPremium: decoded.role === 'PREMIUM',
                     };
                 } catch (decodeError) {
                     console.error("Failed to decode token:", decodeError);
@@ -75,13 +77,15 @@ const SingleApp = ({ appData }) => {
             // Ensure isAdmin is always a boolean
             if (user) {
                 user.isAdmin = user.role === 'ADMIN';
+                user.isMod = user.role === 'MOD';
+                user.isPremium = user.role === 'PREMIUM';
             }
             setUserData(user);
 
             if (user) {
-                const isAdmin = user.role === 'ADMIN';
+                const { isAdmin, isMod, isPremium } = user;
                 const hasPurchased = user.purchasedGames?.map(String).includes(String(appData._id));
-                const shouldHaveAccess = isAdmin || !appData.isPaid || hasPurchased;
+                const shouldHaveAccess = isAdmin || isMod || isPremium || !appData.isPaid || hasPurchased;
 
                 setHasAccess(shouldHaveAccess);
             } else {
@@ -230,7 +234,7 @@ const SingleApp = ({ appData }) => {
     return (
         <div style={{ position: 'relative' }}>
             {/* Admin Edit Floating Button */}
-            {userData?.isAdmin && (
+            {userData?.isAdmin || userData.isMod && (
                 <button
                     className="absolute top-8 right-8 z-[100] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-5 py-3 rounded-full shadow-xl font-bold uppercase tracking-wider flex items-center gap-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 pointer-events-auto"
                     style={{
