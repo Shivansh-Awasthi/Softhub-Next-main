@@ -78,7 +78,7 @@ const RandomGameButton = ({ platform = "mac", onGameFetched }) => {
     const handleShuffleClick = async () => {
         if (shuffleCooldown) return; // Prevent rapid clicks
         setShuffleCooldown(true);
-        setTimeout(() => setShuffleCooldown(false), 1500); // 2s cooldown
+        setTimeout(() => setShuffleCooldown(false), 2000); // 2s cooldown
         setIsExploding(true);
         setTimeout(() => setIsExploding(false), 700);
         showRandomBlessing();

@@ -557,28 +557,6 @@ export default function GameRequestList() {
         fetchUserId();
     }, []);
 
-    // Check if user is too new to vote (call once on mount)
-    useEffect(() => {
-        const checkAccountAge = async () => {
-            const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-            if (!token) return;
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests/limit`, {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {},
-                });
-                const data = await res.json();
-                if (data && data.newUser && data.daysLeft) {
-                    setAccountTooNew(true);
-                    setDaysLeft(data.daysLeft);
-                } else {
-                    setAccountTooNew(false);
-                }
-            } catch (err) {
-                // ignore
-            }
-        };
-        checkAccountAge();
-    }, []);
 
     useEffect(() => {
         const fetchRequests = async () => {
