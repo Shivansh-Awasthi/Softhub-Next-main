@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import GameRequestList from "./GameRequestList";
 import GameRequestForm from "./gameRequest";
 import Link from "next/link";
@@ -20,7 +20,7 @@ function MemberOnlyCard() {
                             <div className="group relative">
                                 <div className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-r from-blue-500/40 to-indigo-500/40 animate-pulse group-hover:from-blue-600/40 group-hover:to-indigo-600/40 transition-all duration-300"></div>
                                 <div className="relative w-32 h-32 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 group-hover:from-blue-600 group-hover:to-indigo-700 shadow-xl p-4 transition-all duration-300">
-                                    <img src="https://i.postimg.cc/9fxCdJDc/image-removebg-preview.png" alt="AnkerGames" className="w-24 h-24 object-contain transform group-hover:scale-110 transition-transform duration-300" fetchPriority="high" />
+                                    <img src="https://i.postimg.cc/9fxCdJDc/image-removebg-preview.png" alt="ToxicGames" className="w-24 h-24 object-contain transform group-hover:scale-110 transition-transform duration-300" fetchPriority="high" />
                                 </div>
                             </div>
                         </div>
@@ -119,19 +119,45 @@ function MemberOnlyCard() {
 
 export default function RequestPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [showMemberCard, setShowMemberCard] = useState(false);
+    const contentRef = useRef(null);
+
     useEffect(() => {
         if (typeof window !== "undefined") {
             const token = localStorage.getItem("token");
-            setIsLoggedIn(!!token);
+            const loggedIn = !!token;
+            setIsLoggedIn(loggedIn);
+
+            if (!loggedIn) {
+                // Scroll effect for non-logged-in users
+                setTimeout(() => {
+                    // Scroll to bottom
+                    window.scrollTo({
+                        top: document.documentElement.scrollHeight,
+                        behavior: 'smooth'
+                    });
+
+                    // Then scroll back to top and show member card
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                        setShowMemberCard(true);
+                    }, 2000);
+                }, 100);
+            }
         }
     }, []);
+
     return (
-        <div className="bg-[#030712] min-h-screen">
-            {!isLoggedIn && <MemberOnlyCard />}
-            {isLoggedIn && <>
-                <GameRequestForm />
-                <GameRequestList />
-            </>}
+        <div className="bg-[#030712] min-h-screen" ref={contentRef}>
+            {/* Always render the content */}
+            <GameRequestForm />
+            <GameRequestList />
+
+            {/* Show member card only after scroll effect */}
+            {!isLoggedIn && showMemberCard && <MemberOnlyCard />}
         </div>
     );
 }

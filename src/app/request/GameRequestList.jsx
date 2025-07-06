@@ -565,7 +565,7 @@ export default function GameRequestList() {
             try {
                 const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/requests`, {
-                    headers: token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN, } : {},
+                    headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN, },
                 });
                 const data = await res.json();
                 if (res.ok) {
