@@ -164,75 +164,91 @@ const UpdateApps = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setUpdating(true); // Start loader
-        // setLoading(true); // Remove this line, only use updating for submit
+        setUpdating(true);
+
         const token = localStorage.getItem('token');
-        let decoded = null;
-        if (token) {
-            try {
-                decoded = jwtDecode(token);
-            } catch (err) {
-                toast.error('Invalid token. Please login again.');
+        if (!token) {
+            toast.error('You must be logged in.');
+            setUpdating(false);
+            router.push('/');
+            return;
+        }
+
+        try {
+            // Fetch real-time user data
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+            if (process.env.NEXT_PUBLIC_API_TOKEN) {
+                headers['X-Auth-Token'] = process.env.NEXT_PUBLIC_API_TOKEN;
+            }
+
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me`, {
+                headers,
+            });
+
+            const userRole = res.data?.user?.role;
+
+            if (!['ADMIN', 'MOD'].includes(userRole)) {
+                toast.error('Unauthorized access. Only admins or moderators can update apps.');
+                setTimeout(() => router.push('/'), 2000);
                 setUpdating(false);
-                router.push('/');
                 return;
             }
-        }
-        if (!decoded || decoded.role !== 'ADMIN' || decoded.role !== 'MOD') {
-            toast.error('Unauthorized access. Only admins or moderators can update apps.');
-            setTimeout(() => router.push('/'), 2000);
-            setUpdating(false);
-            return;
-        }
-        const filteredDownloadLink = downloadLink.filter(link => link.trim() !== "");
-        if (filteredDownloadLink.length === 0) {
-            toast.error("Please provide at least one download link!");
-            setUpdating(false);
-            return;
-        }
-        if (tags.length === 0) {
-            toast.error("Please select at least one tag!");
-            setUpdating(false);
-            return;
-        }
-        // Prepare payload for URL-based images
-        const filteredThumbnails = thumbnail.filter(Boolean);
-        const payload = {
-            title,
-            description,
-            platform,
-            architecture,
-            tags,
-            isPaid,
-            price: String(price),
-            size: `${size} ${unit}`,
-            category,
-            gameMode,
-            releaseYear: String(releaseYear),
-            systemRequirements,
-            coverImg,
-            thumbnail: filteredThumbnails, // Send as array, not comma-separated string
-            downloadLink: filteredDownloadLink,
-        };
-        try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://toxicgames.in';
-            await axios.put(`${apiUrl}/api/apps/edit/${appId}`, payload, {
+
+            // Validate form data
+            const filteredDownloadLink = downloadLink.filter(link => link.trim() !== "");
+            if (filteredDownloadLink.length === 0) {
+                toast.error("Please provide at least one download link!");
+                setUpdating(false);
+                return;
+            }
+
+            if (tags.length === 0) {
+                toast.error("Please select at least one tag!");
+                setUpdating(false);
+                return;
+            }
+
+            const filteredThumbnails = thumbnail.filter(Boolean);
+            const payload = {
+                title,
+                description,
+                platform,
+                architecture,
+                tags,
+                isPaid,
+                price: String(price),
+                size: `${size} ${unit}`,
+                category,
+                gameMode,
+                releaseYear: String(releaseYear),
+                systemRequirements,
+                coverImg,
+                thumbnail: filteredThumbnails,
+                downloadLink: filteredDownloadLink,
+            };
+
+            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/edit/${appId}`, payload, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                     'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
                 },
             });
+
             toast.success("🎉 App updated successfully!");
             setTimeout(() => {
-                setUpdating(false); // Stop loader
+                setUpdating(false);
                 window.location.reload();
             }, 1500);
         } catch (error) {
+            console.error(error);
             toast.error("❌ Error updating app! " + (error.response?.data?.message || error.message));
             setUpdating(false);
         }
     };
+
 
     // Handler for thumbnail input change
     const handleThumbnailChange = (idx, value) => {
