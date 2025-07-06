@@ -41,6 +41,45 @@ function PopupModal({ open, message, onClose }) {
     );
 }
 
+// NewAccountModal: Dedicated modal for new accounts (7-day restriction)
+function NewAccountModal({ open, daysLeft, onClose }) {
+    if (!open) return null;
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-[6px] transition-all">
+            <div className="bg-[#232b39] border border-[#2e3748] rounded-2xl shadow-2xl max-w-md w-full p-8 pt-7 relative animate-fadeIn">
+                {/* Top blue border */}
+                <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-blue-500" />
+                {/* Close button */}
+                <button onClick={onClose} className="absolute top-4 right-4 text-[#7b8597] hover:text-blue-400 text-xl focus:outline-none">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+                <div className="flex flex-col items-center">
+                    <div className="bg-[#22335a] rounded-full p-4 mb-4">
+                        <svg className="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01" />
+                        </svg>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-2">New Account Restriction</div>
+                    <div className="text-base text-[#b2b9c9] mb-6 text-center">
+                        Your account is too new to submit a game request.<br />
+                        Accounts must be at least <span className="font-semibold text-blue-400">7 days old</span> to request or vote for games.<br />
+                        {daysLeft > 0 && (
+                            <span className="block mt-2 text-blue-300">{daysLeft} day{daysLeft !== 1 ? 's' : ''} left until you can request.</span>
+                        )}
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 bg-[#313a4d] text-white rounded-xl font-semibold shadow hover:bg-[#3a4560] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-all text-lg"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function formatTimeLeft(dateString) {
     if (!dateString) return "";
     const now = new Date();
@@ -69,6 +108,8 @@ export default function GameRequestForm() {
     const [limitLoading, setLimitLoading] = useState(true);
     const [showDenuvoModal, setShowDenuvoModal] = useState(false);
     const [showSuccessCard, setShowSuccessCard] = useState(false);
+    const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+    const [newAccountDaysLeft, setNewAccountDaysLeft] = useState(0);
 
     const stages = [
         {
@@ -191,6 +232,10 @@ export default function GameRequestForm() {
                 setNextRequestAvailable(data.nextRequestAvailable || null);
                 setModalMessage("Your request limit exceeded. You can request only a single game in a week.");
                 setModalOpen(true);
+            } else if (res.status === 403 && (data?.error?.toLowerCase?.().includes('account') || data?.message?.toLowerCase?.().includes('account'))) {
+                // Show new account modal
+                setNewAccountDaysLeft(data.daysLeft || 0);
+                setShowNewAccountModal(true);
             } else {
                 setModalMessage(data.error || data.message || "Failed to submit request.");
                 setModalOpen(true);
@@ -217,6 +262,7 @@ export default function GameRequestForm() {
                 </div>
             </div>
             <PopupModal open={modalOpen} message={modalMessage} onClose={() => setModalOpen(false)} />
+            <NewAccountModal open={showNewAccountModal} daysLeft={newAccountDaysLeft} onClose={() => setShowNewAccountModal(false)} />
             <section className="bg-[#030712] pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
