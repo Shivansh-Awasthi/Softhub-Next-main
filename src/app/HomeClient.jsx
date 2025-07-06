@@ -125,7 +125,7 @@ const HomeClient = ({
             <div className="pb-6 lg:pb-8 w-full">
                 <div className="relative w-full aspect-[2.4/1] rounded-lg overflow-hidden">
                     {/* Edge overlays for glassy effect */}
-                    <div className="absolute inset-0 pointer-events-none z-20">
+                    <div className="absolute inset-0 pointer-events-none z-12">
                         <div className="absolute top-0 inset-x-0">
                             <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-gray-950 via-gray-950/60 to-transparent"></div>
                         </div>
