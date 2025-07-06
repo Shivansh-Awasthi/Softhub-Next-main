@@ -388,7 +388,9 @@ function RequestCard({ req, status, onVote, voting, isVoted }) {
                                         {req.votes} of 20 votes received
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        Insufficient community support
+                                        {req.votes < 20
+                                            ? "Insufficient community support"
+                                            : "We were unable to process this game "}
                                     </div>
                                 </div>
                             </>
