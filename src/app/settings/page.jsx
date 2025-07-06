@@ -2,11 +2,13 @@
 import SettingsForm from "./SettingsForm";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
+
 
 export default function SettingsPage() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const router = useRouter();
     useEffect(() => {
         async function fetchUser() {
             try {
@@ -80,7 +82,7 @@ export default function SettingsPage() {
     };
 
     if (loading) return <div className="text-center py-10">Loading...</div>;
-    if (!user) return <div className="text-center py-10 text-red-500">User not found or not logged in.</div>;
+    if (!user) return router.push("/login");
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#30712]">

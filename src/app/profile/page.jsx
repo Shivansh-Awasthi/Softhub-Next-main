@@ -44,7 +44,7 @@ const ProfilePage = () => {
                 const token = localStorage.getItem("token");
                 const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
                 if (!token) {
-                    router.push("/user/login");
+                    router.push("/login");
                     return;
                 }
                 // Always send Authorization, and send X-Auth-Token if available
