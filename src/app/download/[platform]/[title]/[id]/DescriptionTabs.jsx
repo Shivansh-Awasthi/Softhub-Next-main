@@ -75,12 +75,12 @@ const DescriptionTabs = ({ data }) => {
             {/* Tabs Section - Show for Mac or PC */}
             {(isMac || isPC) && (
                 <div className="relative">
-                    <div className="flex bg-[#0F0F0F] p-1 rounded-t-2xl">
+                    <div className="flex bg-[#0F0F0F] p-1 rounded-t-2xl gap-2">
                         <button
                             ref={descriptionRef}
                             onClick={() => handleTabClick('description')}
-                            className={`flex-1 text-lg sm:text-xl font-bold py-4 transition-all duration-300 ${activeTab === 'description'
-                                ? 'text-white bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl shadow-lg'
+                            className={`flex-1 text-sm sm:text-sm lg:text-2xl md:text-lg font-bold py-4 transition-all duration-300 ${activeTab === 'description'
+                                ? 'text-white bg-gradient-to-r from-pink-800 to-orange-500 rounded-xl shadow-lg'
                                 : 'text-gray-400 hover:text-gray-200'
                                 }`}
                         >
@@ -91,8 +91,8 @@ const DescriptionTabs = ({ data }) => {
                                 <button
                                     ref={installationRef}
                                     onClick={() => handleTabClick('installation')}
-                                    className={`flex-1 text-lg sm:text-xl font-bold py-4 transition-all duration-300 ${activeTab === 'installation'
-                                        ? 'text-white bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl shadow-lg'
+                                    className={`flex-1 text-sm sm:text-sm lg:text-2xl md:text-lg font-bold py-4 transition-all duration-300 ${activeTab === 'installation'
+                                        ? 'text-white bg-gradient-to-r from-pink-800 to-orange-500 rounded-xl shadow-lg'
                                         : 'text-gray-400 hover:text-gray-200'
                                         }`}
                                 >
@@ -100,8 +100,8 @@ const DescriptionTabs = ({ data }) => {
                                 </button>
                                 <button
                                     onClick={() => handleTabClick('macrequirements')}
-                                    className={`flex-1 text-lg sm:text-xl font-bold py-4 transition-all duration-300 ${activeTab === 'macrequirements'
-                                        ? 'text-white bg-gradient-to-r from-indigo-600 to-blue-500 rounded-xl shadow-lg'
+                                    className={`flex-1 text-sm sm:text-sm lg:text-2xl md:text-lg font-bold py-4 transition-all duration-300 ${activeTab === 'macrequirements'
+                                        ? 'text-white bg-gradient-to-r from-pink-800 to-orange-500 rounded-xl shadow-lg'
                                         : 'text-gray-400 hover:text-gray-200'
                                         }`}
                                 >
@@ -112,8 +112,8 @@ const DescriptionTabs = ({ data }) => {
                         {isPC && (
                             <button
                                 onClick={() => handleTabClick('requirements')}
-                                className={`flex-1 text-lg sm:text-xl font-bold py-4 transition-all duration-300 ${activeTab === 'requirements'
-                                    ? 'text-white bg-gradient-to-r from-indigo-600 to-blue-500 rounded-xl shadow-lg'
+                                className={`flex-1 text-sm sm:text-sm lg:text-2xl md:text-lg font-bold py-4 transition-all duration-300 ${activeTab === 'requirements'
+                                    ? 'text-white bg-gradient-to-r from-pink-800 to-orange-500 rounded-xl shadow-lg'
                                     : 'text-gray-400 hover:text-gray-200'
                                     }`}
                             >
@@ -133,7 +133,7 @@ const DescriptionTabs = ({ data }) => {
             )}
 
             {/* Content Section */}
-            <div className="p-6 sm:p-8">
+            <div className="p-6 sm:p-5">
                 {isMac ? (
                     activeTab === 'description' ? (
                         <>
@@ -193,7 +193,7 @@ const DescriptionTabs = ({ data }) => {
                         </div>
                     ) : activeTab === 'macrequirements' ? (
                         // MAC SYSTEM REQUIREMENTS TAB
-                        <div className="px-4 py-12">
+                        <div className="py-5">
                             <div className="grid md:grid-cols-2 gap-4 md:gap-8">
                                 {/* Installation Guide Box */}
                                 <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden">

@@ -270,7 +270,7 @@ const SingleApp = ({ appData }) => {
                             </div>
                             <div className="flex w-full flex-col overflow-hidden">
                                 <div className="w-full flex items-center justify-between overflow-hidden">
-                                    <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 text-base sm:text-xl md:text-xl lg:text-3xl font-bold overflow-hidden text-ellipsis truncate max-w-full whitespace-normal md:whitespace-nowrap">
+                                    <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 text-base sm:text-xl md:text-xl lg:text-2xl font-bold truncate whitespace-nowrap overflow-hidden max-w-[80%]">
                                         {data.title}
                                     </h1>
                                 </div>
