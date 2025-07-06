@@ -234,7 +234,7 @@ const SingleApp = ({ appData }) => {
     return (
         <div style={{ position: 'relative' }}>
             {/* Admin Edit Floating Button */}
-            {userData?.isAdmin || userData.isMod && (
+            {(userData?.isAdmin || userData?.isMod) && (
                 <button
                     className="absolute top-8 right-8 z-[100] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-5 py-3 rounded-full shadow-xl font-bold uppercase tracking-wider flex items-center gap-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 pointer-events-auto"
                     style={{

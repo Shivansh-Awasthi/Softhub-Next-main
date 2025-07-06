@@ -25,7 +25,6 @@ export default function SettingsPage() {
                 try {
                     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/me`, { headers, credentials: "include" });
                     data = await res.json();
-                    console.log(data);
 
                     if (data && data.user) setUser(data.user);
                     else throw new Error();
