@@ -136,7 +136,7 @@ const SIZE_RANGES = [
   { id: "60-70", label: "60 - 70 GB" },
   { id: "70-80", label: "70 - 80 GB" },
   { id: "80-90", label: "80 - 90 GB" },
-  { id: "90-above", label: "90 GB & Above" },
+  { id: "90+", label: "90 GB & Above" },
 ];
 
 const YEARS = [

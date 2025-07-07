@@ -270,6 +270,17 @@ export default function Ps2Iso({ serverData }) {
             .replace(/\-\-+/g, '-');
     };
 
+    // Helper: Count active filters for badge
+    const getActiveFilterCount = () => {
+        let count = 0;
+        if (filters.genres && filters.genres.length > 0) count++;
+        if (filters.gameMode && filters.gameMode !== 'any') count++;
+        if (filters.size) count++;
+        if (filters.year) count++;
+        if (filters.popularity && filters.popularity !== 'all') count++;
+        return count;
+    };
+
     return (
         <div className="container mx-auto p-2 relative">
             {/* Heading and filter/clear buttons layout */}
@@ -290,8 +301,9 @@ export default function Ps2Iso({ serverData }) {
                             </h1>
                         </div>
                     </div>
+
                     <div className="flex flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} activeFilterCount={getActiveFilterCount()} />
                         {isFilterActive() && (
                             <button
                                 onClick={handleClearFilters}

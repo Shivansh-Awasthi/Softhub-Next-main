@@ -521,13 +521,24 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         }
     };
 
+    // Helper: Count active filters for badge
+    const getActiveFilterCount = () => {
+        let count = 0;
+        if (filters.genres && filters.genres.length > 0) count++;
+        if (filters.gameMode && filters.gameMode !== 'any') count++;
+        if (filters.size) count++;
+        if (filters.year) count++;
+        if (filters.popularity && filters.popularity !== 'all') count++;
+        return count;
+    };
+
     // Error state or no games available
     if ((error && !data.length) || (!data.length && !isPageTransitioning)) {
         return (
             <div className="container mx-auto p-2 pb-24 relative">
                 {/* Filter Bar at the top for error/empty state */}
                 <div className="mb-6 flex justify-end items-center gap-3">
-                    <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                    <FilterBar onOpenFilters={() => setFilterModalOpen(true)} activeFilterCount={getActiveFilterCount()} />
                     {isFilterActive() && (
                         <button
                             onClick={handleClearFilters}
@@ -688,7 +699,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         <div className="container mx-auto p-2 pb-24">
             {/* Filter Bar - always visible at the top */}
             <div className="mb-6 flex justify-end items-center gap-3">
-                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                <FilterBar onOpenFilters={() => setFilterModalOpen(true)} activeFilterCount={getActiveFilterCount()} />
                 {isFilterActive() && (
                     <button
                         onClick={handleClearFilters}

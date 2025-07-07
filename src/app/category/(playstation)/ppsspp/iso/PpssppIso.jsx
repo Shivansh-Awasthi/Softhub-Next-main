@@ -270,12 +270,22 @@ export default function PpssppIso({ serverData }) {
             .replace(/\-\-+/g, '-');
     };
 
+    // Helper: Count active filters for badge
+    const getActiveFilterCount = () => {
+        let count = 0;
+        if (filters.genres && filters.genres.length > 0) count++;
+        if (filters.gameMode && filters.gameMode !== 'any') count++;
+        if (filters.size) count++;
+        if (filters.year) count++;
+        if (filters.popularity && filters.popularity !== 'all') count++;
+        return count;
+    };
+
     return (
         <div className="container mx-auto p-2 relative">
             {/* Heading and filter/clear buttons layout */}
             <div className="cover mb-12 relative">
                 <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4">
-                    {/* Filter and clear buttons */}
 
                     {/* Centered heading */}
                     <div className="w-full sm:w-auto flex justify-center">
@@ -290,8 +300,9 @@ export default function PpssppIso({ serverData }) {
                             </h1>
                         </div>
                     </div>
+                    {/* Filter and clear buttons */}
                     <div className="flex flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} activeFilterCount={getActiveFilterCount()} />
                         {isFilterActive() && (
                             <button
                                 onClick={handleClearFilters}
@@ -304,6 +315,7 @@ export default function PpssppIso({ serverData }) {
                             </button>
                         )}
                     </div>
+
                 </div>
             </div>
             <FilterModal open={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={handleApplyFilters} initialFilters={filters} />
@@ -406,45 +418,67 @@ export default function PpssppIso({ serverData }) {
                                 )}
                             </div>
 
-                            <div className="flex flex-col p-3 bg-gradient-to-br from-[#1E1E1E] to-[#121212] flex-grow relative">
-                                {/* Glowing separator line */}
-                                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-600/20 to-transparent"></div>
+                            {/* Game title and additional info */}
+                            <div className="flex-1 p-4 bg-gradient-to-br from-[#1E1E1E] to-[#121212]">
+                                <h3 className="text-sm font-semibold text-white truncate">{ele.title}</h3>
+                                <div className="mt-1 text-xs text-gray-400">
+                                    {/* Enhanced platform and region display */}
+                                    <span className="flex items-center">
+                                        <FaPlaystation className="mr-1 text-lg" />
+                                        <span className="text-[10px] font-medium">{ele.platform}</span>
+                                    </span>
+                                    {ele.region && (
+                                        <span className="flex items-center mt-1">
+                                            <svg className="w-3 h-3 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                            <span className="text-[10px] font-medium">{ele.region}</span>
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
 
-                                <div className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-white text-center pb-2 overflow-hidden whitespace-nowrap text-ellipsis group-hover:from-blue-400 group-hover:to-purple-400 transition-colors duration-300">
-                                    {ele.title}
-                                </div>
-                                <div className="text-xs font-normal text-gray-400 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1 text-purple-400">
-                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                                    </svg>
-                                    {ele.size}
-                                </div>
+                            {/* Conditional content based on game properties */}
+                            <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                                {/* Rating badge - only if rating exists */}
+                                {ele.rating && (
+                                    <div className="flex items-center mb-2">
+                                        <div className="text-xs font-semibold text-white bg-green-500 rounded-full px-3 py-1 mr-2">
+                                            {ele.rating}
+                                        </div>
+                                        <div className="text-[10px] text-gray-400">
+                                            {ele.votes} votes
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Description - show only if available */}
+                                {ele.description && (
+                                    <div className="text-xs text-gray-300 line-clamp-2">
+                                        {ele.description}
+                                    </div>
+                                )}
                             </div>
                         </Link>
                     ))}
                 </div>
             )}
 
-            {/* Enhanced Pagination Controls */}
-            {totalPages > 1 && (
-                <div className="mt-12 relative">
-                    {/* Pagination decorative elements */}
-                    <div className="absolute left-1/4 -top-8 w-24 h-24 bg-purple-600 opacity-5 rounded-full blur-2xl -z-10"></div>
-                    <div className="absolute right-1/4 -top-8 w-24 h-24 bg-blue-600 opacity-5 rounded-full blur-2xl -z-10"></div>
-
-                    <div className="relative z-10">
-                        <EnhancedPagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            isLoading={loading}
-                        />
-                    </div>
-
-                    {/* Decorative line */}
-                    <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/20 to-transparent -z-10"></div>
-                </div>
-            )}
+            {/* Pagination - always show the wrapper to reserve space */}
+            <div className="mt-8">
+                <EnhancedPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    showPrevNext={true}
+                    showFirstLast={true}
+                    containerClassName="flex justify-center items-center gap-2"
+                    buttonClassName="px-4 py-2 rounded-md transition-all duration-300"
+                    activeButtonClassName="bg-blue-600 text-white shadow-md"
+                    inactiveButtonClassName="bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    disabledButtonClassName="opacity-50 cursor-not-allowed"
+                />
+            </div>
         </div>
     );
 }

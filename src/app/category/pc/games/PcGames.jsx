@@ -255,16 +255,27 @@ export default function PcGames({ serverData, initialPage = 1 }) {
             params.delete('sortBy');
         }
 
-        // Always reset to page 1 on filter
-        params.set('page', '1');
-
         return params;
     }
 
     // Handle filter apply
     const handleApplyFilters = (filters) => {
         const params = mapFiltersToQuery(filters);
+        // Always reset to page 1 on filter change
+        params.set('page', '1');
         router.push(`/category/pc/games?${params.toString()}`);
+        setFilterModalOpen(false);
+    };
+
+    // Count active filters for badge
+    const getActiveFilterCount = () => {
+        let count = 0;
+        if (filters.genres && filters.genres.length > 0) count++;
+        if (filters.gameMode && filters.gameMode !== 'any') count++;
+        if (filters.size) count++;
+        if (filters.year) count++;
+        if (filters.popularity && filters.popularity !== 'all') count++;
+        return count;
     };
 
     // Check if any filter is active
@@ -302,7 +313,7 @@ export default function PcGames({ serverData, initialPage = 1 }) {
                     </div>
                     {/* Filter and clear buttons */}
                     <div className="flex flex-row items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} />
+                        <FilterBar onOpenFilters={() => setFilterModalOpen(true)} filtersActiveCount={getActiveFilterCount()} />
                         {isFilterActive() && (
                             <button
                                 onClick={handleClearFilters}
