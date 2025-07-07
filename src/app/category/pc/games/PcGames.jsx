@@ -378,7 +378,6 @@ export default function PcGames({ serverData, initialPage = 1 }) {
                                     alt={ele.title}
                                     onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = '/default-game-cover.jpg';
                                     }}
                                     className="w-full h-full object-cover rounded-t-xl transition-transform duration-700 ease-in-out transform group-hover:scale-110"
                                 />
