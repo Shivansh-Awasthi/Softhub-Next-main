@@ -379,6 +379,7 @@ export default function PcGames({ serverData, initialPage = 1 }) {
                                     onError={(e) => {
                                         e.target.onerror = null;
                                     }}
+                                    //
                                     className="w-full h-full object-cover rounded-t-xl transition-transform duration-700 ease-in-out transform group-hover:scale-110"
                                 />
                             </figure>
