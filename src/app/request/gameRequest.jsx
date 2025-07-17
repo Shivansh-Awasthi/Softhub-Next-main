@@ -491,121 +491,121 @@ export default function GameRequestForm() {
                                         </div>
                                     </div>
                                 ) : (
-                                <form onSubmit={handleSubmit} className="space-y-7">
-                                    {/* Game Title */}
-                                    <div>
-                                        <label htmlFor="gameTitle" className="block text-base font-semibold text-white mb-2 tracking-wide">
-                                            Game Title
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                placeholder="Enter the game title..."
-                                                value={title}
-                                                onChange={(e) => setTitle(e.target.value)}
-                                                required
-                                                maxLength={191}
-                                                className="w-full px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
-                                            />
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#7b8597]">{title.length}/191</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Steam Store URL */}
-                                    <div>
-                                        <label htmlFor="steamUrl" className="block text-base font-semibold text-white mb-2 tracking-wide">
-                                            Steam Store URL
-                                        </label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                                <FaSteam className="text-xl text-[#7b8597]" />
-                                            </div>
-                                            <input
-                                                type="url"
-                                                placeholder="https://store.steampowered.com/app/..."
-                                                value={steamLink}
-                                                onChange={(e) => setSteamLink(e.target.value)}
-                                                className="w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Platform Dropdown */}
-                                    <div>
-                                        <label htmlFor="platform" className="block text-base font-semibold text-white mb-2 tracking-wide">
-                                            Platform
-                                        </label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                                <FaGamepad className="text-xl text-[#7b8597]" />
-                                            </div>
-                                            <select
-                                                value={platform}
-                                                onChange={(e) => setPlatform(e.target.value)}
-                                                required
-                                                className={`w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none appearance-none text-base shadow-inner ${!platform ? 'text-[#7b8597]' : 'text-white'}`}
-                                            >
-                                                <option value="" disabled>Select a platform</option>
-                                                <option value="PC">PC</option>
-                                                <option value="Mac">Mac</option>
-                                            </select>
-                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                                <svg className="w-4 h-4 text-[#7b8597]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Release Verification Checkbox */}
-                                    <div className="flex items-start bg-transparent rounded-lg py-2">
-                                        <input
-                                            id="verification"
-                                            type="checkbox"
-                                            className="w-5 h-5 accent-blue-600 rounded border border-[#232c3a] mt-1 focus:ring-blue-500"
-                                            required
-                                        />
-                                        <label htmlFor="verification" className="ml-3 text-[#b2b9c9] text-sm select-none">
-                                            I verify that this game has been officially released and is patched by Scene groups or P2P community.
-                                            <button type="button" onClick={() => setShowDenuvoModal(true)} className="text-blue-400 hover:underline ml-1 inline-flex items-center focus:outline-none">
-                                                What is Denuvo? <FaInfoCircle className="ml-1" />
-                                            </button>
-                                        </label>
-                                    </div>
-
-                                    {/* Important Notice */}
-                                    <div className="p-4 rounded-xl bg-[#2a1a13]/80 border border-[#ffb86b] flex items-start gap-3">
-                                        <FaExclamationTriangle className="h-5 w-5 text-yellow-400 mt-1" />
+                                    <form onSubmit={handleSubmit} className="space-y-7">
+                                        {/* Game Title */}
                                         <div>
-                                            <h3 className="text-sm font-semibold text-yellow-200 mb-1">Important Notice</h3>
-                                            <p className="text-sm text-yellow-100">
-                                                Games protected by Denuvo DRM cannot be published on our platform. Please verify the game's DRM status before submitting your request to avoid rejection.
-                                            </p>
+                                            <label htmlFor="gameTitle" className="block text-base font-semibold text-white mb-2 tracking-wide">
+                                                Game Title
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter the game title..."
+                                                    value={title}
+                                                    onChange={(e) => setTitle(e.target.value)}
+                                                    required
+                                                    maxLength={191}
+                                                    className="w-full px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
+                                                />
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#7b8597]">{title.length}/191</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Request Processing Info */}
-                                    <div className="p-4 rounded-xl bg-[#1a2233]/80 border border-[#3b4a6b] flex items-start gap-3">
-                                        <FaInfoCircle className="h-5 w-5 text-blue-400 mt-1" />
+                                        {/* Steam Store URL */}
                                         <div>
-                                            <h3 className="text-sm font-semibold text-blue-200 mb-1">Request Processing Information</h3>
-                                            <p className="text-sm text-blue-100">
-                                                Requests require 20+ community votes for priority processing. Average processing time is 24 hours after reaching the threshold.
-                                            </p>
+                                            <label htmlFor="steamUrl" className="block text-base font-semibold text-white mb-2 tracking-wide">
+                                                Steam Store URL
+                                            </label>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                    <FaSteam className="text-xl text-[#7b8597]" />
+                                                </div>
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://store.steampowered.com/app/..."
+                                                    value={steamLink}
+                                                    onChange={(e) => setSteamLink(e.target.value)}
+                                                    className="w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] text-white border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none placeholder:text-[#7b8597] text-base shadow-inner"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Submit Button */}
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 text-lg mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                                    >
-                                        <FaPlus className="text-xl" />
-                                        {loading ? "Submitting..." : "Submit Request"}
-                                    </button>
-                                    {message && <div className="text-center text-sm mt-2 text-green-400">{message}</div>}
-                                </form>
+                                        {/* Platform Dropdown */}
+                                        <div>
+                                            <label htmlFor="platform" className="block text-base font-semibold text-white mb-2 tracking-wide">
+                                                Platform
+                                            </label>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                    <FaGamepad className="text-xl text-[#7b8597]" />
+                                                </div>
+                                                <select
+                                                    value={platform}
+                                                    onChange={(e) => setPlatform(e.target.value)}
+                                                    required
+                                                    className={`w-full pl-10 px-4 py-3 rounded-lg bg-[#181f2a] border border-[#232c3a] focus:border-blue-400 focus:ring-2 focus:ring-blue-500/40 transition-all duration-200 outline-none appearance-none text-base shadow-inner ${!platform ? 'text-[#7b8597]' : 'text-white'}`}
+                                                >
+                                                    <option value="" disabled>Select a platform</option>
+                                                    <option value="PC">PC</option>
+                                                    <option value="Mac">Mac</option>
+                                                </select>
+                                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                    <svg className="w-4 h-4 text-[#7b8597]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Release Verification Checkbox */}
+                                        <div className="flex items-start bg-transparent rounded-lg py-2">
+                                            <input
+                                                id="verification"
+                                                type="checkbox"
+                                                className="w-5 h-5 accent-blue-600 rounded border border-[#232c3a] mt-1 focus:ring-blue-500"
+                                                required
+                                            />
+                                            <label htmlFor="verification" className="ml-3 text-[#b2b9c9] text-sm select-none">
+                                                I verify that this game has been officially released and is patched by Scene groups or P2P community.
+                                                <button type="button" onClick={() => setShowDenuvoModal(true)} className="text-blue-400 hover:underline ml-1 inline-flex items-center focus:outline-none">
+                                                    What is Denuvo? <FaInfoCircle className="ml-1" />
+                                                </button>
+                                            </label>
+                                        </div>
+
+                                        {/* Important Notice */}
+                                        <div className="p-4 rounded-xl bg-[#2a1a13]/80 border border-[#ffb86b] flex items-start gap-3">
+                                            <FaExclamationTriangle className="h-5 w-5 text-yellow-400 mt-1" />
+                                            <div>
+                                                <h3 className="text-sm font-semibold text-yellow-200 mb-1">Important Notice</h3>
+                                                <p className="text-sm text-yellow-100">
+                                                    Games protected by Denuvo DRM cannot be published on our platform. Please verify the game's DRM status before submitting your request to avoid rejection.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Request Processing Info */}
+                                        <div className="p-4 rounded-xl bg-[#1a2233]/80 border border-[#3b4a6b] flex items-start gap-3">
+                                            <FaInfoCircle className="h-5 w-5 text-blue-400 mt-1" />
+                                            <div>
+                                                <h3 className="text-sm font-semibold text-blue-200 mb-1">Request Processing Information</h3>
+                                                <p className="text-sm text-blue-100">
+                                                    Requests require 20+ community votes for priority processing. Average processing time is 24 hours after reaching the threshold.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Submit Button */}
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-2 text-lg mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                                        >
+                                            <FaPlus className="text-xl" />
+                                            {loading ? "Submitting..." : "Submit Request"}
+                                        </button>
+                                        {message && <div className="text-center text-sm mt-2 text-green-400">{message}</div>}
+                                    </form>
                                 )}
                             </div>
                             {/* right card */}

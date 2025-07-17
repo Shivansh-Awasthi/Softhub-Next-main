@@ -9,14 +9,60 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import Link from 'next/link';
 
-const SingleApp = ({ appData }) => {
+const SingleApp = ({ id, platform, title }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [data, setData] = useState(appData);
+    const [data, setData] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [error, setError] = useState(null);
     const [hasAccess, setHasAccess] = useState(null); // Start with null (loading)
     const [userData, setUserData] = useState(null);
     const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+
+    // Fetch app data client-side
+    useEffect(() => {
+        const fetchAppData = async () => {
+            setError(null);
+            setData(null);
+            try {
+                const token = localStorage.getItem('token');
+                const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
+                const headers = xAuthToken ? { 'X-Auth-Token': xAuthToken } : {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                // Tr
+                // y protected route first
+                let res;
+                try {
+                    res = await axios.get(
+                        `${process.env.NEXT_PUBLIC_API_URL}/api/apps/get/${id}/protected`,
+                        { headers }
+                    );
+                    if (res.data?.app) {
+                        setData(res.data.app);
+                        return;
+                    }
+                } catch (err) {
+                    // Fallback to public route
+                    try {
+                        res = await axios.get(
+                            `${process.env.NEXT_PUBLIC_API_URL}/api/apps/get/${id}`,
+                            { headers }
+                        );
+                        if (res.data?.app) {
+                            setData(res.data.app);
+                            return;
+                        }
+                        setError(res.data?.message || 'App not found');
+                    } catch (err2) {
+                        setError(err2.response?.data?.message || 'Failed to fetch app data');
+                    }
+                }
+            } catch (err) {
+                setError('Failed to fetch app data');
+            }
+        };
+        if (id) fetchAppData();
+    }, [id]);
 
     // Robust user data fetching with API + JWT fallback
     const fetchUserData = useCallback(async () => {
@@ -84,13 +130,13 @@ const SingleApp = ({ appData }) => {
 
             if (user) {
                 const { isAdmin, isMod, isPremium } = user;
-                const hasPurchased = user.purchasedGames?.map(String).includes(String(appData._id));
-                const shouldHaveAccess = isAdmin || isMod || isPremium || !appData.isPaid || hasPurchased;
+                const hasPurchased = user.purchasedGames?.map(String).includes(String(id));
+                const shouldHaveAccess = isAdmin || isMod || isPremium || !data?.isPaid || hasPurchased;
 
                 setHasAccess(shouldHaveAccess);
             } else {
                 // No user = guest
-                setHasAccess(!appData.isPaid);
+                setHasAccess(!data?.isPaid);
             }
         } catch (error) {
             console.error("Access check error:", error);
@@ -98,7 +144,7 @@ const SingleApp = ({ appData }) => {
         } finally {
             setIsCheckingAccess(false);
         }
-    }, [appData, fetchUserData]);
+    }, [data, fetchUserData, id]);
 
     // Initial load and event listeners
     useEffect(() => {
@@ -191,10 +237,10 @@ const SingleApp = ({ appData }) => {
     }
 
     // If the app is paid and the user doesn't have access
-    if (!hasAccess) {
+    if (!hasAccess && data) {
         return (
-            <div className="flex justify-center items-center h-[40rem]">
-                <div className="text-center p-8 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-xl border border-purple-600/20 max-w-md">
+            <div className="fixed inset-0 flex justify-center items-center z-[2000]" style={{ backdropFilter: 'blur(8px)', background: 'rgba(0,0,0,0.5)' }}>
+                <div className="text-center p-8 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-xl border border-purple-600/20 max-w-md shadow-2xl" style={{ zIndex: 2001 }}>
                     <div className="mb-6">
                         <div className="bg-red-500/20 p-4 rounded-full inline-block">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,32 +250,26 @@ const SingleApp = ({ appData }) => {
                     </div>
                     <h1 className="text-2xl font-bold text-red-400 mb-4">Access Restricted</h1>
                     <p className="text-gray-300 mb-6">
-                        {appData.isPaid
-                            ? "This is a premium app. Please purchase it to access the download."
-                            : "You don't have permission to access this content."
-                        }
+                        You need to purchase the game in order to play it.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Link
                             href="/membership"
                             className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
                         >
-                            Get Membership
+                            Buy Membership
                         </Link>
-                        <button
-                            onClick={() => window.history.back()}
+                        <Link
+                            href="/"
                             className="px-6 py-3 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors duration-300"
                         >
-                            Go Back
-                        </button>
+                            Go to Home Page
+                        </Link>
                     </div>
                 </div>
             </div>
         );
     }
-
-
-
 
     return (
         <div style={{ position: 'relative' }}>
@@ -263,15 +303,15 @@ const SingleApp = ({ appData }) => {
                             <div className="relative">
                                 <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-25"></div>
                                 <img
-                                    src={data.thumbnail && data.thumbnail[0] ? data.thumbnail[0] : "https://via.placeholder.com/58"}
-                                    alt={data.title}
+                                    src={data?.thumbnail?.[0] || "https://via.placeholder.com/58"}
+                                    alt={data?.title || "App"}
                                     className="relative h-[48px] w-[48px] sm:h-[58px] sm:w-[58px] rounded-lg object-cover object-center border border-purple-500/20"
                                 />
                             </div>
                             <div className="flex w-full flex-col overflow-hidden">
                                 <div className="w-full flex items-center justify-between overflow-hidden">
                                     <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 text-base sm:text-xl md:text-xl lg:text-2xl font-bold truncate whitespace-nowrap overflow-hidden max-w-[80%]">
-                                        {data.title}
+                                        {data?.title || ""}
                                     </h1>
                                 </div>
                                 <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] text-gray-300 uppercase font-medium mt-0.5 flex items-center">
@@ -279,21 +319,21 @@ const SingleApp = ({ appData }) => {
                                         <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
                                         <path d="M12 18h.01" />
                                     </svg>
-                                    {data.platform}
+                                    {data?.platform || ""}
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Slider Logic */}
-                    {data.thumbnail && data.thumbnail.length > 1 && (
+                    {data?.thumbnail?.length > 1 && (
                         <div id="default-carousel" className="flex relative w-full max-w-full mt-6">
                             <div className="relative bg-gradient-to-br from-[#1E1E1E] to-[#121212] w-full h-[13rem] sm:h-[19rem] md:h-[20rem] lg:h-[26rem] overflow-hidden rounded-xl border border-purple-600/20 shadow-lg">
                                 {/* Ambient background elements */}
                                 <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
                                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
 
-                                {data.thumbnail.slice(1).map((image, index) => (
+                                {data?.thumbnail?.slice(1).map((image, index) => (
                                     <div key={index} className={`transition-all duration-700 ease-in-out ${index === currentIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-95 hidden'} h-full`}>
                                         <img
                                             src={image}
@@ -306,7 +346,7 @@ const SingleApp = ({ appData }) => {
 
                             {/* Slider indicators */}
                             <div className="absolute flex -translate-x-1/2 bottom-4 left-1/2 space-x-2 overflow-hidden max-w-full justify-center">
-                                {data.thumbnail.slice(1).map((_, index) => (
+                                {data?.thumbnail?.slice(1).map((_, index) => (
                                     <button
                                         key={index}
                                         type="button"
@@ -384,7 +424,7 @@ const SingleApp = ({ appData }) => {
                                     </svg>
                                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Platform</h2>
                                 </div>
-                                <p className="text-sm text-gray-100 ml-6 font-medium">{data.platform}</p>
+                                <p className="text-sm text-gray-100 ml-6 font-medium">{data?.platform || ""}</p>
                             </div>
                             {/* Interface Language */}
                             {/* <div>
@@ -410,10 +450,10 @@ const SingleApp = ({ appData }) => {
                                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tested</h2>
                                 </div>
                                 <p className="text-sm text-gray-100 ml-6 font-medium">
-                                    {data.platform === "Mac" && "Mac Air M1"}
-                                    {data.platform === "PC" && "PC"}
-                                    {data.platform === "Android" && "Android device"}
-                                    {data.platform === "Playstation" && "PC (Emulator)"}
+                                    {data?.platform === "Mac" && "Mac Air M1"}
+                                    {data?.platform === "PC" && "PC"}
+                                    {data?.platform === "Android" && "Android device"}
+                                    {data?.platform === "Playstation" && "PC (Emulator)"}
                                 </p>
                             </div>
                             {/* Size */}
@@ -424,7 +464,7 @@ const SingleApp = ({ appData }) => {
                                     </svg>
                                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Size</h2>
                                 </div>
-                                <p className="text-sm text-gray-100 ml-6 font-medium">{data.size}</p>
+                                <p className="text-sm text-gray-100 ml-6 font-medium">{data?.size || ""}</p>
                             </div>
                             {/* Updated at */}
                             <div>
@@ -435,7 +475,7 @@ const SingleApp = ({ appData }) => {
                                     </svg>
                                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Updated at</h2>
                                 </div>
-                                <p className="text-sm text-gray-100 ml-6 font-medium">{formatDate(data.updatedAt)}</p>
+                                <p className="text-sm text-gray-100 ml-6 font-medium">{data?.updatedAt ? formatDate(data.updatedAt) : ""}</p>
                             </div>
                             {/* Architecture */}
                             <div>
@@ -446,7 +486,7 @@ const SingleApp = ({ appData }) => {
                                     </svg>
                                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Architecture</h2>
                                 </div>
-                                <p className="text-sm text-gray-100 ml-6 font-medium">{data.architecture && String(data.architecture).trim() !== '' ? data.architecture : (data.platform === 'Mac' ? 'Port' : data.platform === 'PC' ? 'Native' : '')}</p>
+                                <p className="text-sm text-gray-100 ml-6 font-medium">{data?.architecture && String(data.architecture).trim() !== '' ? data.architecture : (data?.platform === 'Mac' ? 'Port' : data?.platform === 'PC' ? 'Native' : '')}</p>
                             </div>
                         </div>
                     </div>
@@ -461,7 +501,7 @@ const SingleApp = ({ appData }) => {
                                     <polyline points="7 10 12 15 17 10" />
                                     <line x1="12" y1="15" x2="12" y2="3" />
                                 </svg>
-                                Free Download ({data.size})
+                                Free Download ({data?.size || ""})
                             </div>
                         </button>
                     </div>
@@ -644,8 +684,8 @@ const SingleApp = ({ appData }) => {
                         )}
 
                         <DownloadSection
-                            platform={data.platform}
-                            downloadLinks={data.downloadLink}
+                            platform={data?.platform || ""}
+                            downloadLinks={data?.downloadLink || []}
                         />
 
                         {/* Troubleshooting Section */}
@@ -661,15 +701,17 @@ const SingleApp = ({ appData }) => {
             <div
                 className="fixed top-0 bottom-0 right-0 left-0"
                 style={{
-                    background: `linear-gradient(to top right, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%), url('${data.thumbnail[2]}')`,
+                    background: data?.thumbnail?.[2]
+                        ? `linear-gradient(to top right, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%), url('${data.thumbnail[2]}')`
+                        : 'linear-gradient(to top right, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',
-                    opacity: 0.4, // Slightly reduced opacity to make content more visible
+                    opacity: 0.4,
                     zIndex: -10,
-                    pointerEvents: 'none', // Allows interaction with elements above this
-                    height: '100vh', // Only cover the viewport height
-                    maxHeight: '100vh', // Ensure it doesn't extend beyond viewport
+                    pointerEvents: 'none',
+                    height: '100vh',
+                    maxHeight: '100vh',
                 }}
             >
             </div>
@@ -684,7 +726,7 @@ const SingleApp = ({ appData }) => {
 
                 <h2 className='pt-6 mb-8 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 relative z-10'>Comments</h2>
                 <div className='flex justify-center w-full relative z-10'>
-                    <GiscusComments objectId={data._id} />
+                    <GiscusComments objectId={data?._id || ""} />
                 </div>
             </div>
         </div>

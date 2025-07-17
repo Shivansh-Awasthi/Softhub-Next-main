@@ -53,7 +53,6 @@ export async function loginUser(formData) {
             }
         };
     } catch (error) {
-        console.error('Login error:', error);
 
         // Handle axios specific errors
         if (error.response) {
