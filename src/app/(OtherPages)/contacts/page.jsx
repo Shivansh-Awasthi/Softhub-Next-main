@@ -139,7 +139,7 @@ export default function ContactsPage() {
                   type="text"
                   id="name"
                   className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
-                  placeholder="John Doe"
+                  placeholder="Enter Your Name"
                 />
               </div>
 
@@ -149,7 +149,7 @@ export default function ContactsPage() {
                   type="email"
                   id="email"
                   className="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
-                  placeholder="john@example.com"
+                  placeholder="Enter your email address"
                 />
               </div>
 
