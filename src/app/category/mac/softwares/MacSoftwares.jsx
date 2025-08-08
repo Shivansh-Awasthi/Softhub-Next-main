@@ -8,52 +8,63 @@ import { LuAppWindowMac } from "react-icons/lu";
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function MacSoftwares({ serverData, initialPage = 1 }) {
+
+export default function MacSoftwares() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
     const ITEMS_PER_PAGE = 48;
 
-    // Extract data from server response
-    const extractData = (data) => {
-        if (data?.apps && Array.isArray(data.apps)) {
-            return {
-                apps: data.apps,
-                total: data.total || 0
-            };
-        }
-        if (data?.data && Array.isArray(data.data)) {
-            return {
-                apps: data.data,
-                total: data.total || 0
-            };
-        }
-        return {
-            apps: [],
-            total: 0
-        };
-    };
-    const { apps, total } = extractData(serverData);
-
-    const [data, setData] = useState(apps);
-    const [totalItems, setTotalItems] = useState(total);
+    const [data, setData] = useState([]);
+    const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(serverData?.error || null);
-    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const [filterModalOpen, setFilterModalOpen] = useState(false);
     const totalPages = Math.max(Math.ceil(totalItems / ITEMS_PER_PAGE), 1);
 
-    // Update state when props or URL changes
+    // Fetch data on mount and whenever filters/page changes
     useEffect(() => {
-        const { apps, total } = extractData(serverData);
-        setData(apps);
-        setTotalItems(total);
-        setError(serverData?.error || null);
-        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
-        if (pageFromUrl !== currentPage) {
-            setCurrentPage(pageFromUrl);
-        }
-    }, [serverData, searchParams]);
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const params = new URLSearchParams(searchParams.toString());
+                const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+                setCurrentPage(pageFromUrl);
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/smac?${params.toString()}`,
+                    {
+                        headers: {
+                            'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                        },
+                    }
+                );
+                if (!res.ok) {
+                    throw new Error(`API error: ${res.status}`);
+                }
+                const data = await res.json();
+                let apps = [];
+                let total = 0;
+                if (data?.apps && Array.isArray(data.apps)) {
+                    apps = data.apps;
+                    total = data.total || 0;
+                } else if (data?.data && Array.isArray(data.data)) {
+                    apps = data.data;
+                    total = data.total || 0;
+                }
+                setData(apps);
+                setTotalItems(total);
+                setError(null);
+            } catch (err) {
+                setError(err.message);
+                setData([]);
+                setTotalItems(0);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [searchParams]);
 
     // Helper: Map filter modal values to backend query params
     const mapFiltersToQuery = (filters) => {
