@@ -58,7 +58,7 @@ const SecurityRestrictions = () => {
     if (typeof window === 'undefined') return;
     if (isAdmin) return;
 
-    console.log('Non-admin user detected. Applying security restrictions.');
+
 
     // Save original console methods
     const originalConsoleLog = console.log;
