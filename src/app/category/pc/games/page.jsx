@@ -5,7 +5,6 @@ import PcGames from "./PcGames";
 
 
 export default function PcGamesPage() {
-    ;
 
     return <PcGames />;
 }
