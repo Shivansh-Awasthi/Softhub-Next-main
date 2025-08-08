@@ -5,6 +5,7 @@ import GiscusComments from './GiscusComments';
 import GameAnnouncement from './GameAnnouncement';
 import DownloadSection from './DownloadSection';
 import DescriptionTabs from './DescriptionTabs';
+import LoadingSkeleton from './LoadingSkeleton';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import Link from 'next/link';
@@ -215,16 +216,10 @@ const SingleApp = ({ id, platform, title }) => {
         };
     }, []);
 
-    // Loading state
-    if (isCheckingAccess || hasAccess === null) {
-        return (
-            <div className="flex justify-center items-center h-[40rem]">
-                <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-                    <h1 className="text-xl text-gray-300">Checking access...</h1>
-                </div>
-            </div>
-        );
+
+    // Show skeleton while loading data (before data is set or error is set)
+    if (data === null && !error) {
+        return <LoadingSkeleton />;
     }
 
     // If there's an error, show an error message
