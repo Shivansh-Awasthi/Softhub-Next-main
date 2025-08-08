@@ -17,33 +17,69 @@ const images = [
     'https://img.playbook.com/X0CxPl24l4RbK0kdRTk7NAtbQVW_5S9PYB05cE4vFZk/Z3M6Ly9wbGF5Ym9v/ay1hc3NldHMtcHVi/bGljLzM1MThlMDAx/LTNiYWQtNGQxZS1i/OWQ0LTY1MmM5MWQx/OTU4Yw'
 ];
 
-const HomeClient = ({
-    macGames,
-    macSoftwares,
-    pcGames,
-    androidGames,
-    ps2Games,
-    totalMacGames,
-    totalMacSoft,
-    totalPcGames,
-    totalAndroidGames,
-    totalPs2Iso
-}) => {
+const HomeClient = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const pathname = usePathname();
+
+    // Data state for all sections
+    const [macGames, setMacGames] = useState([]);
+    const [macSoftwares, setMacSoftwares] = useState([]);
+    const [pcGames, setPcGames] = useState([]);
+    const [androidGames, setAndroidGames] = useState([]);
+    const [ps2Games, setPs2Games] = useState([]);
+    const [totalMacGames, setTotalMacGames] = useState(0);
+    const [totalMacSoft, setTotalMacSoft] = useState(0);
+    const [totalPcGames, setTotalPcGames] = useState(0);
+    const [totalAndroidGames, setTotalAndroidGames] = useState(0);
+    const [totalPs2Iso, setTotalPs2Iso] = useState(0);
 
     // For count visitors accessible/visible only for the admins
     const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState(null);
 
-    // Check the role in localStorage on component mount
+    // Fetch all data on mount
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                const [macGamesRes, macSoftRes, pcGamesRes, androidGamesRes, ps2GamesRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?page=1&limit=48`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/smac`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/pc?page=1&limit=48`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/android`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ps2`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } })
+                ]);
+                const [macGamesData, macSoftData, pcGamesData, androidGamesData, ps2GamesData] = await Promise.all([
+                    macGamesRes.json(),
+                    macSoftRes.json(),
+                    pcGamesRes.json(),
+                    androidGamesRes.json(),
+                    ps2GamesRes.json()
+                ]);
+                setMacGames(macGamesData.apps || []);
+                setTotalMacGames(macGamesData.total || 0);
+                setMacSoftwares(macSoftData.apps || []);
+                setTotalMacSoft(macSoftData.total || 0);
+                setPcGames(pcGamesData.apps || []);
+                setTotalPcGames(pcGamesData.total || 0);
+                setAndroidGames(androidGamesData.apps || []);
+                setTotalAndroidGames(androidGamesData.total || 0);
+                setPs2Games(ps2GamesData.apps || []);
+                setTotalPs2Iso(ps2GamesData.total || 0);
+            } catch (err) {
+                // Optionally handle error
+            }
+        };
+        fetchAll();
+    }, []);
+
+    // For count visitors accessible/visible only for the admins
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const token = localStorage.getItem("token");
                 const xAuthToken = process.env.NEXT_PUBLIC_API_TOKEN;
                 if (!token) {
-                    setUserData(null);
+                    setUser(null);
                     return null;
                 }
                 // Always send Authorization, and send X-Auth-Token if available
@@ -61,9 +97,6 @@ const HomeClient = ({
                     if (admin === "ADMIN") {
                         setIsAdmin(true);
                     }
-
-
-
                 } catch (err) {
                     // If backend fails, try to decode token on frontend
                     try {
@@ -71,7 +104,6 @@ const HomeClient = ({
                         setUser({
                             username: decoded.role || decoded.role || "user",
                         });
-
                         if (decoded.role === "ADMIN") {
                             setIsAdmin(true);
                         }
@@ -91,7 +123,6 @@ const HomeClient = ({
     const createSlug = (text = '') => {
         // First ensure we have a string
         const str = String(text || '');
-
         return str
             .toLowerCase() // Convert to lowercase
             .trim() // Remove whitespace from both ends
@@ -285,7 +316,7 @@ const HomeClient = ({
                 {/* Conditional rendering based on data existence */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
                     {Array.isArray(macGames) && macGames.length > 0 ? (
-                        macGames.slice(-8).reverse().map((ele) => (
+                        macGames.slice(0, 8).reverse().map((ele) => (
                             <Link
                                 key={ele._id}
                                 href={`/download/${createSlug(ele.platform)}/${createSlug(ele.title)}/${ele._id}`}
