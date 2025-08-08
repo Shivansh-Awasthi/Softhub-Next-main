@@ -109,6 +109,15 @@ const CreateApps = () => {
         });
     };
 
+    // Converts multiple blank lines to the correct number of \n for backend
+    function convertLineBreaksToN(descriptionText) {
+        // Replace all \r\n or \r with \n for consistency
+        let normalized = descriptionText.replace(/\r\n?/g, '\n');
+        // Replace every sequence of 2 or more newlines with the same number of \n
+        // This will turn 2 newlines into \n\n, 3 into \n\n\n, etc.
+        return normalized.replace(/\n{2,}/g, (match) => '\\n'.repeat(match.length));
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -148,7 +157,8 @@ const CreateApps = () => {
 
         const formData = new FormData();
         formData.append('title', title);
-        formData.append('description', description);
+        // Convert description line breaks before sending
+        formData.append('description', convertLineBreaksToN(description));
         formData.append('platform', platform);
         formData.append('architecture', architecture);
         formData.append('tags', tags.join(','));
