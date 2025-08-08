@@ -42,7 +42,7 @@ const HomeClient = () => {
         const fetchAll = async () => {
             try {
                 const [macGamesRes, macSoftRes, pcGamesRes, androidGamesRes, ps2GamesRes] = await Promise.all([
-                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?page=1&limit=48`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?sortBy=oldest`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/smac`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/pc?page=1&limit=48`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/android`, { headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN } }),
@@ -316,7 +316,7 @@ const HomeClient = () => {
                 {/* Conditional rendering based on data existence */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
                     {Array.isArray(macGames) && macGames.length > 0 ? (
-                        macGames.slice(0, 8).reverse().map((ele) => (
+                        macGames.slice(0, 8).map((ele) => (
                             <Link
                                 key={ele._id}
                                 href={`/download/${createSlug(ele.platform)}/${createSlug(ele.title)}/${ele._id}`}

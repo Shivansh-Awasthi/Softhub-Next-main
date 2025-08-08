@@ -22,7 +22,8 @@ const slugify = (text = '') => {
         .replace(/\-\-+/g, '-');
 };
 
-export default function MacGames({ serverData, initialPage = 1 }) {
+
+export default function MacGames() {
     // Configuration
     const ITEMS_PER_PAGE = 48;
 
@@ -31,36 +32,12 @@ export default function MacGames({ serverData, initialPage = 1 }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    // Get the current page from URL or initialPage prop
-
-    // Extract data from server response
-    const extractData = (data) => {
-        if (data?.apps && Array.isArray(data.apps)) {
-            return {
-                games: data.apps,
-                total: data.total || 0
-            };
-        }
-        if (data?.data && Array.isArray(data.data)) {
-            return {
-                games: data.data,
-                total: data.total || 0
-            };
-        }
-        return {
-            games: [],
-            total: 0
-        };
-    };
-
-    const { games, total } = extractData(serverData);
-
     // State
-    const [data, setData] = useState(games);
-    const [totalApps, setTotalApps] = useState(total);
-    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [data, setData] = useState([]);
+    const [totalApps, setTotalApps] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [isPageTransitioning, setIsPageTransitioning] = useState(false);
-    const [error, setError] = useState(serverData?.error || null);
+    const [error, setError] = useState(null);
     const [purchasedGames, setPurchasedGames] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [userData, setUserData] = useState(null);
@@ -76,26 +53,47 @@ export default function MacGames({ serverData, initialPage = 1 }) {
         popularity: 'all',
     });
 
-    // Update state when props or URL changes
+    // Fetch data on mount and whenever filters/page changes
     useEffect(() => {
-        // Update data and total from server data
-        const { games, total } = extractData(serverData);
-        setData(games);
-        setTotalApps(total);
-
-        // Update current page from URL
-        const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
-        if (pageFromUrl !== currentPage) {
-            setCurrentPage(pageFromUrl);
-        }
-
-        // Reset page transition state
-        const timer = setTimeout(() => {
-            setIsPageTransitioning(false);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [serverData, searchParams]);
+        const fetchData = async () => {
+            try {
+                const params = new URLSearchParams(searchParams.toString());
+                const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
+                setCurrentPage(pageFromUrl);
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/mac?${params.toString()}`,
+                    {
+                        headers: {
+                            'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN,
+                        },
+                    }
+                );
+                if (!res.ok) {
+                    throw new Error(`API error: ${res.status}`);
+                }
+                const data = await res.json();
+                let games = [];
+                let total = 0;
+                if (data?.apps && Array.isArray(data.apps)) {
+                    games = data.apps;
+                    total = data.total || 0;
+                } else if (data?.data && Array.isArray(data.data)) {
+                    games = data.data;
+                    total = data.total || 0;
+                }
+                setData(games);
+                setTotalApps(total);
+                setError(null);
+            } catch (err) {
+                setError(err.message);
+                setData([]);
+                setTotalApps(0);
+            } finally {
+                setIsPageTransitioning(false);
+            }
+        };
+        fetchData();
+    }, [searchParams]);
 
     // Load user data from localStorage on client side
     useEffect(() => {
