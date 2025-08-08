@@ -16,71 +16,50 @@ const formatDate = (dateString) => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = '', initialPage = 1, timestamp = Date.now() }) => {
+
+const SearchResults = () => {
     const router = useRouter();
 
-    // Initialize with initialQuery
-    const [query, setQuery] = useState(initialQuery);
-
-    // Update query from URL when component mounts on client
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            // Get query from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlQuery = urlParams.get('query');
-            if (urlQuery) {
-                setQuery(urlQuery);
-            }
-        }
-    }, []);
-
-    // Store the timestamp for cache busting
-    const [searchTimestamp, setSearchTimestamp] = useState(timestamp);
-
-    const [data, setData] = useState(initialData.apps || []);
+    // Query state from URL
+    const [query, setQuery] = useState('');
+    const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(initialData.error || '');
-
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalApps, setTotalApps] = useState(initialData.total || 0);
-    const [itemsPerPage] = useState(48); // 48 items per page
-
-    // User data state
+    const [error, setError] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalApps, setTotalApps] = useState(0);
+    const itemsPerPage = 48;
     const [userData, setUserData] = useState({
         purchasedGames: [],
         isAdmin: false
     });
 
 
-    const handleData = async () => {
-        // Skip fetching if we're on the initial page (server has already fetched the data)
-        // regardless of whether results were found or not
-        if (currentPage === initialPage) {
+
+    // Fetch data from API
+    const fetchData = async (searchQuery, page) => {
+        if (!searchQuery || searchQuery.length < 1) {
+            setError(<span style={{ fontSize: '15px' }}>⚠ Search field is empty.</span>);
+            setData([]);
+            setTotalApps(0);
+            setLoading(false);
             return;
         }
-
         setLoading(true);
-
+        setError('');
         try {
-            // If query is empty, fetch all apps
-            const trimmedQuery = query ? query.trim() : '';
-
+            const trimmedQuery = searchQuery.trim();
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/apps/all?page=${currentPage}&limit=${itemsPerPage}&q=${encodeURIComponent(trimmedQuery)}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/apps/all?page=${page}&limit=${itemsPerPage}&q=${encodeURIComponent(trimmedQuery)}`,
                 {
                     headers: {
                         'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN
                     }
                 }
             );
-
             if (!response.ok) {
                 throw new Error(`API error: ${response.status}`);
             }
-
             const responseData = await response.json();
-
             if (responseData.success) {
                 setData(responseData.apps);
                 setTotalApps(responseData.total);
@@ -89,7 +68,7 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
                 setError('Failed to load data. Please try again later.');
             }
         } catch (error) {
-            console.log("Error fetching apps:", error);
+            console.error("Error fetching apps:", error);
             setError('Failed to load data. Please try again later.');
         } finally {
             setLoading(false);
@@ -97,6 +76,17 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
     };
 
     // Update URL when page changes
+
+    // Get query from URL on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlQuery = urlParams.get('query') || '';
+            setQuery(urlQuery);
+        }
+    }, []);
+
+    // Fetch user data from token
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem("token");
@@ -105,7 +95,6 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
                     const decoded = jwtDecode(token);
                     const purchasedGames = decoded?.purchasedGames || [];
                     const isAdmin = decoded?.role === 'ADMIN';
-
                     setUserData({
                         purchasedGames,
                         isAdmin
@@ -118,34 +107,21 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
     }, []);
 
 
-    // Reset currentPage to 1 and update timestamp whenever the query changes
-    useEffect(() => {
-        if (query !== initialQuery) {
-            setCurrentPage(1);
-            // Update timestamp to ensure fresh results
-            setSearchTimestamp(Date.now());
-        }
-    }, [query, initialQuery]);
 
-    // Fetch the data whenever the page, query, or timestamp changes
+    // Reset page to 1 when query changes
     useEffect(() => {
-        try {
-            if (query) {
-                handleData();
-            }
-        } catch (error) {
-            console.error("Error in data fetching effect:", error);
-            setError('An error occurred while fetching data. Please try again.');
-        }
-    }, [currentPage, query, searchTimestamp]);
-
-    // Handle empty search query state
-    useEffect(() => {
-        if (!query || query.length < 1) {
-            setError(<span style={{ fontSize: '15px' }}>⚠ Search field is empty.</span>);
-            setData([]); // Clear data when no query
-        }
+        setCurrentPage(1);
     }, [query]);
+
+    // Fetch data when query or page changes
+    useEffect(() => {
+        if (query) {
+            fetchData(query, currentPage);
+        } else {
+            setData([]);
+            setTotalApps(0);
+        }
+    }, [query, currentPage]);
 
     // Calculate total pages based on the total apps count
     const totalPages = Math.ceil(totalApps / itemsPerPage);
@@ -153,8 +129,6 @@ const SearchResults = ({ initialData = { apps: [], total: 0 }, initialQuery = ''
     // Handle Page Change
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
-
-        // Scroll to top
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
