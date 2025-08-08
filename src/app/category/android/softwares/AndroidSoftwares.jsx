@@ -8,51 +8,59 @@ import { FaAndroid } from "react-icons/fa6";
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function AndroidSoftwares({ serverData, initialPage = 1 }) {
+export default function AndroidSoftwares() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const pathname = '/category/android/softwares'; // FIX: use correct route for filters and pagination
+    const pathname = '/category/android/softwares';
     const ITEMS_PER_PAGE = 48;
-
-    // Extract data from server response
-    const extractData = (data) => {
-        if (data?.apps && Array.isArray(data.apps)) {
-            return {
-                apps: data.apps,
-                total: data.total || 0
-            };
-        }
-        if (data?.data && Array.isArray(data.data)) {
-            return {
-                apps: data.data,
-                total: data.total || 0
-            };
-        }
-        return {
-            apps: [],
-            total: 0
-        };
-    };
-    const { apps, total } = extractData(serverData);
-
-    const [data, setData] = useState(apps);
-    const [totalItems, setTotalItems] = useState(total);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(serverData?.error || null);
-    const [currentPage, setCurrentPage] = useState(initialPage);
+    const [data, setData] = useState([]);
+    const [totalItems, setTotalItems] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
     const [filterModalOpen, setFilterModalOpen] = useState(false);
     const totalPages = Math.max(Math.ceil(totalItems / ITEMS_PER_PAGE), 1);
 
     useEffect(() => {
-        const { apps, total } = extractData(serverData);
-        setData(apps);
-        setTotalItems(total);
-        setError(serverData?.error || null);
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const params = new URLSearchParams();
+                params.set('page', currentPage);
+                params.set('limit', ITEMS_PER_PAGE);
+                if (searchParams.get('tags')) params.set('tags', searchParams.get('tags'));
+                if (searchParams.get('gameMode')) params.set('gameMode', searchParams.get('gameMode'));
+                if (searchParams.get('sizeLimit')) params.set('sizeLimit', searchParams.get('sizeLimit'));
+                if (searchParams.get('releaseYear')) params.set('releaseYear', searchParams.get('releaseYear'));
+                if (searchParams.get('sortBy')) params.set('sortBy', searchParams.get('sortBy'));
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/sandroid?${params.toString()}`,
+                    {
+                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
+                    }
+                );
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const json = await res.json();
+                setData(json.apps || json.data || []);
+                setTotalItems(json.total || 0);
+            } catch (err) {
+                setError('Failed to load data: ' + err.message);
+                setData([]);
+                setTotalItems(0);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [searchParams, currentPage]);
+
+    useEffect(() => {
         const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
         if (pageFromUrl !== currentPage) {
             setCurrentPage(pageFromUrl);
         }
-    }, [serverData, searchParams]);
+    }, [searchParams, currentPage]);
 
     // Unified GENRES list for both mapping and extraction
     const GENRES = [

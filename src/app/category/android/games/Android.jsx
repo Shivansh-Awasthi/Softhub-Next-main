@@ -8,18 +8,17 @@ import { FaAndroid } from "react-icons/fa6";
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function Android({ initialData = { apps: [], total: 0 }, initialPage = 1 }) {
+export default function Android() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [data, setData] = useState(initialData.apps || []);
-    const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalItems, setTotalItems] = useState(initialData.total || 0);
     const itemsPerPage = 48;
-    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
+    const [totalItems, setTotalItems] = useState(0);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filterModalOpen, setFilterModalOpen] = useState(false);
-
-    // Persistent filter state
+    // ...existing filter state and helpers...
     const [filters, setFilters] = useState({
         genres: [],
         filterModeAny: true,
@@ -28,21 +27,48 @@ export default function Android({ initialData = { apps: [], total: 0 }, initialP
         year: '',
         popularity: 'all',
     });
-
-    // Calculate total pages
     const totalPages = totalItems > 0 ? Math.ceil(totalItems / itemsPerPage) : 1;
 
-    // Update state when props change
     useEffect(() => {
-        setData(initialData.apps || []);
-        setTotalItems(initialData.total || 0);
+        const fetchData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const params = new URLSearchParams();
+                params.set('page', currentPage);
+                params.set('limit', itemsPerPage);
+                if (searchParams.get('tags')) params.set('tags', searchParams.get('tags'));
+                if (searchParams.get('gameMode')) params.set('gameMode', searchParams.get('gameMode'));
+                if (searchParams.get('sizeLimit')) params.set('sizeLimit', searchParams.get('sizeLimit'));
+                if (searchParams.get('releaseYear')) params.set('releaseYear', searchParams.get('releaseYear'));
+                if (searchParams.get('sortBy')) params.set('sortBy', searchParams.get('sortBy'));
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/android?${params.toString()}`,
+                    {
+                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
+                    }
+                );
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const json = await res.json();
+                setData(json.apps || []);
+                setTotalItems(json.total || 0);
+            } catch (err) {
+                setError('Failed to load data: ' + err.message);
+                setData([]);
+                setTotalItems(0);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [searchParams, currentPage]);
 
-        // Update current page from URL if it changes
+    useEffect(() => {
         const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
         if (pageFromUrl !== currentPage) {
             setCurrentPage(pageFromUrl);
         }
-    }, [initialData, searchParams, currentPage]);
+    }, [searchParams, currentPage]);
 
     // Update handlePageChange to preserve filters
     const handlePageChange = (newPage) => {
