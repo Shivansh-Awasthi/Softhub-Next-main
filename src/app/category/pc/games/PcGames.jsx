@@ -8,29 +8,25 @@ import RandomGameButton from '@/app/components/RandomGameButton';
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function PcGames({ serverData, initialPage = 1 }) {
+export default function PcGames() {
     const searchParams = useSearchParams();
     const router = useRouter();
-
-    // Get current page from URL or props
     const pageFromUrl = parseInt(searchParams.get('page') || '1', 10);
 
     // Function to check if a game is new (within 2 days) with validation
     const isGameNew = (createdAt) => {
         if (!createdAt) return false;
-
         const now = new Date();
         const twoDaysAgo = new Date(now - 2 * 24 * 60 * 60 * 1000);
         const gameDate = new Date(createdAt);
-
         return !isNaN(gameDate) && gameDate >= twoDaysAgo;
     };
 
-    // Initialize with safe access to serverData
-    const [data, setData] = useState(serverData?.apps || []);
-    const [error, setError] = useState(serverData?.error || null);
-    const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalItems, setTotalItems] = useState(serverData?.total || 0);
+    // Client-side state
+    const [data, setData] = useState([]);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(pageFromUrl);
+    const [totalItems, setTotalItems] = useState(0);
     const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     // Add persistent filter state
@@ -46,12 +42,40 @@ export default function PcGames({ serverData, initialPage = 1 }) {
     const itemsPerPage = 48;
     const totalPages = Math.max(Math.ceil(totalItems / itemsPerPage), 1); // Ensure at least 1 page
 
-    // Update state when props change
+    // Fetch data on mount and whenever filters/page changes
     useEffect(() => {
-        setData(serverData?.apps || []);
-        setTotalItems(serverData?.total || 0);
-        setError(serverData?.error || null);
-    }, [serverData]);
+        const fetchData = async () => {
+            setError(null);
+            try {
+                const params = new URLSearchParams();
+                params.set('page', currentPage);
+                params.set('limit', itemsPerPage);
+                if (searchParams.get('tags')) params.set('tags', searchParams.get('tags'));
+                if (searchParams.get('gameMode')) params.set('gameMode', searchParams.get('gameMode'));
+                if (searchParams.get('sizeLimit')) params.set('sizeLimit', searchParams.get('sizeLimit'));
+                if (searchParams.get('releaseYear')) params.set('releaseYear', searchParams.get('releaseYear'));
+                if (searchParams.get('sortBy')) params.set('sortBy', searchParams.get('sortBy'));
+
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/pc?${params.toString()}`,
+                    {
+                        headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
+                    }
+                );
+                if (!res.ok) {
+                    throw new Error(`API error: ${res.status}`);
+                }
+                const json = await res.json();
+                setData(json.apps || []);
+                setTotalItems(json.total || 0);
+            } catch (err) {
+                setError('Failed to load data: ' + err.message);
+                setData([]);
+                setTotalItems(0);
+            }
+        };
+        fetchData();
+    }, [searchParams, currentPage]);
 
     // Update current page when URL changes
     useEffect(() => {
@@ -345,15 +369,13 @@ export default function PcGames({ serverData, initialPage = 1 }) {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-40 -z-10"></div>
 
             {/* Content: Loading, Error, No Data, or Data Grid */}
-            {!serverData ? (
+            {error ? (
+                <p className="text-red-500 text-center py-12">{error}</p>
+            ) : data.length === 0 ? (
                 <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
                     <p>Loading PC games...</p>
                 </div>
-            ) : error ? (
-                <p className="text-red-500 text-center py-12">{error}</p>
-            ) : data.length === 0 ? (
-                <p className="text-center py-12">No PC games found.</p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 relative">
                     {/* Grid accent elements */}
@@ -435,7 +457,7 @@ export default function PcGames({ serverData, initialPage = 1 }) {
             )}
 
             {/* Enhanced Pagination Controls */}
-            {totalPages > 1 && serverData && (
+            {totalPages > 1 && (
                 <div className="mt-12 relative">
                     <div className="absolute left-1/4 -top-8 w-24 h-24 bg-purple-600 opacity-5 rounded-full blur-2xl -z-10"></div>
                     <div className="absolute right-1/4 -top-8 w-24 h-24 bg-blue-600 opacity-5 rounded-full blur-2xl -z-10"></div>
