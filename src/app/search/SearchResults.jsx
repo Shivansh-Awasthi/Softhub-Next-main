@@ -32,6 +32,7 @@ const SearchResults = () => {
         purchasedGames: [],
         isAdmin: false
     });
+    const [hasSearched, setHasSearched] = useState(false);
 
 
 
@@ -42,10 +43,12 @@ const SearchResults = () => {
             setData([]);
             setTotalApps(0);
             setLoading(false);
+            setHasSearched(false);
             return;
         }
         setLoading(true);
         setError('');
+        setHasSearched(true);
         try {
             const trimmedQuery = searchQuery.trim();
             const response = await fetch(
@@ -120,6 +123,7 @@ const SearchResults = () => {
         } else {
             setData([]);
             setTotalApps(0);
+            setHasSearched(false);
         }
     }, [query, currentPage]);
 
@@ -156,7 +160,7 @@ const SearchResults = () => {
                         <p className="relative z-10">{error}</p>
                     </div>
                 </div>
-            ) : data.length === 0 ? (
+            ) : (!loading && data.length === 0 && hasSearched) ? (
                 <div>
                     <h1 className='text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 text-3xl font-bold mb-6'>No Results Found</h1>
                     <div className="p-6 bg-gradient-to-br from-[#1E1E1E] to-[#121212] rounded-xl text-sm text-center border border-purple-600/20 shadow-lg relative overflow-hidden">
