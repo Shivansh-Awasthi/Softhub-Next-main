@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
@@ -8,7 +8,7 @@ import { FaPlaystation } from "react-icons/fa";
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
 
-export default function PpssppIso({ serverData }) {
+export default function PpssppIso() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const initialPage = parseInt(searchParams.get('page') || '1', 10);
@@ -98,62 +98,63 @@ export default function PpssppIso({ serverData }) {
         return gameCreatedAt >= twoDaysAgo;
     };
 
-    // Initialize with server data or handle error from server
-    const [data, setData] = useState(serverData.apps || []);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(serverData.error || null);
+    // Initialize with empty data, fetch on client
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(initialPage);
-    const [totalItems, setTotalItems] = useState(serverData.total || 0);
+    const [totalItems, setTotalItems] = useState(0);
     const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     const itemsPerPage = 48;
     const totalPages = Math.max(Math.ceil(totalItems / itemsPerPage), 1); // Ensure at least 1 page
 
-    // Debug log to see what data we're receiving
-    useEffect(() => {
-    }, [serverData]);
 
+    // Update current page when URL changes
     useEffect(() => {
-        // Update current page when URL changes
         const page = parseInt(searchParams.get('page') || '1', 10);
         if (page !== currentPage) {
             setCurrentPage(page);
         }
     }, [searchParams, currentPage]);
 
+    // Fetch data on mount and whenever filters/page changes
     useEffect(() => {
-        if (currentPage === 1) return; // already have page 1 data from server
-
         const fetchData = async () => {
             setLoading(true);
+            setError(null);
             try {
+                const params = new URLSearchParams();
+                params.set('page', currentPage);
+                params.set('limit', itemsPerPage);
+                if (searchParams.get('tags')) params.set('tags', searchParams.get('tags'));
+                if (searchParams.get('gameMode')) params.set('gameMode', searchParams.get('gameMode'));
+                if (searchParams.get('sizeLimit')) params.set('sizeLimit', searchParams.get('sizeLimit'));
+                if (searchParams.get('releaseYear')) params.set('releaseYear', searchParams.get('releaseYear'));
+                if (searchParams.get('sortBy')) params.set('sortBy', searchParams.get('sortBy'));
+
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ppsspp?page=${currentPage}&limit=${itemsPerPage}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/apps/category/ppsspp?${params.toString()}`,
                     {
                         headers: { 'X-Auth-Token': process.env.NEXT_PUBLIC_API_TOKEN },
                     }
                 );
-
                 if (!res.ok) {
                     throw new Error(`API error: ${res.status}`);
                 }
-
                 const json = await res.json();
-
-                // Handle API response structure
                 setData(json.apps || []);
                 setTotalItems(json.total || 0);
-                setError(null);
             } catch (err) {
                 setError('Failed to load data: ' + err.message);
-                console.error("Client fetch failed:", err.message);
+                setData([]);
+                setTotalItems(0);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
-    }, [currentPage]);
+    }, [searchParams, currentPage]);
 
     // Helper: Map filter modal values to backend query params
     const mapFiltersToQuery = (filters) => {
