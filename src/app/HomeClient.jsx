@@ -9,6 +9,7 @@ import { FaAndroid } from "react-icons/fa";
 import { FaPlaystation } from "react-icons/fa";
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import HomeSkeleton from './components/HomeSkeleton';
 
 const images = [
     'https://i.postimg.cc/BbS29P7N/large-4e95cb1c3581c16b158ac86839992bb3-Skyrim-20header.jpg',
@@ -141,6 +142,18 @@ const HomeClient = () => {
         }, 5000);
         return () => clearInterval(interval);
     }, []);
+
+
+    const isLoading =
+        macGames.length === 0 ||
+        macSoftwares.length === 0 ||
+        pcGames.length === 0 ||
+        androidGames.length === 0 ||
+        ps2Games.length === 0;
+
+    if (isLoading) {
+        return <HomeSkeleton />;
+    }
 
     return (
         <div className="relative">
