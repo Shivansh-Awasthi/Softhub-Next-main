@@ -18,7 +18,7 @@ const Dmca = () => {
                 <p>Your request will be considered by the Site Administration within 7 (Seven) business days from the date of receipt of the request with comprehensive data and confirmation of the violation of your rights.
                 </p>
                 <br />
-                <p>In accordance with the current norms of the legislation of the Russian Federation, the Site Administration is ready to consider all disputed issues within the framework of the pre-trial settlement procedure.</p>
+                <p>In accordance with the current norms of the legislation of the Indian laws, the Site Administration is ready to consider all disputed issues within the framework of the pre-trial settlement procedure.</p>
                 <br />
             </div>
         </div>
