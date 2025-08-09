@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import CategorySkeleton from '@/app/category/CategorySkeleton';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
@@ -331,7 +332,7 @@ export default function PpssppIso() {
 
 
             {loading ? (
-                <p className="text-center">Loading...</p>
+                <CategorySkeleton itemCount={12} />
             ) : error ? (
                 <div className="text-center">
                     <p className="text-red-500 mb-4">{error}</p>
