@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function DonatePage() {
   const [fundingData, setFundingData] = useState({
-    rdr2: 950,
-    macbook: 0,
-    monthly: 0,
+    rdr2: 0,
+    macbook: 15,
+    monthly: 30,
     total: 0
   });
 
   const [goals] = useState({
-    rdr2: 1200,
+    rdr2: 1500,
     macbook: 2000,
     monthly: 100
   });
@@ -51,35 +51,9 @@ export default function DonatePage() {
     setTimeout(() => setShowThankYou(false), 5000);
   };
 
-  // Fetch data from Sheety API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('https://api.sheety.co/93ba89c95aaf4b9825dab4755b23175d/toxicgamesGoal/sheet1');
-        const data = await response.json();
 
-        if (data.sheet1 && data.sheet1.length > 0) {
-          const sheetData = data.sheet1[0];
-          setFundingData({
-            rdr2: sheetData.rdr2 || 0,
-            macbook: sheetData.macbook || 0,
-            monthly: sheetData.monthly || 0,
-            total: sheetData.total || 0
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching data from Sheety:', error);
-      }
-    };
-
-    fetchData();
-
-    // Calculate days remaining in the month
-    const today = new Date();
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const daysLeft = lastDay.getDate() - today.getDate();
-    setDaysRemaining(daysLeft);
-  }, []);
+  // Calculate days remaining in the month (static, can update manually if needed)
+  // If you want to update daysRemaining, just setDaysRemaining(newValue) from here.
 
   // Circular progress component
   const CircularProgress = ({ percentage, title, current, goal, color, size = 20 }) => (
@@ -156,7 +130,7 @@ export default function DonatePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10"></div>
             <img
               className="w-full h-auto"
-              src="https://i.postimg.cc/8CKCtDWs/4y35ygtayile1.png"
+              src="https://i.postimg.cc/MHdDkGr6/91127-horizon-zero-dawn-games-pc-games-xbox-games-ps-games-hd-4k.jpg"
               alt="Project Banner"
             />
             <div className="absolute bottom-4 left-4 z-20">
@@ -413,11 +387,11 @@ export default function DonatePage() {
           </div>
 
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400 mb-3">Ragnarok is Coming</h2>
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400 mb-3">Ragnarok is closed.</h2>
           </div>
 
           <div className="animate-pulse text-red-400 font-medium p-3 bg-black/30 rounded-lg border border-red-500/20">
-            After the completion of Red Dead Redemption 2, then the other games will be posted.
+            After the completion of above game, then the other games will be posted.
           </div>
 
           <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-orange-500 px-4 py-2 rounded-full shadow-lg flex items-center">

@@ -67,12 +67,12 @@ export default function CoffeePage() {
                                 <div className="flex items-center gap-3">
                                     <div className="flex items-center text-2xl font-bold text-amber-400">
                                         <FaRupeeSign className="mr-1" />
-                                        999
+                                        1299
                                     </div>
                                     <div className="text-gray-400">|</div>
                                     <div className="flex items-center text-2xl font-bold text-amber-400">
                                         <FaDollarSign className="mr-1" />
-                                        15
+                                        20
                                     </div>
                                 </div>
                                 <div className="text-gray-400 mt-1">one-time payment</div>

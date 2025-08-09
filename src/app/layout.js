@@ -5,7 +5,7 @@ import GlobalHeader from './components/GlobalHeader/page';
 import { LoadingProvider } from './context/LoadingContext';
 import ClientScrollProgressBar from './components/ClientScrollProgressBar';
 import SecurityRestrictions from './components/Restrict/SecurityRestrictions';
-import SnowEffect from './components/SnowEffect';
+// import SnowEffect from './components/SnowEffect';
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
         suppressHydrationWarning={true}
       >
-        <SnowEffect count={70} startAfterSidebar={true} />
+        {/* <SnowEffect count={70} startAfterSidebar={true} /> */}
         <ClientScrollProgressBar />
         <SecurityRestrictions />
         <div className="flex min-h-screen">
@@ -38,9 +38,9 @@ export default function RootLayout({ children }) {
           <div className="flex-1 w-full transition-all duration-300">
             <div className="container mx-auto px-4">
               <div className="mt-8 mb-4">
-                <Suspense fallback={<div className="w-full h-12 bg-[#242424] rounded-lg animate-pulse"></div>}>
-                  <GlobalHeader />
-                </Suspense>
+
+                <GlobalHeader />
+
               </div>
               <div className="relative">
                 <Suspense fallback={<div>Loading content...</div>}>
