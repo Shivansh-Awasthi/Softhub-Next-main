@@ -10,6 +10,7 @@ import { LuAppWindowMac } from "react-icons/lu";
 import RandomGameButton from '@/app/components/RandomGameButton';
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
+import CategorySkeleton from '../../CategorySkeleton';
 
 // Slugify function (simplified version)
 const slugify = (text = '') => {
@@ -553,24 +554,17 @@ export default function MacGames() {
                 </div>
             </div>
 
-            {data.length > 0 ? (
+            {error ? (
+                <p className="text-red-500 text-center py-12">{error}</p>
+            ) : data.length === 0 ? (
+                <CategorySkeleton itemCount={12} />
+            ) : (
                 <>
                     <div className="relative">
-                        {/* Loading overlay during page transitions */}
-                        {isPageTransitioning && (
-                            <div className="absolute inset-0 bg-[#1a1a1a] bg-opacity-70 z-10 flex items-center justify-center rounded-lg">
-                                <div className="flex flex-col items-center">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                                    <p className="text-white text-lg">Loading page {currentPage}...</p>
-                                </div>
-                            </div>
-                        )}
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 transition-opacity duration-300 ease-in-out relative">
                             {/* Grid accent elements */}
                             <div className="absolute -top-6 -left-6 w-12 h-12 border-t-2 border-l-2 border-purple-500/30 rounded-tl-lg"></div>
                             <div className="absolute -bottom-6 -right-6 w-12 h-12 border-b-2 border-r-2 border-blue-500/30 rounded-br-lg"></div>
-
                             {data.map((game) => (
                                 <GameCard
                                     key={game?._id || `game-${Math.random().toString(36).substring(2, 9)}`}
@@ -579,44 +573,24 @@ export default function MacGames() {
                             ))}
                         </div>
                     </div>
-
                     {totalPages > 1 && (
                         <div className="mt-12 relative">
                             {/* Pagination decorative elements */}
                             <div className="absolute left-1/4 -top-8 w-24 h-24 bg-purple-600 opacity-5 rounded-full blur-2xl -z-10"></div>
                             <div className="absolute right-1/4 -top-8 w-24 h-24 bg-blue-600 opacity-5 rounded-full blur-2xl -z-10"></div>
-
                             <div className="relative z-10">
                                 <EnhancedPagination
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
-                                    isLoading={isPageTransitioning}
+                                    isLoading={false}
                                 />
                             </div>
-
                             {/* Decorative line */}
                             <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/20 to-transparent -z-10"></div>
                         </div>
                     )}
                 </>
-            ) : (
-                <div className="text-center py-10 text-gray-400">
-                    No games available at the moment
-                    {isFilterActive() && (
-                        <div className="mt-4">
-                            <button
-                                onClick={handleClearFilters}
-                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
-                            >
-                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <span className="relative flex items-center gap-2 font-medium">
-                                    Clear Filters
-                                </span>
-                            </button>
-                        </div>
-                    )}
-                </div>
             )}
 
             {/* Random game button - always visible at the bottom right */}

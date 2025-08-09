@@ -7,6 +7,7 @@ import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
 import { LuAppWindowMac } from "react-icons/lu";
 import FilterBar from '@/app/components/Filtres/FilterBar';
 import FilterModal from '@/app/components/Filtres/FilterModal';
+import CategorySkeleton from '../../CategorySkeleton';
 
 
 export default function MacSoftwares() {
@@ -326,48 +327,15 @@ export default function MacSoftwares() {
                 </div>
             </div>
 
-            {loading ? (
-                <p className="text-center">Loading...</p>
-            ) : error ? (
-                <div className="text-center text-red-500">
-                    {error}
-                    {isFilterActive() && (
-                        <div className="mt-4">
-                            <button
-                                onClick={handleClearFilters}
-                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
-                            >
-                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <span className="relative flex items-center gap-2 font-medium">
-                                    Clear Filters
-                                </span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+            {error ? (
+                <p className="text-red-500 text-center py-12">{error}</p>
             ) : data.length === 0 ? (
-                <div className="text-center py-10 text-gray-400">
-                    No Mac softwares found.
-                    {isFilterActive() && (
-                        <div className="mt-4">
-                            <button
-                                onClick={handleClearFilters}
-                                className="group relative px-4 py-2 rounded-xl bg-white dark:bg-gray-900 text-red-500 border border-red-200/50 dark:border-red-700/50 hover:border-red-500/50 dark:hover:border-red-500/50 shadow-sm hover:shadow transition-all duration-300"
-                            >
-                                <div className="absolute inset-0 rounded-xl bg-red-500/5 dark:bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <span className="relative flex items-center gap-2 font-medium">
-                                    Clear Filters
-                                </span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                <CategorySkeleton itemCount={12} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 relative">
                     {/* Grid accent elements */}
                     <div className="absolute -top-6 -left-6 w-12 h-12 border-t-2 border-l-2 border-purple-500/30 rounded-tl-lg"></div>
                     <div className="absolute -bottom-6 -right-6 w-12 h-12 border-b-2 border-r-2 border-blue-500/30 rounded-br-lg"></div>
-
                     {data.map((ele) => (
                         <Link
                             key={ele._id}
@@ -377,7 +345,6 @@ export default function MacSoftwares() {
                             {/* Ambient background elements - always visible */}
                             <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-600 opacity-10 rounded-full blur-xl"></div>
                             <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-600 opacity-10 rounded-full blur-xl"></div>
-
                             <div className="flex flex-col justify-center items-center h-36 bg-gradient-to-br from-[#1E1E1E] to-[#121212] pt-4 relative">
                                 {/* App icon with enhanced styling */}
                                 <div className="relative">
@@ -388,7 +355,6 @@ export default function MacSoftwares() {
                                         className="relative rounded-lg w-16 h-16 transition-transform duration-700 ease-in-out transform group-hover:scale-110 border border-purple-500/20 z-10"
                                     />
                                 </div>
-
                                 {/* Software platform badge */}
                                 <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md z-20 border border-purple-600/20">
                                     <div className="text-[10px] font-medium text-blue-400 flex items-center">
@@ -396,7 +362,6 @@ export default function MacSoftwares() {
                                         Mac App
                                     </div>
                                 </div>
-
                                 {/* NEW badge for software within 2 days */}
                                 {isGameNew(ele.createdAt) && (
                                     <div className="absolute top-2 right-2 z-20">
