@@ -135,6 +135,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
         };
     };
 
+
     const { games, total } = extractData(serverData);
 
     // State
@@ -634,12 +635,13 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
                                 <div className="font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
                                         Mac Exclusive Games{' '}
-                                        <span className="font-medium text-blue-400">0</span>
+                                        <span className="font-medium text-blue-400">{total}</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     {/* Description text - responsive for small screens */}
                     <p className="text-gray-400 max-w-2xl mx-auto mb-6 text-sm sm:text-base md:text-lg px-4 sm:px-0">
@@ -738,7 +740,7 @@ export default function Ps4Iso({ serverData, initialPage = 1 }) {
                             <div className="font-bold text-lg sm:text-2xl md:text-3xl lg:text-4xl">
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
                                     Mac Exclusive Games{' '}
-                                    <span className="font-medium text-blue-400">0</span>
+                                    <span className="font-medium text-blue-400">{total}</span>
                                 </span>
                             </div>
                         </div>
