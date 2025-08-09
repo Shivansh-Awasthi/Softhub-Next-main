@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import CategorySkeleton from '@/app/category/CategorySkeleton';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
@@ -372,10 +373,7 @@ export default function PcGames() {
             {error ? (
                 <p className="text-red-500 text-center py-12">{error}</p>
             ) : data.length === 0 ? (
-                <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-                    <p>Loading PC games...</p>
-                </div>
+                <CategorySkeleton itemCount={12} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 relative">
                     {/* Grid accent elements */}

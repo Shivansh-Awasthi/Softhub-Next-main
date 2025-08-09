@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import CategorySkeleton from '@/app/category/CategorySkeleton';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import EnhancedPagination from '@/app/components/Pagination/EnhancedPagination';
@@ -327,7 +328,7 @@ export default function Android() {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTMwIDMwaDMwVjBoLTMwdjMwek0wIDMwaDMwdjMwSDB2LTMweiIgZmlsbD0iIzJkMmQyZCIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] bg-center opacity-40 -z-10"></div>
 
             {loading ? (
-                <p className="text-center">Loading...</p>
+                <CategorySkeleton itemCount={12} />
             ) : error ? (
                 <div className="text-center">
                     <p className="text-red-500 mb-4">{error}</p>
